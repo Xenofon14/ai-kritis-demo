@@ -63,6 +63,28 @@
   transition: 0.2s;
 }
 
+    /* === Διάταξη χαρακτήρων σε grid === */
+#characterSelection {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 16px;
+  justify-items: center;
+}
+
+.character img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.character img:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 12px rgba(255,255,255,0.4);
+}
+    
   </style>
 </head>
 <body>
@@ -537,8 +559,6 @@ async function getComment(transcript, mission) {
     return "Σφάλμα στο σχόλιο.";
   }
 }
-
-
 
 // === Κουμπί Βαθμολογίας ===
 document.getElementById("scoreBtn").addEventListener("click", async ()=>{
