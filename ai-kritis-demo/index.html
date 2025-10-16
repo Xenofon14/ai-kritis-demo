@@ -63,26 +63,34 @@
   transition: 0.2s;
 }
 
-    /* === Διάταξη χαρακτήρων σε grid === */
+  /* === Διάταξη χαρακτήρων σε πλέγμα === */
 #characterSelection {
   display: grid !important;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 20px;
   justify-items: center;
+  margin-top: 20px;
+}
+
+.character {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 10px;
+  text-align: center;
+  width: 120px;
 }
 
 .character img {
-  width: 100px;
-  height: 100px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  box-shadow: 0 0 8px rgba(0,0,0,0.3);
-  transition: transform 0.2s, box-shadow 0.2s;
+  margin-bottom: 5px;
+  transition: transform 0.2s;
 }
 
 .character img:hover {
   transform: scale(1.08);
-  box-shadow: 0 0 12px rgba(255,255,255,0.4);
 }
     
   </style>
