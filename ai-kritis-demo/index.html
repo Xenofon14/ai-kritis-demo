@@ -394,6 +394,14 @@ function renderActivePlayer() {
   document.getElementById('roundTotal').textContent = game.totalRounds;
   const bonusBtn = document.getElementById('bonusBtn');
   bonusBtn.disabled = p.bonusLeft <= 0;
+  // ενημέρωσε και το εμφανιζόμενο κείμενο του γύρου
+document.getElementById('roundLabel').textContent = game.currentRound;
+document.getElementById('roundTotal').textContent = game.totalRounds;
+
+// Εμφάνισε μήνυμα για τον γύρο κάτω από το όνομα
+const comment = document.getElementById("socraticComment");
+comment.textContent = `🌀 Παίζουμε γύρο ${game.currentRound} από ${game.totalRounds}`;
+
 }
 
 function loadMissions(){
