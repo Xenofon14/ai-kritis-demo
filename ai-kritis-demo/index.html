@@ -418,6 +418,8 @@ function renderMission(id){
 /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
+let remainingTime = 90;
+let isPaused = false;
 
 function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
