@@ -512,7 +512,7 @@ function initSTT(){
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
 });
-
+ 
 /* ---------- Listen button ---------- */
 document.getElementById("listenBtn").addEventListener("click", ()=>{
   if(!recognition){ initSTT(); }
