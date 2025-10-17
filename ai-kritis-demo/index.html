@@ -620,7 +620,7 @@ document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
   renderActivePlayer();
   clearInterval(timerInterval);
   isTimerRunning = false;
-  startTimer(game.baseTimeSec);
+  document.getElementById("timer").textContent = "1:30";
 });
 
 document.getElementById('bonusBtn').addEventListener('click', ()=>{
