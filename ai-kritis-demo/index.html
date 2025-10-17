@@ -515,6 +515,7 @@ function initSTT(){
     }
     document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
   };
+}
 
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
