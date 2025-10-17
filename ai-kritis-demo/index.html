@@ -475,6 +475,12 @@ let recognition = null;
 let recognizing = false;
 let finalTranscript = "";
 
+// === Speech-to-Text ===
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let recognizing = false;
+let finalTranscript = "";
+
 function initSTT(){
   if(!SpeechRecognition){
     alert("Ο browser δεν υποστηρίζει Speech Recognition. Πρότεινεται Chrome σε desktop/Android.");
@@ -493,6 +499,7 @@ function initSTT(){
   };
 
   recognition.onend = () => {
+    // αν ο γύρος τρέχει, ξαναξεκινάμε την ακρόαση (ώσπου να πατήσει stop ή να λήξει ο χρόνος)
     if (isTimerRunning && recognizing) {
       try { recognition.start(); return; } catch(e) {}
     }
@@ -514,10 +521,12 @@ function initSTT(){
     }
     document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
   };
+} // <-- ΠΡΟΣΟΧΗ: Κλείνει εδώ, μόνο μία αγκύλη!
 
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
 });
+
 
 // Όταν ξεκινάει η ακρόαση, ξεκινάει και το χρονόμετρο 1:30
 document.getElementById("listenBtn").addEventListener("click", ()=>{
