@@ -475,12 +475,6 @@ let recognition = null;
 let recognizing = false;
 let finalTranscript = "";
 
-// === Speech-to-Text ===
-const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-let recognition = null;
-let recognizing = false;
-let finalTranscript = "";
-
 function initSTT(){
   if(!SpeechRecognition){
     alert("Ο browser δεν υποστηρίζει Speech Recognition. Πρότεινεται Chrome σε desktop/Android.");
