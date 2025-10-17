@@ -414,8 +414,21 @@ function renderMission(id){
   document.getElementById("missionQuestion").textContent = `${m.title}: ${m.question}`;
   document.getElementById("missionSelect").value = id;
 }
+/* ---------- Advance turn & round ---------- */
+function advanceTurn() {
+  // Προχώρησε στον επόμενο παίκτη
+  game.activeIndex = (game.activeIndex + 1) % game.players.length;
 
-/* ---------- Timer ---------- */
+  // Αν γυρίσαμε στον πρώτο παίκτη, σημαίνει ότι ολοκληρώθηκε ένας γύρος
+  if (game.activeIndex === 0 && game.currentRound < game.totalRounds) {
+    game.currentRound++;
+  }
+
+  // Ενημέρωσε την οθόνη
+  renderActivePlayer();
+}
+
+  /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
 let remainigTimeTime = 90;
@@ -447,24 +460,13 @@ function startTimer(durationSec = 90) {
       audio.play();
       try { if (recognition && recognizing) recognition.stop(); } catch (e) {}
 
-      // 👉 Αν τελείωσαν όλοι οι παίκτες, πήγαινε στον επόμενο γύρο
-      game.activeIndex = (game.activeIndex + 1) % game.players.length;
-      if (game.activeIndex === 0) {
-        if (game.currentRound < game.totalRounds) {
-          game.currentRound++;
-        }
-      }
-
-      renderActivePlayer(); // ✅ ενημερώνει τον γύρο (1/2 → 2/2)
-      document.getElementById('roundLabel').textContent = game.currentRound;
-      document.getElementById('roundTotal').textContent = game.totalRounds;
-  return;
+      advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
+      return;
     }
 
     updateDisplay();
   }, 1000);
 }
-
 
    /* ---------- Pause / Resume button ---------- */
 document.getElementById("pauseBtn").addEventListener("click", () => {
