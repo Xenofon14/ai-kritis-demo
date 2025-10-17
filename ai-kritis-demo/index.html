@@ -493,10 +493,17 @@ function initSTT(){
     document.getElementById("listenBtn").classList.add("recording");
     document.getElementById("listenBtn").textContent = "■ Σταμάτα την ακρόαση";
   };
-  recognition.onend = () => {
-    recognizing = false;
-    document.getElementById("listenBtn").classList.remove("recording");
-    document.getElementById("listenBtn").textContent = "🎙️ Ο Σωκράτης ακούει";
+  
+ recognition.onend = () => {
+  // αν ο γύρος τρέχει, ξαναξεκινάμε την ακρόαση (ώσπου να πατήσει stop ή να λήξει ο χρόνος)
+  if (isTimerRunning && recognizing) {
+    try { recognition.start(); return; } catch(e) {}
+  }
+  recognizing = false;
+  document.getElementById("listenBtn").classList.remove("recording");
+  document.getElementById("listenBtn").textContent = "🎙️ Ο Σωκράτης ακούει";
+};
+
   };
   recognition.onerror = (e) => {
     console.warn("STT error:", e.error);
