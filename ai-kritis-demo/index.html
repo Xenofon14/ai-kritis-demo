@@ -428,50 +428,44 @@ function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
   isTimerRunning = true;
   isPaused = false;
-  remainigTimeTime = durationSec;
-   
+  remainingTime = durationSec; // ✅ σωστό όνομα μεταβλητής
+
   function updateDisplay() {
-    const minutes = Math.floor(remainigTimeTime / 60);
-    const seconds = remainigTimeTime % 60;
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
     document.getElementById("timer").textContent =
-      `${minutes}:${seconds.toString().padStart(2,"0")}`;
+      `${minutes}:${seconds.toString().padStart(2, "0")}`;
   }
 
   updateDisplay();
   timerInterval = setInterval(() => {
-    remainigTimeTime--;
-    if (remainingTime < 0) {
-  clearInterval(timerInterval);
-  isTimerRunning = false;
-  document.getElementById("timer").textContent = "⏰ Τέλος!";
-  const audio = new Audio("sounds/philosophical_chime.mp3");
-  audio.play();
-  try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
+    if (isPaused) return; // ⏸️ δεν μειώνει χρόνο αν έχει παύση
+    remainingTime--;
 
-  // ➕ Νέο κομμάτι λογικής τέλους γύρου:
-  const nextIndex = (game.activeIndex + 1) % game.players.length;
-  if (nextIndex !== 0) {
-    // υπάρχουν ακόμη παίκτες
-    document.getElementById("socraticComment").textContent =
-      "Ο χρόνος τελείωσε. Επόμενος παίκτης μπορεί να πατήσει 🎙️ Ο Σωκράτης ακούει.";
-  } else {
-    // γύρος ολοκληρώθηκε
-    document.getElementById("socraticComment").textContent =
-      "🎯 Ο γύρος ολοκληρώθηκε! Πάτησε 'Βαθμολογία' για να δεις τα αποτελέσματα.";
-    document.getElementById("timer").textContent = "0:00";
-    // ανανέωσε τον γύρο, αν δεν είναι ο τελευταίος
-    if (game.currentRound < game.totalRounds) {
-      game.currentRound++;
+    if (remainingTime < 0) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      document.getElementById("timer").textContent = "⏰ Τέλος!";
+      const audio = new Audio("sounds/philosophical_chime.mp3");
+      audio.play();
+      try { if (recognition && recognizing) recognition.stop(); } catch (e) {}
+
+      // 👉 Αν τελείωσαν όλοι οι παίκτες, πήγαινε στον επόμενο γύρο
+      game.activeIndex = (game.activeIndex + 1) % game.players.length;
+      if (game.activeIndex === 0) {
+        if (game.currentRound < game.totalRounds) {
+          game.currentRound++;
+        }
+      }
+
+      renderActivePlayer(); // ✅ ενημερώνει τον γύρο (1/2 → 2/2)
+      return;
     }
-  }
-  renderActivePlayer();
-      renderActivePlayer(); // ✅ ενημέρωσε τα στοιχεία στην οθόνη
-  return;
-}
 
     updateDisplay();
   }, 1000);
 }
+
 
    /* ---------- Pause / Resume button ---------- */
 document.getElementById("pauseBtn").addEventListener("click", () => {
