@@ -394,9 +394,6 @@ function renderActivePlayer() {
   document.getElementById('roundTotal').textContent = game.totalRounds;
   const bonusBtn = document.getElementById('bonusBtn');
   bonusBtn.disabled = p.bonusLeft <= 0;
-  // ενημέρωσε και το εμφανιζόμενο κείμενο του γύρου
-document.getElementById('roundLabel').textContent = game.currentRound;
-document.getElementById('roundTotal').textContent = game.totalRounds;
 }
 
 function loadMissions(){
@@ -459,7 +456,9 @@ function startTimer(durationSec = 90) {
       }
 
       renderActivePlayer(); // ✅ ενημερώνει τον γύρο (1/2 → 2/2)
-      return;
+      document.getElementById('roundLabel').textContent = game.currentRound;
+      document.getElementById('roundTotal').textContent = game.totalRounds;
+  return;
     }
 
     updateDisplay();
