@@ -419,6 +419,7 @@ function renderMission(id){
 
 // === Χρονόμετρο 1:30 ===
 let timerInterval = null;
+let isTimerRunning = false;
 
 function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
