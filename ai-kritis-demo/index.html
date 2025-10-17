@@ -437,15 +437,34 @@ function startTimer(durationSec = 90) {
   updateDisplay();
   timerInterval = setInterval(() => {
     remainigTimeTime--;
-    if (remainigTimeTime < 0) {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      document.getElementById("timer").textContent = "⏰ Τέλος!";
-      const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-      audio.play();
-      try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
-      return;
+    if (remainingTime < 0) {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  document.getElementById("timer").textContent = "⏰ Τέλος!";
+  const audio = new Audio("sounds/philosophical_chime.mp3");
+  audio.play();
+  try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
+
+  // ➕ Νέο κομμάτι λογικής τέλους γύρου:
+  const nextIndex = (game.activeIndex + 1) % game.players.length;
+  if (nextIndex !== 0) {
+    // υπάρχουν ακόμη παίκτες
+    document.getElementById("socraticComment").textContent =
+      "Ο χρόνος τελείωσε. Επόμενος παίκτης μπορεί να πατήσει 🎙️ Ο Σωκράτης ακούει.";
+  } else {
+    // γύρος ολοκληρώθηκε
+    document.getElementById("socraticComment").textContent =
+      "🎯 Ο γύρος ολοκληρώθηκε! Πάτησε 'Βαθμολογία' για να δεις τα αποτελέσματα.";
+    document.getElementById("timer").textContent = "0:00";
+    // ανανέωσε τον γύρο, αν δεν είναι ο τελευταίος
+    if (game.currentRound < game.totalRounds) {
+      game.currentRound++;
     }
+  }
+  renderActivePlayer();
+  return;
+}
+
     updateDisplay();
   }, 1000);
 }
