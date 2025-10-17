@@ -347,7 +347,7 @@ document.getElementById("playerCount").addEventListener("change", () => {
 <div class="panel score" id="totalScore">—/10</div>
 
 <script>
-
+/* ---------- Missions ---------- */
 const missions = [
   {id:"M-001",title:"Δίκαιο",question:"Τι είναι δίκαιο;"},
   {id:"M-002",title:"Φιλία",question:"Τι σημαίνει να είμαι φίλος;"},
@@ -372,7 +372,7 @@ const missions = [
   {id:"M-021",title:"Τεχνητή Νοημοσύνη",question:"Πόση Τεχνητή Νοημοσύνη είναι αρκετή;"}
 ];
 
-// === Αρχικό state παιχνιδιού (προσωρινό MVP) ===
+/* ---------- Game state ---------- */
 const game = {
   players: [
     { id: 'p1', name: 'Λία', color: '#ffd166', bonusLeft: 1 },
@@ -380,26 +380,24 @@ const game = {
   ],
   currentRound: 1,
   totalRounds: 2,
-  activeIndex: 0,       // ποιος παίζει τώρα
+  activeIndex: 0,
   baseTimeSec: 90
 };
 
 function renderActivePlayer() {
   const p = game.players[game.activeIndex];
-  // Όνομα & avatar
   document.getElementById('activePlayerName').textContent = p.name;
   document.getElementById('activeAvatar').textContent = p.name[0] || 'Π';
   document.getElementById('activeAvatar').style.background = p.color || '#cfe0ff';
-  // Γύροι
   document.getElementById('roundLabel').textContent = game.currentRound;
   document.getElementById('roundTotal').textContent = game.totalRounds;
-  // Bonus κουμπί (θα το “δέσουμε” αργότερα με λογική)
   const bonusBtn = document.getElementById('bonusBtn');
   bonusBtn.disabled = p.bonusLeft <= 0;
 }
 
 function loadMissions(){
   const sel = document.getElementById("missionSelect");
+  sel.innerHTML = "";
   missions.forEach(m=>{
     const opt = document.createElement("option");
     opt.value = m.id;
@@ -416,12 +414,13 @@ function renderMission(id){
   document.getElementById("missionSelect").value = id;
 }
 
-// === Χρονόμετρο 1:30 ===
+/* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
 
 function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
+  isTimerRunning = true;
   let remaining = durationSec;
 
   function updateDisplay() {
@@ -434,25 +433,20 @@ function startTimer(durationSec = 90) {
   updateDisplay();
   timerInterval = setInterval(() => {
     remaining--;
-if (remaining < 0) {
-  clearInterval(timerInterval);
-  isTimerRunning = false;
-  document.getElementById("timer").textContent = "⏰ Τέλος!";
-
-  // Πιο ήρεμος ήχος
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
-  audio.play();
-
-  // Σταμάτα αυτόματα το μικρόφωνο αν είναι ενεργό
-  try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
-  return;
-}
-    
+    if (remaining < 0) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      document.getElementById("timer").textContent = "⏰ Τέλος!";
+      const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
+      audio.play();
+      try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
+      return;
+    }
     updateDisplay();
   }, 1000);
 }
 
-// === Φωνή Σωκράτη (Text-to-Speech) ===
+/* ---------- Text-to-Speech (Socrates) ---------- */
 document.getElementById("speakBtn").addEventListener("click", ()=>{
   const comment = document.getElementById("socraticComment").textContent.trim();
   if(!comment || comment==="—"){ 
@@ -460,27 +454,24 @@ document.getElementById("speakBtn").addEventListener("click", ()=>{
     return;
   }
   const utterance = new SpeechSynthesisUtterance(comment);
-
-  // Προσπάθησε να βρει ελληνική φωνή
   const voices = speechSynthesis.getVoices();
   const greekVoice = voices.find(v => v.lang.startsWith("el"));
   if(greekVoice) utterance.voice = greekVoice;
-
   speechSynthesis.speak(utterance);
 });
 
-// === Speech-to-Text ===
+/* ---------- Speech-to-Text ---------- */
 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 let recognition = null;
 let recognizing = false;
 let finalTranscript = "";
+let shouldListen = false; // για αυτόματη επανεκκίνηση όσο “τρέχει” ο γύρος
 
 function initSTT(){
   if(!SpeechRecognition){
     alert("Ο browser δεν υποστηρίζει Speech Recognition. Πρότεινεται Chrome σε desktop/Android.");
     return;
   }
-
   recognition = new SpeechRecognition();
   recognition.continuous = true;
   recognition.interimResults = true;
@@ -493,11 +484,12 @@ function initSTT(){
   };
 
   recognition.onend = () => {
-    // αν ο γύρος τρέχει, ξαναξεκινάμε την ακρόαση (ώσπου να πατήσει stop ή να λήξει ο χρόνος)
-    if (isTimerRunning && recognizing) {
+    recognizing = false;
+    // αν ο χρόνος “τρέχει” και θέλουμε να συνεχίσει η ακρόαση, ξαναξεκίνα
+    if (shouldListen && isTimerRunning) {
       try { recognition.start(); return; } catch(e) {}
     }
-    recognizing = false;
+    // αλλιώς, επανάφερε το κουμπί
     document.getElementById("listenBtn").classList.remove("recording");
     document.getElementById("listenBtn").textContent = "🎙️ Ο Σωκράτης ακούει";
   };
@@ -515,52 +507,50 @@ function initSTT(){
     }
     document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
   };
-} // <-- ΠΡΟΣΟΧΗ: Κλείνει εδώ, μόνο μία αγκύλη!
+}
 
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
 });
 
-
-// Όταν ξεκινάει η ακρόαση, ξεκινάει και το χρονόμετρο 1:30
+/* ---------- Listen button ---------- */
 document.getElementById("listenBtn").addEventListener("click", ()=>{
   if(!recognition){ initSTT(); }
   if(!recognition){ return; }
+
   if(!recognizing){
+    shouldListen = true;
     finalTranscript = document.getElementById("transcript").value.trim() + " ";
     recognition.start();
-    startTimer(90); // <-- ξεκινάει το χρονόμετρο
+    startTimer(game.baseTimeSec || 90);
   }else{
+    shouldListen = false;
     recognition.stop();
-    clearInterval(timerInterval); // σταματάει το χρονόμετρο
+    clearInterval(timerInterval);
+    isTimerRunning = false;
   }
 });
 
-// Όταν αλλάζεις Αποστολή στο dropdown, ενημερώνει τον τίτλο/ερώτημα
+/* ---------- Mission select ---------- */
 document.getElementById("missionSelect").addEventListener("change", (e)=>{
   renderMission(e.target.value);
 });
 
-// Μόλις αρχίσει να γράφει ο παίκτης, ξεκινά ο χρόνος αν δεν «τρέχει» ήδη
+/* ---------- Start timer on typing ---------- */
 document.getElementById("transcript").addEventListener("input", () => {
   if (!isTimerRunning) {
     startTimer(game.baseTimeSec || 90);
   }
 });
 
-// === Σταθερή Βαθμολογία (temperature 0) μέσω του server ===
+/* ---------- Server calls ---------- */
 async function getScore(transcript, mission) {
   try {
     const response = await fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "score",
-        transcript,
-        mission
-      })
+      body: JSON.stringify({ type: "score", transcript, mission })
     });
-
     const data = await response.json();
     return data;
   } catch (err) {
@@ -568,19 +558,13 @@ async function getScore(transcript, mission) {
   }
 }
 
-/// === Σχόλιο Σωκράτη (temperature 0.5) μέσω του server ===
 async function getComment(transcript, mission) {
   try {
     const response = await fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        type: "comment",
-        transcript,
-        mission
-      })
+      body: JSON.stringify({ type: "comment", transcript, mission })
     });
-
     const data = await response.json();
     return data.comment || "—";
   } catch (err) {
@@ -588,17 +572,15 @@ async function getComment(transcript, mission) {
   }
 }
 
-// === Κουμπί Βαθμολογίας ===
+/* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=>{
   const transcript = document.getElementById("transcript").value.trim();
   const missionId = document.getElementById("missionSelect").value;
   const mission = missions.find(m=>m.id===missionId);
 
-  // Κλήσεις για βαθμολογία + σχόλιο
   const scores = await getScore(transcript, mission);
   const comment = await getComment(transcript, mission);
 
-  // Αν υπήρξε σφάλμα
   if(scores.error){
     document.getElementById("socraticComment").textContent = scores.error;
     document.getElementById("totalScore").textContent = "--/10";
@@ -606,13 +588,10 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=>{
     return;
   }
 
-  // Ενημέρωση σχολίου
   document.getElementById("socraticComment").textContent = comment;
 
-  // Εμφάνιση αναλυτικής βαθμολογίας
   const criteriaList = document.getElementById("criteriaList");
-  criteriaList.innerHTML = ""; // καθάρισε παλιά στοιχεία
-
+  criteriaList.innerHTML = "";
   if(scores.criteria){
     for(const [k,v] of Object.entries(scores.criteria)){
       const li = document.createElement("li");
@@ -620,58 +599,48 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=>{
       criteriaList.appendChild(li);
     }
   }
-
-  // Εμφάνιση συνολικού σκορ
   document.getElementById("totalScore").textContent = scores.total + "/10";
 });
 
-function toggleBusy(b){
-  const btn = document.getElementById("scoreBtn");
-  btn.disabled = b;
-  btn.textContent = b ? "Υπολογισμός…" : "⚖️ Βαθμολογία";
-}
-
-// Εναλλαγή ενεργού παίκτη (κυκλικά)
+/* ---------- Next player / Bonus ---------- */
 document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
   game.activeIndex = (game.activeIndex + 1) % game.players.length;
   renderActivePlayer();
   clearInterval(timerInterval);
+  isTimerRunning = false;
   startTimer(game.baseTimeSec);
 });
 
-// Bonus +30"
 document.getElementById('bonusBtn').addEventListener('click', ()=>{
   const p = game.players[game.activeIndex];
   if(p.bonusLeft > 0){
-    p.bonusLeft--; // χάνει την κάρτα
-    // πρόσθεσε 30 sec στο χρονόμετρο
+    p.bonusLeft--;
     const timerEl = document.getElementById("timer").textContent;
     if(/^\d+:\d+$/.test(timerEl)){
       const [min, sec] = timerEl.split(":").map(Number);
       let remaining = min*60 + sec + 30;
       startTimer(remaining);
     }
-    renderActivePlayer(); // ενημέρωσε το κουμπί (να γκριζάρει)
+    renderActivePlayer();
   }
 });
 
+/* ---------- Boot ---------- */
 loadMissions();
 renderActivePlayer();
 
-// === Εκκίνηση Παιχνιδιού ===
+/* ---------- Start Game (setup → app) ---------- */
 document.getElementById("startGameBtn").addEventListener("click", () => {
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
   const useBonus = document.getElementById("useBonus").checked;
 
-  // Βρες ποιοι χαρακτήρες επιλέχθηκαν
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
     alert("Παρακαλώ επίλεξε όσους χαρακτήρες όσοι είναι οι παίκτες!");
     return;
   }
 
-  // Δημιούργησε τη λίστα παικτών του παιχνιδιού
   game.players = selected.slice(0, playerCount).map(el => ({
     id: el.dataset.id,
     name: el.dataset.name,
@@ -683,23 +652,22 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   game.totalRounds = roundCount;
   game.activeIndex = 0;
 
-  // Απόκρυψε την οθόνη ρυθμίσεων
   document.getElementById("setupScreen").style.display = "none";
-
-  // Εμφάνισε τον πρώτο παίκτη
   renderActivePlayer();
-}); //
-  
-// === Εναλλαγή από Αρχική Οθόνη σε Setup Screen ===
+});
+
+/* ---------- Welcome → Setup ---------- */
 document.getElementById("goToSetup").addEventListener("click", () => {
   document.getElementById("welcomeScreen").style.display = "none";
   document.getElementById("setupScreen").style.display = "flex";
 });
 
-// === Κουμπί Πληροφορίες (εμφανίζει οδηγίες παιχνιδιού) ===
+/* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
   alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
 });
+</script>
+
 
 </script>
 </body>
