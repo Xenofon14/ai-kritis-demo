@@ -633,10 +633,12 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=>{
 
 /* ---------- Next player / Bonus ---------- */
 document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
-  game.activeIndex = (game.activeIndex + 1) % game.players.length;
-  renderActivePlayer();
   clearInterval(timerInterval);
   isTimerRunning = false;
+  isPaused = false;
+  remainingTime = game.baseTimeSec; // επαναφορά χρόνου
+
+  advanceTurn(); // ✅ ενιαία λογική αλλαγής παίκτη και γύρου
   document.getElementById("timer").textContent = "1:30";
 });
 
