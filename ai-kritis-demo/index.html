@@ -418,27 +418,26 @@ function renderMission(id){
 /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
-let remainingTime = 90;
+let remainigTimeTime = 90;
 let isPaused = false;
 
 function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
   isTimerRunning = true;
   isPaused = false;
-  remainingTime = durationSec;
-
+  remainigTimeTime = durationSec;
    
   function updateDisplay() {
-    const minutes = Math.floor(remainingTime / 60);
-    const seconds = remainingTime % 60;
+    const minutes = Math.floor(remainigTimeTime / 60);
+    const seconds = remainigTimeTime % 60;
     document.getElementById("timer").textContent =
       `${minutes}:${seconds.toString().padStart(2,"0")}`;
   }
 
   updateDisplay();
   timerInterval = setInterval(() => {
-    remaining--;
-    if (remainingTime < 0) {
+    remainigTimeTime--;
+    if (remainigTimeTime < 0) {
       clearInterval(timerInterval);
       isTimerRunning = false;
       document.getElementById("timer").textContent = "⏰ Τέλος!";
@@ -630,8 +629,8 @@ document.getElementById('bonusBtn').addEventListener('click', ()=>{
     const timerEl = document.getElementById("timer").textContent;
     if(/^\d+:\d+$/.test(timerEl)){
       const [min, sec] = timerEl.split(":").map(Number);
-      let remaining = min*60 + sec + 30;
-      startTimer(remaining);
+      let remainigTime = min*60 + sec + 30;
+      startTimer(remainigTime);
     }
     renderActivePlayer();
   }
