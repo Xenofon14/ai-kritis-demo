@@ -514,7 +514,6 @@ function initSTT(){
       else interim += res[0].transcript;
     }
     document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
-  };
 }
 
 document.getElementById("langSelect").addEventListener("change", () => {
