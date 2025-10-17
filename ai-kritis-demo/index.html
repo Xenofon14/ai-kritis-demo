@@ -315,7 +315,6 @@ document.getElementById("playerCount").addEventListener("change", () => {
   </div>
 </div>
 
-
   <div class="row">
     <select id="missionSelect"></select>
     <select id="langSelect" title="Γλώσσα Ακρόασης">
@@ -446,14 +445,12 @@ if (remaining < 0) {
 
   // Σταμάτα αυτόματα το μικρόφωνο αν είναι ενεργό
   try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
-
   return;
 }
     
     updateDisplay();
   }, 1000);
 }
-
 
 // === Φωνή Σωκράτη (Text-to-Speech) ===
 document.getElementById("speakBtn").addEventListener("click", ()=>{
@@ -541,6 +538,13 @@ document.getElementById("listenBtn").addEventListener("click", ()=>{
 // Όταν αλλάζεις Αποστολή στο dropdown, ενημερώνει τον τίτλο/ερώτημα
 document.getElementById("missionSelect").addEventListener("change", (e)=>{
   renderMission(e.target.value);
+});
+
+// Μόλις αρχίσει να γράφει ο παίκτης, ξεκινά ο χρόνος αν δεν «τρέχει» ήδη
+document.getElementById("transcript").addEventListener("input", () => {
+  if (!isTimerRunning) {
+    startTimer(game.baseTimeSec || 90);
+  }
 });
 
 // === Σταθερή Βαθμολογία (temperature 0) μέσω του server ===
