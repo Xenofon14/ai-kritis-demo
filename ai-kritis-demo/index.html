@@ -427,6 +427,7 @@ function startTimer(durationSec = 90) {
   isPaused = false;
   remainingTime = durationSec;
 
+   
   function updateDisplay() {
     const minutes = Math.floor(remainingTime / 60);
     const seconds = remainingTime % 60;
@@ -436,32 +437,8 @@ function startTimer(durationSec = 90) {
 
   updateDisplay();
   timerInterval = setInterval(() => {
-    if (isPaused) return; // ⏸️ δεν μειώνει τον χρόνο αν έχει παύση
-    remainingTime--;
-    if (remainingTime < 0) {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      document.getElementById("timer").textContent = "⏰ Τέλος!";
-      const audio = new Audio("sounds/philosophical_chime.mp3");
-      audio.play();
-      try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
-      return;
-    }
-    updateDisplay();
-  }, 1000);
-}
-
-  function updateDisplay() {
-    const minutes = Math.floor(remaining / 60);
-    const seconds = remaining % 60;
-    document.getElementById("timer").textContent =
-      `${minutes}:${seconds.toString().padStart(2,"0")}`;
-  }
-
-  updateDisplay();
-  timerInterval = setInterval(() => {
     remaining--;
-    if (remaining < 0) {
+    if (remainingTime < 0) {
       clearInterval(timerInterval);
       isTimerRunning = false;
       document.getElementById("timer").textContent = "⏰ Τέλος!";
@@ -473,6 +450,13 @@ function startTimer(durationSec = 90) {
     updateDisplay();
   }, 1000);
 }
+
+   /* ---------- Pause / Resume button ---------- */
+document.getElementById("pauseBtn").addEventListener("click", () => {
+  if (!isTimerRunning) return;
+  isPaused = !isPaused;
+  document.getElementById("pauseBtn").textContent = isPaused ? "▶️ Συνέχεια" : "⏸️ Παύση";
+});
 
 /* ---------- Text-to-Speech (Socrates) ---------- */
 document.getElementById("speakBtn").addEventListener("click", ()=>{
