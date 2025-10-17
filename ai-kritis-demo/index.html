@@ -618,6 +618,8 @@ function toggleBusy(b){
 document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
   game.activeIndex = (game.activeIndex + 1) % game.players.length;
   renderActivePlayer();
+  clearInterval(timerInterval);
+  startTimer(game.baseTimeSec);
 });
 
 // Bonus +30"
