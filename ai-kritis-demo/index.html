@@ -493,7 +493,6 @@ function initSTT(){
   };
 
   recognition.onend = () => {
-    // αν ο γύρος τρέχει, ξαναξεκινάμε την ακρόαση (ώσπου να πατήσει stop ή να λήξει ο χρόνος)
     if (isTimerRunning && recognizing) {
       try { recognition.start(); return; } catch(e) {}
     }
@@ -514,8 +513,8 @@ function initSTT(){
       else interim += res[0].transcript;
     }
     document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
-}
-
+  };
+}  
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
 });
