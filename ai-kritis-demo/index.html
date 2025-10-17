@@ -435,17 +435,21 @@ function startTimer(durationSec = 90) {
   updateDisplay();
   timerInterval = setInterval(() => {
     remaining--;
-   if (remaining < 0) {
+if (remaining < 0) {
   clearInterval(timerInterval);
+  isTimerRunning = false;
   document.getElementById("timer").textContent = "⏰ Τέλος!";
 
-  // Παίξε ήχο ειδοποίησης
-  const audio = new Audio("https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg");
+  // Πιο ήρεμος ήχος
+  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/wood_plank_flicks.ogg");
   audio.play();
+
+  // Σταμάτα αυτόματα το μικρόφωνο αν είναι ενεργό
+  try { if (recognition && recognizing) recognition.stop(); } catch(e) {}
 
   return;
 }
-   
+    
     updateDisplay();
   }, 1000);
 }
