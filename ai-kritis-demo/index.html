@@ -473,36 +473,47 @@ function advanceTurn() {
   renderActivePlayer();
 }
 
-/* ---------- Αποτελέσματα Αποστολής ---------- */
+  /* ---------- Αποτελέσματα Αποστολής ---------- */
 function showResultsSummary() {
   // ✅ Υπολογισμός τελικών σκορ από το game.scores (με ασφάλεια)
   const totalScores = {};
   game.players.forEach(p => {
     const arr = game.scores[p.name] || [];
-    const validNumbers = arr.filter
+    const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
+    const sum = validNumbers.length > 0 ? validNumbers.reduce((a, b) => a + b, 0) : 0;
+    totalScores[p.name] = sum;
+  });
 
- // ✅ Επιλογή ρήσης ανάλογα με την Αποστολή
-const currentMission = document.getElementById("missionSelect").value;
-const availableQuotes = quotesByMission[currentMission] || [];
+  // ✅ Εύρεση νικητή (με το μεγαλύτερο άθροισμα)
+  const winner = Object.keys(totalScores).reduce((a, b) =>
+    totalScores[a] > totalScores[b] ? a : b
+  );
 
-let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
-if (availableQuotes.length > 0) {
-  const random = Math.floor(Math.random() * availableQuotes.length);
-  selectedQuote = `«${availableQuotes[random].quote}» — ${availableQuotes[random].author}`;
-}
+  // ✅ Επιλογή ρήσης ανάλογα με την Αποστολή
+  const currentMission = document.getElementById("missionSelect").value;
+  const availableQuotes = quotesByMission[currentMission] || [];
 
-document.getElementById("socratesQuote").textContent = selectedQuote;
+  let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
+  if (availableQuotes.length > 0) {
+    const random = Math.floor(Math.random() * availableQuotes.length);
+    selectedQuote = `«${availableQuotes[random].quote}» — ${availableQuotes[random].author}`;
+  }
+  document.getElementById("socratesQuote").textContent = selectedQuote;
 
   // ✅ Δημιουργία λίστας με τα αποτελέσματα
   let html = "<ul style='list-style:none; padding:0;'>";
-  for (let p in totalScores) {
-    const arr = game.scores[p] || [];
-    const average = arr.length > 0 ? (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1) : "—";
-    html += `<li><strong>${p}</strong>: ${totalScores[p]} πόντοι (Μ.Ο.: ${average})</li>`;
-  }
+  game.players.forEach(p => {
+    const arr = game.scores[p.name] || [];
+    const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
+    const average = validNumbers.length > 0
+      ? (validNumbers.reduce((a, b) => a + b, 0) / validNumbers.length).toFixed(1)
+      : "—";
+    const sum = totalScores[p.name] || 0;
+    html += `<li><strong>${p.name}</strong>: ${sum} πόντοι (Μ.Ο.: ${average})</li>`;
+  });
   html += `</ul><p style="margin-top:15px;">🏆 Νικητής: <strong>${winner}</strong></p>`;
 
-  // ✅ Εμφάνιση
+  // ✅ Εμφάνιση modal με τα αποτελέσματα
   document.getElementById("resultsSummary").innerHTML = html;
   document.getElementById("resultModal").style.display = "flex";
 
@@ -515,7 +526,7 @@ document.getElementById("socratesQuote").textContent = selectedQuote;
     document.getElementById("resultModal").style.display = "none";
   };
 }
-  
+
   /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
