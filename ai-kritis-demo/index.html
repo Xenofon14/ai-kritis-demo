@@ -388,7 +388,8 @@ const game = {
   currentRound: 1,
   totalRounds: 2,
   activeIndex: 0,
-  baseTimeSec: 90
+  baseTimeSec: 90,
+   scores: {}   // ✅ εδώ δηλώνουμε τον χώρο όπου θα αποθηκεύονται οι βαθμολογίες
 };
 
 function renderActivePlayer() {
@@ -443,42 +444,48 @@ function advanceTurn() {
 
 /* ---------- Αποτελέσματα Αποστολής ---------- */
 function showResultsSummary() {
-  // Παράδειγμα προσωρινών δεδομένων (θα συνδέσουμε κανονικά αργότερα)
-  const scores = {};
+  // ✅ Υπολογισμός τελικών σκορ από το game.scores
+  const totalScores = {};
   game.players.forEach(p => {
-    const totalText = document.getElementById("totalScore").textContent;
-    const total = parseInt(totalText) || Math.floor(Math.random() * 10) + 1;
-    scores[p.name] = total;
+    const arr = game.scores[p.name] || [];
+    const sum = arr.reduce((a, b) => a + b, 0);
+    totalScores[p.name] = sum;
   });
 
-  // Βρες νικητή
-  const winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+  // ✅ Βρες τον νικητή (με το μεγαλύτερο άθροισμα)
+  const winner = Object.keys(totalScores).reduce((a, b) =>
+    totalScores[a] > totalScores[b] ? a : b
+  );
 
-  // Τυχαία φράση Σωκράτη
+  // ✅ Φράσεις του Σωκράτη
   const quotes = [
     "Η αλήθεια λάμπει μέσα από τον διάλογο.",
     "Δεν διδάσκω· βοηθώ να γεννηθεί η σκέψη.",
     "Το σημαντικό δεν είναι να έχεις δίκιο, αλλά να αναζητάς το αληθινό.",
-    "Όποιος ξέρει ότι δεν ξέρει, ήδη γνωρίζει κάτι σπουδαίο."
+    "Όποιος ξέρει ότι δεν ξέρει, ήδη γνωρίζει κάτι σπουδαίο.",
+    "Η ψυχή του ανθρώπου γίνεται όμορφη με την αλήθεια."
   ];
-
   document.getElementById("socratesQuote").textContent =
     quotes[Math.floor(Math.random() * quotes.length)];
 
-  // Δημιουργία HTML λίστας αποτελεσμάτων
+  // ✅ Δημιουργία λίστας με τα αποτελέσματα
   let html = "<ul style='list-style:none; padding:0;'>";
-  for (let p in scores) {
-    html += `<li><strong>${p}</strong>: ${scores[p]} / 10</li>`;
+  for (let p in totalScores) {
+    const arr = game.scores[p] || [];
+    const average = (arr.reduce((a, b) => a + b, 0) / arr.length).toFixed(1);
+    html += `<li><strong>${p}</strong>: ${totalScores[p]} πόντοι (Μ.Ο.: ${average})</li>`;
   }
   html += `</ul><p style="margin-top:15px;">🏆 Νικητής: <strong>${winner}</strong></p>`;
 
+  // ✅ Εμφάνιση
   document.getElementById("resultsSummary").innerHTML = html;
   document.getElementById("resultModal").style.display = "flex";
 
-  // Ήχος αναγγελίας
+  // ✅ Ήχος
   const audio = new Audio("sounds/philosophical_chime.mp3");
   audio.play();
 
+  // ✅ Κουμπί “Επόμενη Αποστολή”
   document.getElementById("nextMissionBtn").onclick = () => {
     document.getElementById("resultModal").style.display = "none";
   };
@@ -685,6 +692,11 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=>{
     }
   }
   document.getElementById("totalScore").textContent = scores.total + "/10";
+  
+  // ✅ Αποθήκευση σκορ ανά παίκτη
+  const activePlayer = game.players[game.activeIndex].name;
+  if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
+  game.scores[activePlayer].push(scores.total);
 });
 
 /* ---------- Next player / Bonus ---------- */
