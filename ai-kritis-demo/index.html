@@ -43,6 +43,88 @@
   border-radius: 12px;
   padding: 10px;
 }
+
+    /* === Νέος σχεδιασμός βαθμολογίας === */
+#socraticPanel {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+  position: relative;
+  border-left: 4px solid #f2c14e;
+}
+
+.socrates-header {
+  font-weight: 700;
+  color: #f2c14e;
+  margin-bottom: 8px;
+}
+
+.socrates-comment {
+  font-style: italic;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+/* Κριτήρια */
+#criteriaPanel {
+  background: rgba(255,255,255,0.08);
+  border-radius: 15px;
+  margin-top: 15px;
+  padding: 12px 15px;
+}
+
+.criteria-header {
+  font-weight: 700;
+  color: #6ee0ff;
+  margin-bottom: 8px;
+}
+
+#criteriaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#criteriaList li {
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#criteriaList li::before {
+  content: "•";
+  color: #6ee0ff;
+  margin-right: 6px;
+}
+
+/* Συνολικό σκορ */
+#scorePanel {
+  text-align: center;
+  background: linear-gradient(135deg,#ffd166,#ff7e5f);
+  border-radius: 20px;
+  padding: 12px;
+  margin-top: 15px;
+  color: #001;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.score-label {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.score-value {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+    
 #timer {
   color: #ffde59;
 }
@@ -340,18 +422,23 @@ document.getElementById("playerCount").addEventListener("change", () => {
   <button id="pauseBtn" class="btn-secondary" style="margin-left:10px;min-width:100px;">⏸️ Παύση</button>
 </div>
 
-  <div class="panel">
-    <strong>Σχόλιο Σωκράτη:</strong>
-    <div id="socraticComment">—</div>
-  </div>
-
-<!-- Ανάλυση Βαθμολογίας πάει εδώ -->
-<div class="panel" id="criteriaPanel">
-  <strong>Ανάλυση Βαθμολογίας:</strong>
-  <ul id="criteriaList" style="margin:5px 0 0 15px; padding:0;"></ul>
+<!-- 💬 Σχόλιο Σωκράτη -->
+<div class="panel" id="socraticPanel">
+  <div class="socrates-header">💬 Ο Σωκράτης σχολιάζει:</div>
+  <div id="socraticComment" class="socrates-comment">—</div>
 </div>
 
-<div class="panel score" id="totalScore">—/10</div>
+<!-- ⚖️ Ανάλυση Βαθμολογίας -->
+<div class="panel" id="criteriaPanel">
+  <div class="criteria-header">⚖️ Ανάλυση Βαθμολογίας</div>
+  <ul id="criteriaList"></ul>
+</div>
+
+<!-- 🌟 Συνολικό Σκορ -->
+<div id="scorePanel">
+  <div class="score-label">Συνολική Βαθμολογία</div>
+  <div class="score-value" id="totalScore">—/10</div>
+</div>
 
 <script>
 /* ---------- Missions ---------- */
