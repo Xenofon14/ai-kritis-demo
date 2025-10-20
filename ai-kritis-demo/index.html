@@ -455,21 +455,23 @@ function renderMission(id){
   
 /* ---------- Advance turn & round ---------- */
 function advanceTurn() {
-  // Προχώρησε στον επόμενο παίκτη
-  game.activeIndex = (game.activeIndex + 1) % game.players.length;
+  // Ελέγχουμε αν ο τωρινός παίκτης ήταν ο τελευταίος του τελευταίου γύρου
+  const isLastPlayer = game.activeIndex === game.players.length - 1;
+  const isLastRound = game.currentRound === game.totalRounds;
 
-  // Αν γυρίσαμε στον πρώτο παίκτη, σημαίνει ότι ολοκληρώθηκε ένας γύρος
-  if (game.activeIndex === 0 && game.currentRound < game.totalRounds) {
+  if (isLastPlayer && isLastRound) {
+    showResultsSummary(); // ✅ τώρα τελειώνει αφού παίξουν όλοι στον τελευταίο γύρο
+    return;
+  }
+
+  // Διαφορετικά, απλώς αλλάζουμε παίκτη / γύρο
+  game.activeIndex++;
+
+  if (game.activeIndex >= game.players.length) {
+    game.activeIndex = 0;
     game.currentRound++;
   }
 
-  // Αν φτάσαμε στον τελευταίο παίκτη του τελευταίου γύρου ➜ δείξε αποτελέσματα
-  if (game.currentRound === game.totalRounds && game.activeIndex === 0) {
-    showResultsSummary();
-    return; // σταματά εδώ, δεν χρειάζεται να πάει σε νέο γύρο
-  }
-  
-  // Ενημέρωσε την οθόνη
   renderActivePlayer();
 }
 
