@@ -723,12 +723,15 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=>{
       criteriaList.appendChild(li);
     }
   }
-  document.getElementById("totalScore").textContent = scores.total + "/10";
-  
-  // ✅ Αποθήκευση σκορ ανά παίκτη
+   // ✅ Εμφάνιση συνολικού σκορ (ασφαλής μετατροπή σε αριθμό)
+  const totalNum = Number(scores.total);
+  document.getElementById("totalScore").textContent = (isFinite(totalNum) ? totalNum : 0) + "/10";
+
+  // ✅ Αποθήκευση σκορ ανά παίκτη, 1 εγγραφή ανά γύρο (όχι διπλές)
   const activePlayer = game.players[game.activeIndex].name;
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
-  game.scores[activePlayer].push(scores.total);
+  const roundIndex = game.currentRound - 1; // 0-based index
+  game.scores[activePlayer][roundIndex] = isFinite(totalNum) ? totalNum : 0;
 });
 
 /* ---------- Next player / Bonus ---------- */
