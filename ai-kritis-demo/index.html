@@ -698,13 +698,22 @@ document.getElementById("socratesQuote").innerHTML = quoteHTML;
   document.getElementById("resultsSummary").innerHTML = html;
   document.getElementById("resultModal").style.display = "flex";
 
-  // Ήχος
-  try {
-    const audio = new Audio("sounds/philosophical_chime.mp3");
-    audio.play();
-  } catch (e) {
-    console.warn("Audio failed:", e);
+// ✅ Ήχος - Σωκράτειο Καμπανάκι
+try {
+  const audio = new Audio("sounds/philosophical_chime.mp3");
+  audio.volume = 0.6;          // 🎧 ήπια ένταση
+  audio.currentTime = 0;       // ξεκινά πάντα από την αρχή
+  audio.play().catch(err => console.warn("Audio blocked:", err));
+
+  // ✨ Εφέ λάμψης στο modal (αν υπάρχει)
+  const modalBox = document.querySelector("#resultModal > div");
+  if (modalBox) {
+    modalBox.classList.add("glow");
+    setTimeout(() => modalBox.classList.remove("glow"), 1500);
   }
+
+} catch (e)
+ 
 
   // Επόμενη Αποστολή
   document.getElementById("nextMissionBtn").onclick = () => {
@@ -740,8 +749,14 @@ function startTimer(durationSec = 90) {
       clearInterval(timerInterval);
       isTimerRunning = false;
       document.getElementById("timer").textContent = "⏰ Τέλος!";
-      const audio = new Audio("sounds/philosophical_chime.mp3");
-      audio.play();
+      // ✅ Ήχος λήξης χρόνου - Σωκράτειο Καμπανάκι
+try {
+  const audio = new Audio("sounds/philosophical_chime.mp3");
+  audio.volume = 0.6;          // πιο ήπια ένταση
+  audio.currentTime = 0;       // ξεκινά πάντα απ’ την αρχή
+  audio.play().catch(err => console.warn("Audio blocked:", err));
+} catch
+
       try { if (recognition && recognizing) recognition.stop(); } catch (e) {}
 
       advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
