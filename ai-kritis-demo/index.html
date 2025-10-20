@@ -13,8 +13,68 @@
     button { width:100%; padding:14px; border-radius:20px; border:0; font-size:18px; margin:10px 0; cursor:pointer; }
     .btn-primary { background:linear-gradient(135deg,#cde7ff,#caa5ff); color:#000; }
     .btn-secondary { background:linear-gradient(135deg,#6ee0ff,#3db8ff); color:#002140; }
-    .panel { background:rgba(255,255,255,.08); border-radius:15px; padding:12px; margin:10px 0; }
-    .score { font-size:20px; font-weight:700; text-align:center; margin-top:10px; }
+
+/* === Βελτιωμένη εμφάνιση πίνακα βαθμολογίας === */
+.panel {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  transition: 0.3s ease;
+}
+.panel:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#criteriaPanel strong {
+  color: #6ee0ff;
+  font-size: 17px;
+}
+
+#criteriaList {
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+}
+#criteriaList li {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#criteriaList li::before {
+  content: "•";
+  color: #6ee0ff;
+  margin-right: 6px;
+}
+
+#socraticComment {
+  font-style: italic;
+  color: #e0ecff;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/* === Εμφάνιση συνολικής βαθμολογίας === */
+#totalScore {
+  text-align: center;
+  background: linear-gradient(135deg, #ffd166, #ff7e5f);
+  color: #001;
+  border-radius: 20px;
+  padding: 14px;
+  margin-top: 15px;
+  font-size: 26px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+    
     .tiny { font-size:12px; color:#cfe0ff; opacity:.9 }
     .row { display:flex; gap:8px; }
     .row > * { flex:1; }
