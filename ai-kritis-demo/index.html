@@ -475,19 +475,11 @@ function advanceTurn() {
 
 /* ---------- Αποτελέσματα Αποστολής ---------- */
 function showResultsSummary() {
-  // ✅ Υπολογισμός τελικών σκορ από το game.scores
+  // ✅ Υπολογισμός τελικών σκορ από το game.scores (με ασφάλεια)
   const totalScores = {};
   game.players.forEach(p => {
     const arr = game.scores[p.name] || [];
-// ✅ Αν δεν υπάρχουν βαθμολογίες, δώσε 0
-const sum = arr.length > 0 ? arr.reduce((a, b) => a + b, 0) : 0;
-totalScores[p.name] = sum; 
-  });
-
-  // ✅ Βρες τον νικητή (με το μεγαλύτερο άθροισμα)
-  const winner = Object.keys(totalScores).reduce((a, b) =>
-    totalScores[a] > totalScores[b] ? a : b
-  );
+    const validNumbers = arr.filter
 
  // ✅ Επιλογή ρήσης ανάλογα με την Αποστολή
 const currentMission = document.getElementById("missionSelect").value;
@@ -698,46 +690,53 @@ async function getComment(transcript, mission) {
 }
 
 /* ---------- Score button ---------- */
-document.getElementById("scoreBtn").addEventListener("click", async ()=>{
+document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const transcript = document.getElementById("transcript").value.trim();
   const missionId = document.getElementById("missionSelect").value;
-  const mission = missions.find(m=>m.id===missionId);
+  const mission = missions.find(m => m.id === missionId);
 
   const scores = await getScore(transcript, mission);
   const comment = await getComment(transcript, mission);
 
-  if(scores.error){
+  // Αν αποτύχει το API
+  if (scores.error) {
     document.getElementById("socraticComment").textContent = scores.error;
     document.getElementById("totalScore").textContent = "--/10";
     document.getElementById("criteriaList").innerHTML = "";
     return;
   }
 
+  // Εμφάνισε σχόλιο
   document.getElementById("socraticComment").textContent = comment;
 
+  // Ανάλυση κριτηρίων
   const criteriaList = document.getElementById("criteriaList");
   criteriaList.innerHTML = "";
-  if(scores.criteria){
-    for(const [k,v] of Object.entries(scores.criteria)){
+  if (scores.criteria) {
+    for (const [k, v] of Object.entries(scores.criteria)) {
       const li = document.createElement("li");
       li.textContent = `${k}: ${v}/2`;
       criteriaList.appendChild(li);
     }
   }
 
-  // ✅ Μετατροπή βαθμολογίας σε αριθμό (ακόμα κι αν έρθει ως string ή "8/10")
-let totalNum = 0;
-if (scores.total) {
-  const match = String(scores.total).match(/\d+(\.\d+)?/);
-  if (match) totalNum = parseFloat(match[0]);
-}
-document.getElementById("totalScore").textContent = `${totalNum}/10`;
+  // ✅ Μετατροπή βαθμολογίας σε αριθμό (ανεξαρτήτως μορφής)
+  let totalNum = 0;
+  if (scores.total) {
+    const match = String(scores.total).match(/\d+(\,\d+|\.\d+)?/);
+    if (match) totalNum = parseFloat(match[0].replace(",", "."));
+  }
 
-  // ✅ Αποθήκευση σκορ ανά παίκτη, 1 εγγραφή ανά γύρο (όχι διπλές)
+  // Εμφάνιση
+  document.getElementById("totalScore").textContent = `${totalNum}/10`;
+
+  // ✅ Αποθήκευση σκορ ανά παίκτη
   const activePlayer = game.players[game.activeIndex].name;
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
-  const roundIndex = game.currentRound - 1; // 0-based index
-  game.scores[activePlayer][roundIndex] = isFinite(totalNum) ? totalNum : 0;
+  const roundIndex = game.currentRound - 1; // 0-based
+  game.scores[activePlayer][roundIndex] = totalNum;
+
+  console.log("✅ Αποθηκεύτηκε σκορ:", activePlayer, totalNum, game.scores);
 });
 
 /* ---------- Next player / Bonus ---------- */
