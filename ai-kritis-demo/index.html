@@ -414,6 +414,7 @@ function renderMission(id){
   document.getElementById("missionQuestion").textContent = `${m.title}: ${m.question}`;
   document.getElementById("missionSelect").value = id;
 }
+  
 /* ---------- Advance turn & round ---------- */
 function advanceTurn() {
   // Προχώρησε στον επόμενο παίκτη
@@ -424,10 +425,59 @@ function advanceTurn() {
     game.currentRound++;
   }
 
+  // Αν φτάσαμε στον τελευταίο παίκτη του τελευταίου γύρου ➜ δείξε αποτελέσματα
+  if (game.currentRound === game.totalRounds && game.activeIndex === 0) {
+    showResultsSummary();
+    return; // σταματά εδώ, δεν χρειάζεται να πάει σε νέο γύρο
+  }
+  
   // Ενημέρωσε την οθόνη
   renderActivePlayer();
 }
 
+/* ---------- Αποτελέσματα Αποστολής ---------- */
+function showResultsSummary() {
+  // Παράδειγμα προσωρινών δεδομένων (θα συνδέσουμε κανονικά αργότερα)
+  const scores = {};
+  game.players.forEach(p => {
+    const totalText = document.getElementById("totalScore").textContent;
+    const total = parseInt(totalText) || Math.floor(Math.random() * 10) + 1;
+    scores[p.name] = total;
+  });
+
+  // Βρες νικητή
+  const winner = Object.keys(scores).reduce((a, b) => scores[a] > scores[b] ? a : b);
+
+  // Τυχαία φράση Σωκράτη
+  const quotes = [
+    "Η αλήθεια λάμπει μέσα από τον διάλογο.",
+    "Δεν διδάσκω· βοηθώ να γεννηθεί η σκέψη.",
+    "Το σημαντικό δεν είναι να έχεις δίκιο, αλλά να αναζητάς το αληθινό.",
+    "Όποιος ξέρει ότι δεν ξέρει, ήδη γνωρίζει κάτι σπουδαίο."
+  ];
+
+  document.getElementById("socratesQuote").textContent =
+    quotes[Math.floor(Math.random() * quotes.length)];
+
+  // Δημιουργία HTML λίστας αποτελεσμάτων
+  let html = "<ul style='list-style:none; padding:0;'>";
+  for (let p in scores) {
+    html += `<li><strong>${p}</strong>: ${scores[p]} / 10</li>`;
+  }
+  html += `</ul><p style="margin-top:15px;">🏆 Νικητής: <strong>${winner}</strong></p>`;
+
+  document.getElementById("resultsSummary").innerHTML = html;
+  document.getElementById("resultModal").style.display = "flex";
+
+  // Ήχος αναγγελίας
+  const audio = new Audio("sounds/philosophical_chime.mp3");
+  audio.play();
+
+  document.getElementById("nextMissionBtn").onclick = () => {
+    document.getElementById("resultModal").style.display = "none";
+  };
+}
+  
   /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
@@ -698,6 +748,39 @@ document.getElementById("infoButton").addEventListener("click", () => {
   alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
 });
 
+<!-- === MODAL ΑΝΑΚΟΙΝΩΣΗΣ ΑΠΟΤΕΛΕΣΜΑΤΟΣ === -->
+<div id="resultModal" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3000;
+  color:white;
+  font-family: system-ui, Arial;
+  text-align:center;
+  padding:20px;
+">
+  <div style="background:#142f70; border-radius:20px; padding:30px; max-width:600px; box-shadow:0 0 30px rgba(0,0,0,0.4);">
+    <h2>🏛️ Ο Σωκράτης λέει:</h2>
+    <p id="socratesQuote" style="font-style:italic; font-size:1.2em; margin:20px 0;"></p>
+    <h3>📜 Αποτελέσματα Αποστολής</h3>
+    <div id="resultsSummary" style="margin-top:10px;"></div>
+    <button id="nextMissionBtn" style="
+      margin-top:25px;
+      background:#f2c14e;
+      border:none;
+      padding:12px 25px;
+      border-radius:10px;
+      font-weight:bold;
+      cursor:pointer;
+      color:#000;
+    ">Επόμενη Αποστολή</button>
+  </div>
+</div>
+
+  
 </script>
 </body>
 </html>
