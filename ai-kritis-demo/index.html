@@ -268,9 +268,15 @@ function toggleCharacter(ch, btn) {
 function updateSelectionStatus() {
   const count = parseInt(document.getElementById("playerCount").value);
   const status = document.getElementById("selectionStatus");
-  status.textContent = `Έχεις επιλέξει ${selectedCharacters.length} από ${count} χαρακτήρες.`;
-}
+  status.textContent = count === 1
+  ? `Έχεις επιλέξει ${selectedCharacters.length} χαρακτήρα.`
+  : `Έχεις επιλέξει ${selectedCharacters.length} από ${count} χαρακτήρες.`;
 
+
+const startBtn = document.getElementById("startGameBtn");
+startBtn.disabled = selectedCharacters.length < count;
+startBtn.style.opacity = startBtn.disabled ? "0.5" : "1";
+}
 renderCharacterSelection();
 
 document.getElementById("playerCount").addEventListener("change", () => {
@@ -481,7 +487,7 @@ function showResultsSummary() {
   /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
-let remainigTimeTime = 90;
+let remainigTime = 90;
 let isPaused = false;
 
 function startTimer(durationSec = 90) {
