@@ -379,6 +379,37 @@ const missions = [
   {id:"M-021",title:"Τεχνητή Νοημοσύνη",question:"Πόση Τεχνητή Νοημοσύνη είναι αρκετή;"}
 ];
 
+/* ---------- Ρήσεις ανά Αποστολή ---------- */
+const quotesByMission = {
+  "M-001": [
+    { author: "Πλάτων", quote: "Ο δίκαιος άνθρωπος δεν βλάπτει ποτέ κανέναν. (Πολιτεία)" },
+    { author: "Αριστοτέλης", quote: "Το δίκαιο είναι η αρχή της πολιτικής αρετής. (Ηθικά Νικομάχεια)" }
+  ],
+  "M-002": [
+    { author: "Αριστοτέλης", quote: "Η φιλία είναι μία ψυχή σε δύο σώματα." },
+    { author: "Επίκουρος", quote: "Από όλα όσα η σοφία μάς χαρίζει για την ευτυχία, το πολυτιμότερο είναι η φιλία." }
+  ],
+  "M-005": [
+    { author: "Πλάτων", quote: "Η αλήθεια είναι ο ήλιος του νου." },
+    { author: "Σωκράτης", quote: "Ένα μόνο ξέρω: ότι δεν ξέρω τίποτα. (Απολογία)" }
+  ],
+  "M-006": [
+    { author: "Αριστοτέλης", quote: "Η ανδρεία είναι το μέσο ανάμεσα στον φόβο και την τόλμη." }
+  ],
+  "M-010": [
+    { author: "Αριστοτέλης", quote: "Η ευτυχία είναι το τελικό αγαθό στο οποίο αποβλέπουν όλες οι πράξεις μας." },
+    { author: "Επίκουρος", quote: "Η ευτυχία δεν έρχεται με τα πλούτη, αλλά με τη γαλήνη της ψυχής." }
+  ],
+  "M-017": [
+    { author: "Επίκτητος", quote: "Ελεύθερος είναι όποιος δεν εξαρτάται από τα πάθη του." },
+    { author: "Πλάτων", quote: "Η ελευθερία είναι η τάξη της ψυχής που γνωρίζει το δίκαιο." }
+  ],
+  "M-019": [
+    { author: "Αριστοτέλης", quote: "Το νόημα της ζωής είναι να βρεις τον σκοπό σου και να του αφιερωθείς." },
+    { author: "Σωκράτης", quote: "Μη ζεις χωρίς να εξετάζεις τη ζωή σου. (Απολογία)" }
+  ]
+};
+  
 /* ---------- Game state ---------- */
 const game = {
   players: [
@@ -457,16 +488,17 @@ function showResultsSummary() {
     totalScores[a] > totalScores[b] ? a : b
   );
 
-  // ✅ Φράσεις του Σωκράτη
-  const quotes = [
-    "Η αλήθεια λάμπει μέσα από τον διάλογο.",
-    "Δεν διδάσκω· βοηθώ να γεννηθεί η σκέψη.",
-    "Το σημαντικό δεν είναι να έχεις δίκιο, αλλά να αναζητάς το αληθινό.",
-    "Όποιος ξέρει ότι δεν ξέρει, ήδη γνωρίζει κάτι σπουδαίο.",
-    "Η ψυχή του ανθρώπου γίνεται όμορφη με την αλήθεια."
-  ];
-  document.getElementById("socratesQuote").textContent =
-    quotes[Math.floor(Math.random() * quotes.length)];
+ // ✅ Επιλογή ρήσης ανάλογα με την Αποστολή
+const currentMission = document.getElementById("missionSelect").value;
+const availableQuotes = quotesByMission[currentMission] || [];
+
+let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
+if (availableQuotes.length > 0) {
+  const random = Math.floor(Math.random() * availableQuotes.length);
+  selectedQuote = `«${availableQuotes[random].quote}» — ${availableQuotes[random].author}`;
+}
+
+document.getElementById("socratesQuote").textContent = selectedQuote;
 
   // ✅ Δημιουργία λίστας με τα αποτελέσματα
   let html = "<ul style='list-style:none; padding:0;'>";
