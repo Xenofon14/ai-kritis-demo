@@ -466,6 +466,15 @@ const missions = [
   {id:"M-021",title:"Τεχνητή Νοημοσύνη",question:"Πόση Τεχνητή Νοημοσύνη είναι αρκετή;"}
 ];
 
+/* ---------- Εικόνες Φιλοσόφων ---------- */
+const philosopherImages = {
+  "Πλάτων": "images/philosophers/plato.png",
+  "Αριστοτέλης": "images/philosophers/aristotle.png",
+  "Σωκράτης": "images/philosophers/socrates.png",
+  "Επίκουρος": "images/philosophers/epicurus.png",
+  "Επίκτητος": "images/philosophers/epictetus.png"
+};
+  
 /* ---------- Ρήσεις ανά Αποστολή ---------- */
 const quotesByMission = {
   "M-001": [
@@ -592,24 +601,30 @@ function showResultsSummary() {
     `);
   });
 
-  // Εύρεση νικητή (ή νικητών σε ισοπαλία)
-  const maxScore = Math.max(...Object.values(totalScores));
-  const winners = Object.keys(totalScores).filter(name => totalScores[name] === maxScore);
+ // ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
+const currentMission = document.getElementById("missionSelect").value;
+const availableQuotes = quotesByMission[currentMission] || [];
 
-  const winnerText = winners.length > 1
-    ? `🤝 Ισοπαλία μεταξύ: ${winners.join(" και ")}`
-    : `🏆 Νικητής: <strong>${winners[0]}</strong>`;
+let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
+let author = "Σωκράτης";
 
-  // Επιλογή ρήσης Σωκράτη
-  const currentMission = document.getElementById("missionSelect").value;
-  const availableQuotes = quotesByMission[currentMission] || [];
-  let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
+if (availableQuotes.length > 0) {
+  const random = Math.floor(Math.random() * availableQuotes.length);
+  selectedQuote = `«${availableQuotes[random].quote}»`;
+  author = availableQuotes[random].author;
+}
 
-  if (availableQuotes.length > 0) {
-    const random = Math.floor(Math.random() * availableQuotes.length);
-    selectedQuote = `«${availableQuotes[random].quote}» — ${availableQuotes[random].author}`;
-  }
-  document.getElementById("socratesQuote").textContent = selectedQuote;
+document.getElementById("socratesQuote").textContent = `${selectedQuote} — ${author}`;
+
+// ✅ Προβολή εικόνας φιλοσόφου (αν υπάρχει)
+const imgEl = document.getElementById("philosopherImage");
+if (philosopherImages[author]) {
+  imgEl.src = philosopherImages[author];
+  imgEl.style.display = "block";
+} else {
+  imgEl.style.display = "none";
+}
+
 
   // Δημιουργία λίστας αποτελεσμάτων
   const html = `
