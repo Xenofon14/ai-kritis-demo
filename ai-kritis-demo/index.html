@@ -661,29 +661,29 @@ function showResultsSummary() {
     `);
   });
 
- // ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
+// ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
 const currentMission = document.getElementById("missionSelect").value;
 const availableQuotes = quotesByMission[currentMission] || [];
 
-let selectedQuote = "Ο διάλογος είναι η αρχή της σοφίας.";
-let author = "Σωκράτης";
+let quoteHTML = `<p style="font-style:italic;">«Ο διάλογος είναι η αρχή της σοφίας.»</p><p style="text-align:right;">— Σωκράτης</p>`;
 
 if (availableQuotes.length > 0) {
   const random = Math.floor(Math.random() * availableQuotes.length);
-  selectedQuote = `«${availableQuotes[random].quote}»`;
-  author = availableQuotes[random].author;
+  const q = availableQuotes[random];
+  const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
+
+  quoteHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+      <img src="${imgSrc}" alt="${q.author}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+      <div style="max-width:400px; text-align:left;">
+        <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
+        <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
+      </div>
+    </div>
+  `;
 }
 
-document.getElementById("socratesQuote").textContent = `${selectedQuote} — ${author}`;
-
-// ✅ Προβολή εικόνας φιλοσόφου (αν υπάρχει)
-const imgEl = document.getElementById("philosopherImage");
-if (philosopherImages[author]) {
-  imgEl.src = philosopherImages[author];
-  imgEl.style.display = "block";
-} else {
-  imgEl.style.display = "none";
-}
+document.getElementById("socratesQuote").innerHTML = quoteHTML;
 
 
   // Δημιουργία λίστας αποτελεσμάτων
@@ -1019,7 +1019,7 @@ document.getElementById("infoButton").addEventListener("click", () => {
   padding:20px;
 ">
   <div style="background:#142f70; border-radius:20px; padding:30px; max-width:600px; box-shadow:0 0 30px rgba(0,0,0,0.4);">
-    <h2>🏛️ Ο Σωκράτης λέει:</h2>
+    <h2>📜 Η Σκέψη του Φιλοσόφου:</h2>
     <p id="socratesQuote" style="font-style:italic; font-size:1.2em; margin:20px 0;"></p>
     <h3>📜 Αποτελέσματα Αποστολής</h3>
     <div id="resultsSummary" style="margin-top:10px;"></div>
