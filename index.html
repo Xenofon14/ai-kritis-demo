@@ -806,11 +806,34 @@ let isTimerRunning = false;
 let remainingTime = 90;
 let isPaused = false;
 
+/* === ΝΕΕΣ ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ === */
+function updateTimeBar(durationSec) {
+  const bar = document.getElementById("timeBar");
+  if (!bar || !durationSec) return;
+  const progress = Math.max(0, (remainingTime / durationSec) * 100);
+  bar.style.width = progress + "%";
+}
+
+function zeroTimer() {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  isPaused = false;
+  remainingTime = 0;
+  document.getElementById("timer").textContent = "0:00";
+  updateTimeBar(1);
+}
+
+/* === ΝΕΑ startTimer === */
 function startTimer(durationSec = 90) {
+  if (isTimerRunning && !isPaused) return; // Αν ήδη τρέχει, μην ξαναξεκινά
+
   clearInterval(timerInterval);
   isTimerRunning = true;
   isPaused = false;
-  remainingTime = durationSec;
+
+  if (remainingTime <= 0 || remainingTime > durationSec) {
+    remainingTime = durationSec;
+  }
 
   function updateDisplay() {
     const minutes = Math.floor(remainingTime / 60);
@@ -820,44 +843,27 @@ function startTimer(durationSec = 90) {
   }
 
   updateDisplay();
+  updateTimeBar(durationSec);
 
-  // Ξεκινά το interval του timer
   timerInterval = setInterval(() => {
-    if (isPaused) return; // ⏸️ Αν υπάρχει παύση, μην μετράς
+    if (isPaused) return;
     remainingTime--;
+    updateTimeBar(durationSec);
 
-    // ✨ Ενημέρωση μπάρας χρόνου
-    const bar = document.getElementById("timeBar");
-    if (bar) {
-      const progress = Math.max(0, (remainingTime / durationSec) * 100);
-      bar.style.width = progress + "%";
-    }
-
-    // Αν τελείωσε ο χρόνος
     if (remainingTime < 0) {
       clearInterval(timerInterval);
       isTimerRunning = false;
       document.getElementById("timer").textContent = "⏰ Τέλος!";
 
-      // 🔔 Ήχος λήξης χρόνου - Σωκράτειο καμπανάκι
       try {
         const audio = new Audio("sounds/philosophical_chime.mp3");
         audio.volume = 0.6;
         audio.currentTime = 0;
-        audio.play().catch(err => console.warn("Audio blocked:", err));
-      } catch (e) {
-        console.warn("Audio error:", e);
-      }
+        audio.play().catch(()=>{});
+      } catch {}
 
-      // 💬 Popup σχολίου Σωκράτη
       showSocratesPopup();
-
-      // Αν η ακρόαση είναι ενεργή, σταμάτα τη
-      try {
-        if (recognition && recognizing) recognition.stop();
-      } catch (e) {}
-
-      // Επόμενος παίκτης / γύρος
+      try { if (recognition && recognizing) recognition.stop(); } catch {}
       advanceTurn();
       return;
     }
