@@ -829,6 +829,15 @@ if (availableQuotes.length > 0) {
 
 document.getElementById("socratesQuote").innerHTML = quoteHTML;
 
+let winnerText = "—";
+const entries = Object.entries(totalScores);
+if (entries.length > 0) {
+  const [winner, score] = entries.sort((a,b)=>b[1]-a[1])[0];
+  winnerText = `🏆 Νικητής: ${winner} με σύνολο ${score} πόντους!`;
+} else {
+  winnerText = "Δεν υπάρχουν καταχωρημένα σκορ.";
+}
+  
 // Δημιουργία λίστας αποτελεσμάτων
 const html = `
   <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
