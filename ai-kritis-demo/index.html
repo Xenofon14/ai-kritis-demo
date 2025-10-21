@@ -608,6 +608,18 @@ function renderMission(id){
   document.getElementById("missionQuestion").textContent = `${m.title}: ${m.question}`;
   document.getElementById("missionSelect").value = id;
 }
+
+/* ---------- Τυχαία Σχόλια Σωκράτη ---------- */
+const socratesComments = [
+  "Η σιωπή είναι κι αυτή μια απάντηση.",
+  "Καλή σκέψη, αλλά μήπως έχει κι άλλη όψη;",
+  "Ο διάλογος ανοίγει τον δρόμο της σοφίας.",
+  "Η αλήθεια γεννιέται μέσα από ερωτήσεις.",
+  "Ο Σωκράτης χαμογελά – προχώρα έτσι!",
+  "Μερικές φορές, η γνώση ξεκινά από την απορία.",
+  "Σκέψου ξανά: ποιο είναι το γιατί πίσω από αυτό;",
+  "Κάθε ιδέα αξίζει να ακουστεί."
+];
   
 /* ---------- Advance turn & round ---------- */
 function advanceTurn() {
@@ -635,6 +647,24 @@ function advanceTurn() {
   document.getElementById("totalScore").textContent = "—/10";
 
   renderActivePlayer();
+}
+
+/* ---------- Εμφάνιση Popup Σωκράτη ---------- */
+function showSocratesPopup() {
+  const random = Math.floor(Math.random() * socratesComments.length);
+  const message = socratesComments[random];
+  const popup = document.getElementById("socratesPopup");
+  const text = document.getElementById("socratesPopupText");
+
+  text.textContent = message;
+  popup.style.display = "block";
+  popup.style.opacity = 1;
+
+  setTimeout(() => {
+    popup.style.transition = "opacity 1s";
+    popup.style.opacity = 0;
+    setTimeout(() => popup.style.display = "none", 1000);
+  }, 3000);
 }
 
   /* ---------- Αποτελέσματα Αποστολής ---------- */
@@ -724,7 +754,7 @@ try {
   /* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
-let remainigTime = 90;
+let remainingTime = 90;
 let isPaused = false;
 
 function startTimer(durationSec = 90) {
@@ -745,23 +775,31 @@ function startTimer(durationSec = 90) {
     if (isPaused) return; // ⏸️ δεν μειώνει χρόνο αν έχει παύση
     remainingTime--;
 
-    if (remainingTime < 0) {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      document.getElementById("timer").textContent = "⏰ Τέλος!";
-      // ✅ Ήχος λήξης χρόνου - Σωκράτειο Καμπανάκι
-try {
-  const audio = new Audio("sounds/philosophical_chime.mp3");
-  audio.volume = 0.6;          // πιο ήπια ένταση
-  audio.currentTime = 0;       // ξεκινά πάντα απ’ την αρχή
-  audio.play().catch(err => console.warn("Audio blocked:", err));
-} catch
+if (remainingTime < 0) {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  document.getElementById("timer").textContent = "⏰ Τέλος!";
 
-      try { if (recognition && recognizing) recognition.stop(); } catch (e) {}
+  // ✅ Ήχος λήξης χρόνου - Σωκράτειο Καμπανάκι
+  try {
+    const audio = new Audio("sounds/philosophical_chime.mp3");
+    audio.volume = 0.6;          // πιο ήπια ένταση
+    audio.currentTime = 0;       // ξεκινά πάντα απ’ την αρχή
+    audio.play().catch(err => console.warn("Audio blocked:", err));
+  } catch (e) {
+    console.warn("Audio error:", e);
+  }
 
-      advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
-      return;
-    }
+  // 🏛️ Σχόλιο Σωκράτη στο τέλος γύρου
+  showSocratesPopup();
+
+  try {
+    if (recognition && recognizing) recognition.stop();
+  } catch (e) {}
+
+  advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
+  return;
+}
 
     updateDisplay();
   }, 1000);
@@ -1051,7 +1089,27 @@ document.getElementById("infoButton").addEventListener("click", () => {
   </div>
 </div>
 
-  
+  <!-- Popup Σχολίου Σωκράτη -->
+<div id="socratesPopup" style="
+  display:none;
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.15);
+  border:2px solid #6ee0ff;
+  border-radius:15px;
+  padding:12px 18px;
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+  backdrop-filter:blur(4px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  z-index: 4000;
+">
+  💬 <span id="socratesPopupText"></span>
+</div>
+
 
 </body>
 </html>
