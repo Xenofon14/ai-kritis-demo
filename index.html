@@ -891,7 +891,7 @@ const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecogni
 let recognition = null;
 let recognizing = false;
 let finalTranscript = "";
-let shouldListen = false; // για αυτόματη επανεκκίνηση όσο “τρέχει” ο γύρος
+let shouldListen = false;
 
 function initSTT(){
   if(!SpeechRecognition){
@@ -905,19 +905,24 @@ function initSTT(){
 
   recognition.onstart = () => {
     recognizing = true;
-    document.getElementById("listenBtn").classList.add("recording");
-    document.getElementById("listenBtn").textContent = "■ Σταμάτα την ακρόαση";
+    const listenBtn = document.getElementById("listenBtn");
+    listenBtn.classList.add("recording");
+    listenBtn.textContent = "■ Σταμάτα την ακρόαση";
+    listenBtn.style.background = "linear-gradient(135deg,#ffb6b9,#ff6f61)";
+    document.getElementById("timerPanel").style.opacity = "1";
   };
 
   recognition.onend = () => {
     recognizing = false;
-    // αν ο χρόνος “τρέχει” και θέλουμε να συνεχίσει η ακρόαση, ξαναξεκίνα
-    if (shouldListen && isTimerRunning) {
-      try { recognition.start(); return; } catch(e) {}
+    const listenBtn = document.getElementById("listenBtn");
+    if (isPaused) {
+      listenBtn.textContent = "⏸️ Παύση";
+      listenBtn.style.background = "gray";
+    } else {
+      listenBtn.textContent = "▶️ Ο Σωκράτης ακούει/διαβάζει";
+      listenBtn.style.background = "linear-gradient(135deg,#cde7ff,#caa5ff)";
     }
-    // αλλιώς, επανάφερε το κουμπί
-    document.getElementById("listenBtn").classList.remove("recording");
-    document.getElementById("listenBtn").textContent = "🎙️ Ο Σωκράτης ακούει";
+    listenBtn.classList.remove("recording");
   };
 
   recognition.onerror = (e) => {
@@ -935,10 +940,6 @@ function initSTT(){
   };
 }
 
-document.getElementById("langSelect").addEventListener("change", () => {
-  if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
-});
-
 /* ---------- Listen button ---------- */
 document.getElementById("listenBtn").addEventListener("click", () => {
   if (!recognition) initSTT();
@@ -947,49 +948,24 @@ document.getElementById("listenBtn").addEventListener("click", () => {
   const listenBtn = document.getElementById("listenBtn");
   const timerPanel = document.getElementById("timerPanel");
 
-  // ➕ Αν ΔΕΝ ακούει ήδη, ξεκινά ακρόαση και (αν δεν τρέχει ήδη) χρονόμετρο
   if (!recognizing) {
-    shouldListen = true;
     finalTranscript = document.getElementById("transcript").value.trim() + " ";
-
-    // Ορίζουμε τη γλώσσα κάθε φορά (ασφαλές για αλλαγές)
     recognition.lang = document.getElementById("langSelect").value;
 
-    try {
-      recognition.start();
-      recognizing = true; // ✅ ενημερώνεται χειροκίνητα
-    } catch (err) {
-      console.warn("Δεν ξεκίνησε η αναγνώριση:", err);
-      return;
-    }
-
+    try { recognition.start(); } catch (err) { console.warn(err); return; }
     if (!isTimerRunning) startTimer(game.baseTimeSec || 90);
 
-    // ✨ Οπτικά εφέ - Ενεργή ακρόαση
     isPaused = false;
     timerPanel.style.opacity = "1";
-    listenBtn.textContent = "■ Σταμάτα την ακρόαση";
-    listenBtn.style.background = "linear-gradient(135deg,#ffb6b9,#ff6f61)";
-    listenBtn.classList.add("recording");
     removeSocratesPauseMessage();
 
   } else {
-    // 🔇 Αν ΗΔΗ ακούει — σταματάει και παγώνει τον χρόνο
-    shouldListen = false;
-    recognizing = false; // ✅ σταματάμε χειροκίνητα
-    try {
-      recognition.stop();
-    } catch (err) {
-      console.warn("Δεν σταμάτησε σωστά η αναγνώριση:", err);
-    }
-
     isPaused = true;
+    try { recognition.stop(); } catch (err) { console.warn(err); }
 
-    // ✨ Οπτικά εφέ Παύσης
     timerPanel.style.opacity = "0.6";
     listenBtn.textContent = "⏸️ Παύση";
     listenBtn.style.background = "gray";
-    listenBtn.classList.remove("recording");
     showSocratesPauseMessage();
   }
 });
