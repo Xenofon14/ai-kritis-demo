@@ -932,7 +932,7 @@ function initSTT(){
 document.getElementById("langSelect").addEventListener("change", () => {
   if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
 });
- 
+
 /* ---------- Listen button ---------- */
 document.getElementById("listenBtn").addEventListener("click", () => {
   if (!recognition) initSTT();
@@ -941,30 +941,49 @@ document.getElementById("listenBtn").addEventListener("click", () => {
   const listenBtn = document.getElementById("listenBtn");
   const timerPanel = document.getElementById("timerPanel");
 
-  // Αν δεν ακούει ήδη — ξεκινά ακρόαση και (αν δεν τρέχει ήδη) χρονόμετρο
+  // ➕ Αν ΔΕΝ ακούει ήδη, ξεκινά ακρόαση και (αν δεν τρέχει ήδη) χρονόμετρο
   if (!recognizing) {
     shouldListen = true;
     finalTranscript = document.getElementById("transcript").value.trim() + " ";
-    recognition.start();
+
+    // Ορίζουμε τη γλώσσα κάθε φορά (ασφαλές για αλλαγές)
+    recognition.lang = document.getElementById("langSelect").value;
+
+    try {
+      recognition.start();
+      recognizing = true; // ✅ ενημερώνεται χειροκίνητα
+    } catch (err) {
+      console.warn("Δεν ξεκίνησε η αναγνώριση:", err);
+      return;
+    }
+
     if (!isTimerRunning) startTimer(game.baseTimeSec || 90);
 
-    // ✨ Οπτικά εφέ
+    // ✨ Οπτικά εφέ - Ενεργή ακρόαση
     isPaused = false;
     timerPanel.style.opacity = "1";
     listenBtn.textContent = "■ Σταμάτα την ακρόαση";
     listenBtn.style.background = "linear-gradient(135deg,#ffb6b9,#ff6f61)";
+    listenBtn.classList.add("recording");
     removeSocratesPauseMessage();
 
   } else {
-    // Αν ήδη ακούει — σταματάει και παγώνει τον χρόνο
+    // 🔇 Αν ΗΔΗ ακούει — σταματάει και παγώνει τον χρόνο
     shouldListen = false;
-    recognition.stop();
+    recognizing = false; // ✅ σταματάμε χειροκίνητα
+    try {
+      recognition.stop();
+    } catch (err) {
+      console.warn("Δεν σταμάτησε σωστά η αναγνώριση:", err);
+    }
+
     isPaused = true;
 
-    // ✨ Οπτικά εφέ παύσης
+    // ✨ Οπτικά εφέ Παύσης
     timerPanel.style.opacity = "0.6";
     listenBtn.textContent = "⏸️ Παύση";
     listenBtn.style.background = "gray";
+    listenBtn.classList.remove("recording");
     showSocratesPauseMessage();
   }
 });
