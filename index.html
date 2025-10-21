@@ -686,30 +686,35 @@ const socratesComments = [
   "Κάθε ιδέα αξίζει να ακουστεί."
 ];
   
-/---------- Advance turn & round ---------- */
+/* ---------- Advance turn & round ---------- */
 function advanceTurn() {
-  // Ελέγχουμε αν ο τωρινός παίκτης ήταν ο τελευταίος του τελευταίου γύρου
   const isLastPlayer = game.activeIndex === game.players.length - 1;
   const isLastRound = game.currentRound === game.totalRounds;
-* 
+
   if (isLastPlayer && isLastRound) {
-    showResultsSummary(); // ✅ τώρα τελειώνει αφού παίξουν όλοι στον τελευταίο γύρο
+    console.log("📜 Όλοι οι παίκτες ολοκλήρωσαν! Εμφάνιση τελικής κάρτας...");
+    showResultsSummary();
     return;
   }
 
-  // Διαφορετικά, απλώς αλλάζουμε παίκτη / γύρο
   game.activeIndex++;
-
   if (game.activeIndex >= game.players.length) {
     game.activeIndex = 0;
     game.currentRound++;
+    console.log(`🔁 Νέος γύρος: ${game.currentRound}/${game.totalRounds}`);
   }
 
-  // 🧹 Καθαρισμός πεδίων για τον επόμενο παίκτη
+  // 🧹 Καθαρισμός πεδίων
   document.getElementById("transcript").value = "";
   document.getElementById("socraticComment").textContent = "—";
   document.getElementById("criteriaList").innerHTML = "";
   document.getElementById("totalScore").textContent = "—/10";
+  document.getElementById("timer").textContent = "1:30";
+
+  remainingTime = game.baseTimeSec;
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  isPaused = false;
 
   renderActivePlayer();
 }
