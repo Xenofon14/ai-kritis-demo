@@ -685,18 +685,17 @@ if (availableQuotes.length > 0) {
 
 document.getElementById("socratesQuote").innerHTML = quoteHTML;
 
+// Δημιουργία λίστας αποτελεσμάτων
+const html = `
+  <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
+    ${playerSummaries.join("")}
+  </ul>
+  <p style="margin-top:15px; font-size:17px;">${winnerText}</p>
+`;
 
-  // Δημιουργία λίστας αποτελεσμάτων
-  const html = `
-    <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
-      ${playerSummaries.join("")}
-    </ul>
-    <p style="margin-top:15px; font-size:17px;">${winnerText}</p>
-  `;
-
-  // Εμφάνιση modal
-  document.getElementById("resultsSummary").innerHTML = html;
-  document.getElementById("resultModal").style.display = "flex";
+// Εμφάνιση modal
+document.getElementById("resultsSummary").innerHTML = html;
+document.getElementById("resultModal").style.display = "flex";
 
 // ✅ Ήχος - Σωκράτειο Καμπανάκι
 try {
@@ -712,8 +711,9 @@ try {
     setTimeout(() => modalBox.classList.remove("glow"), 1500);
   }
 
-} catch (e)
- 
+} catch (e) {
+  console.warn("Audio failed:", e);
+}
 
   // Επόμενη Αποστολή
   document.getElementById("nextMissionBtn").onclick = () => {
