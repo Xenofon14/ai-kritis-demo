@@ -236,6 +236,29 @@
 .character img:hover {
   transform: scale(1.08);
 }
+
+/* === Εφέ εμφάνισης popup Σωκράτη === */
+#socratesPopup {
+  transition: opacity 1s, transform 1s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+#socratesPopup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ✨ Λάμψη γύρω από το πλαίσιο */
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px #6ee0ff, 0 0 20px #6ee0ff; }
+  50% { box-shadow: 0 0 20px #6ee0ff, 0 0 30px #6ee0ff; }
+  100% { box-shadow: 0 0 10px #6ee0ff, 0 0 20px #6ee0ff; }
+}
+
+#socratesPopup.glow {
+  animation: glowPulse 2s infinite alternate;
+}
     
   </style>
 </head>
@@ -658,12 +681,19 @@ function showSocratesPopup() {
 
   text.textContent = message;
   popup.style.display = "block";
-  popup.style.opacity = 1;
 
+  // ✨ Προσθήκη κλάσεων για εφέ εμφάνισης & λάμψης
+  popup.classList.add("show", "glow");
+
+  // Μετά από 3 δευτερόλεπτα fade out
   setTimeout(() => {
-    popup.style.transition = "opacity 1s";
+    popup.classList.remove("glow");
     popup.style.opacity = 0;
-    setTimeout(() => popup.style.display = "none", 1000);
+    popup.style.transform = "translateY(20px)";
+    setTimeout(() => {
+      popup.style.display = "none";
+      popup.classList.remove("show");
+    }, 1000);
   }, 3000);
 }
 
