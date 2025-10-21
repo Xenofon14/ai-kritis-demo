@@ -30,6 +30,29 @@
   background: linear-gradient(90deg, #4ef2a6, #f2c14e, #ef476f);
   transition: width 1s linear;
 }
+
+/* === Εφέ τελευταίων 10 δευτερολέπτων === */
+@keyframes flashWarning {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(2); }
+  100% { filter: brightness(1); }
+}
+
+#timeBar.warning {
+  background: linear-gradient(90deg, #ff6b6b, #ff0000);
+  animation: flashWarning 1s infinite;
+}
+
+    /* === Εφέ αναπνοής για το κουμπί Σωκράτη === */
+@keyframes breathe {
+  0% { box-shadow: 0 0 10px #ff4d4d; }
+  50% { box-shadow: 0 0 25px #ff9a9a; }
+  100% { box-shadow: 0 0 10px #ff4d4d; }
+}
+
+button.recording {
+  animation: breathe 2s ease-in-out infinite;
+}
     
 /* === Βελτιωμένη εμφάνιση πίνακα βαθμολογίας === */
 .panel {
@@ -849,6 +872,13 @@ function startTimer(durationSec = 90) {
     if (isPaused) return;
     remainingTime--;
     updateTimeBar(durationSec);
+
+    // 🔴 Προειδοποίηση για τελευταία 10"
+const bar = document.getElementById("timeBar");
+if (bar) {
+  if (remainingTime <= 10) bar.classList.add("warning");
+  else bar.classList.remove("warning");
+}
 
     if (remainingTime < 0) {
       clearInterval(timerInterval);
