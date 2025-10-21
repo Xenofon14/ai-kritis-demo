@@ -800,7 +800,7 @@ try {
   };
 }
 
-  /* ---------- Timer ---------- */
+/* ---------- Timer ---------- */
 let timerInterval = null;
 let isTimerRunning = false;
 let remainingTime = 90;
@@ -810,14 +810,7 @@ function startTimer(durationSec = 90) {
   clearInterval(timerInterval);
   isTimerRunning = true;
   isPaused = false;
-  remainingTime = durationSec; // ✅ σωστό όνομα μεταβλητής
-  
-  // ✨ Ενημέρωση μπάρας χρόνου
-    const bar = document.getElementById("timeBar");
-    if (bar) {
-      const progress = Math.max(0, (remainingTime / durationSec) * 100);
-      bar.style.width = progress + "%";
-    }
+  remainingTime = durationSec;
 
   function updateDisplay() {
     const minutes = Math.floor(remainingTime / 60);
@@ -827,46 +820,51 @@ function startTimer(durationSec = 90) {
   }
 
   updateDisplay();
+
+  // Ξεκινά το interval του timer
   timerInterval = setInterval(() => {
-    if (isPaused) return; // ⏸️ δεν μειώνει χρόνο αν έχει παύση
+    if (isPaused) return; // ⏸️ Αν υπάρχει παύση, μην μετράς
     remainingTime--;
 
-if (remainingTime < 0) {
-  clearInterval(timerInterval);
-  isTimerRunning = false;
-  document.getElementById("timer").textContent = "⏰ Τέλος!";
+    // ✨ Ενημέρωση μπάρας χρόνου
+    const bar = document.getElementById("timeBar");
+    if (bar) {
+      const progress = Math.max(0, (remainingTime / durationSec) * 100);
+      bar.style.width = progress + "%";
+    }
 
-  // ✅ Ήχος λήξης χρόνου - Σωκράτειο Καμπανάκι
-  try {
-    const audio = new Audio("sounds/philosophical_chime.mp3");
-    audio.volume = 0.6;          // πιο ήπια ένταση
-    audio.currentTime = 0;       // ξεκινά πάντα απ’ την αρχή
-    audio.play().catch(err => console.warn("Audio blocked:", err));
-  } catch (e) {
-    console.warn("Audio error:", e);
-  }
+    // Αν τελείωσε ο χρόνος
+    if (remainingTime < 0) {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      document.getElementById("timer").textContent = "⏰ Τέλος!";
 
-  // 🏛️ Σχόλιο Σωκράτη στο τέλος γύρου
-  showSocratesPopup();
+      // 🔔 Ήχος λήξης χρόνου - Σωκράτειο καμπανάκι
+      try {
+        const audio = new Audio("sounds/philosophical_chime.mp3");
+        audio.volume = 0.6;
+        audio.currentTime = 0;
+        audio.play().catch(err => console.warn("Audio blocked:", err));
+      } catch (e) {
+        console.warn("Audio error:", e);
+      }
 
-  try {
-    if (recognition && recognizing) recognition.stop();
-  } catch (e) {}
+      // 💬 Popup σχολίου Σωκράτη
+      showSocratesPopup();
 
-  advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
-  return;
-}
+      // Αν η ακρόαση είναι ενεργή, σταμάτα τη
+      try {
+        if (recognition && recognizing) recognition.stop();
+      } catch (e) {}
+
+      // Επόμενος παίκτης / γύρος
+      advanceTurn();
+      return;
+    }
 
     updateDisplay();
   }, 1000);
 }
-
-   /* ---------- Pause / Resume button ---------- */
-document.getElementById("pauseBtn").addEventListener("click", () => {
-  if (!isTimerRunning) return;
-  isPaused = !isPaused;
-  document.getElementById("pauseBtn").textContent = isPaused ? "▶️ Συνέχεια" : "⏸️ Παύση";
-});
 
 /* ---------- Text-to-Speech (Socrates) ---------- */
 document.getElementById("speakBtn").addEventListener("click", ()=>{
