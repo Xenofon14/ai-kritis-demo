@@ -14,6 +14,23 @@
     .btn-primary { background:linear-gradient(135deg,#cde7ff,#caa5ff); color:#000; }
     .btn-secondary { background:linear-gradient(135deg,#6ee0ff,#3db8ff); color:#002140; }
 
+  /* === Μπάρα χρόνου === */
+#timeBarContainer {
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+#timeBar {
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg, #4ef2a6, #f2c14e, #ef476f);
+  transition: width 1s linear;
+}
+    
 /* === Βελτιωμένη εμφάνιση πίνακα βαθμολογίας === */
 .panel {
   background: rgba(255, 255, 255, 0.08);
@@ -502,7 +519,9 @@ document.getElementById("playerCount").addEventListener("change", () => {
 
 <div class="panel" id="timerPanel">
   ⏳ Χρόνος: <span id="timer">1:30</span>
-  <button id="pauseBtn" class="btn-secondary" style="margin-left:10px;min-width:100px;">⏸️ Παύση</button>
+  <div id="timeBarContainer">
+    <div id="timeBar"></div>
+  </div>
 </div>
 
 <!-- 💬 Σχόλιο Σωκράτη -->
@@ -792,6 +811,13 @@ function startTimer(durationSec = 90) {
   isTimerRunning = true;
   isPaused = false;
   remainingTime = durationSec; // ✅ σωστό όνομα μεταβλητής
+  
+  // ✨ Ενημέρωση μπάρας χρόνου
+    const bar = document.getElementById("timeBar");
+    if (bar) {
+      const progress = Math.max(0, (remainingTime / durationSec) * 100);
+      bar.style.width = progress + "%";
+    }
 
   function updateDisplay() {
     const minutes = Math.floor(remainingTime / 60);
@@ -910,20 +936,38 @@ document.getElementById("langSelect").addEventListener("change", () => {
 });
  
 /* ---------- Listen button ---------- */
-document.getElementById("listenBtn").addEventListener("click", ()=>{
-  if(!recognition){ initSTT(); }
-  if(!recognition){ return; }
+document.getElementById("listenBtn").addEventListener("click", () => {
+  if (!recognition) initSTT();
+  if (!recognition) return;
 
-  if(!recognizing){
+  const listenBtn = document.getElementById("listenBtn");
+  const timerPanel = document.getElementById("timerPanel");
+
+  // Αν δεν ακούει ήδη — ξεκινά ακρόαση και (αν δεν τρέχει ήδη) χρονόμετρο
+  if (!recognizing) {
     shouldListen = true;
     finalTranscript = document.getElementById("transcript").value.trim() + " ";
     recognition.start();
-    startTimer(game.baseTimeSec || 90);
-  }else{
+    if (!isTimerRunning) startTimer(game.baseTimeSec || 90);
+
+    // ✨ Οπτικά εφέ
+    isPaused = false;
+    timerPanel.style.opacity = "1";
+    listenBtn.textContent = "■ Σταμάτα την ακρόαση";
+    listenBtn.style.background = "linear-gradient(135deg,#ffb6b9,#ff6f61)";
+    removeSocratesPauseMessage();
+
+  } else {
+    // Αν ήδη ακούει — σταματάει και παγώνει τον χρόνο
     shouldListen = false;
     recognition.stop();
-    clearInterval(timerInterval);
-    isTimerRunning = false;
+    isPaused = true;
+
+    // ✨ Οπτικά εφέ παύσης
+    timerPanel.style.opacity = "0.6";
+    listenBtn.textContent = "⏸️ Παύση";
+    listenBtn.style.background = "gray";
+    showSocratesPauseMessage();
   }
 });
 
@@ -1085,6 +1129,31 @@ document.getElementById("infoButton").addEventListener("click", () => {
   alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
 });
 
+function showSocratesPauseMessage() {
+  removeSocratesPauseMessage(); // αν υπάρχει ήδη
+  const msg = document.createElement("div");
+  msg.id = "pauseMessage";
+  msg.textContent = "🔇 Ο Σωκράτης δεν ακούει...";
+  msg.style.position = "fixed";
+  msg.style.bottom = "90px";
+  msg.style.left = "50%";
+  msg.style.transform = "translateX(-50%)";
+  msg.style.background = "rgba(0,0,0,0.7)";
+  msg.style.padding = "10px 20px";
+  msg.style.borderRadius = "10px";
+  msg.style.fontSize = "16px";
+  msg.style.color = "#fff";
+  msg.style.zIndex = "5000";
+  msg.style.backdropFilter = "blur(4px)";
+  document.body.appendChild(msg);
+}
+
+function removeSocratesPauseMessage() {
+  const old = document.getElementById("pauseMessage");
+  if (old) old.remove();
+}
+
+  
 </script>
   
 <!-- === MODAL ΑΝΑΚΟΙΝΩΣΗΣ ΑΠΟΤΕΛΕΣΜΑΤΟΣ === -->
