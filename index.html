@@ -1013,6 +1013,10 @@ async function getComment(transcript, mission) {
 
 /* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=> {
+  try { if (recognition && recognizing) recognition.stop(); } catch {}
+  isPaused = false;
+  zeroTimer(); // μηδενίζει χρόνο & μπάρα
+
   const transcript = document.getElementById("transcript").value.trim();
   const missionId = document.getElementById("missionSelect").value;
   const mission = missions.find(m => m.id === missionId);
@@ -1020,7 +1024,6 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const scores = await getScore(transcript, mission);
   const comment = await getComment(transcript, mission);
 
-  // Αν αποτύχει το API
   if (scores.error) {
     document.getElementById("socraticComment").textContent = scores.error;
     document.getElementById("totalScore").textContent = "--/10";
@@ -1028,10 +1031,8 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
     return;
   }
 
-  // Εμφάνισε σχόλιο
   document.getElementById("socraticComment").textContent = comment;
 
-  // Ανάλυση κριτηρίων
   const criteriaList = document.getElementById("criteriaList");
   criteriaList.innerHTML = "";
   if (scores.criteria) {
@@ -1042,20 +1043,16 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
     }
   }
 
-  // ✅ Μετατροπή βαθμολογίας σε αριθμό (ανεξαρτήτως μορφής)
   let totalNum = 0;
   if (scores.total) {
     const match = String(scores.total).match(/\d+(\,\d+|\.\d+)?/);
     if (match) totalNum = parseFloat(match[0].replace(",", "."));
   }
-
-  // Εμφάνιση
   document.getElementById("totalScore").textContent = `${totalNum}/10`;
 
-  // ✅ Αποθήκευση σκορ ανά παίκτη
   const activePlayer = game.players[game.activeIndex].name;
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
-  const roundIndex = game.currentRound - 1; // 0-based
+  const roundIndex = game.currentRound - 1;
   game.scores[activePlayer][roundIndex] = totalNum;
 
   console.log("✅ Αποθηκεύτηκε σκορ:", activePlayer, totalNum, game.scores);
