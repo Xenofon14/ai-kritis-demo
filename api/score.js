@@ -1,14 +1,23 @@
 // === API ROUTE: /api/score.js ===
 import OpenAI from "openai";
 
+// ✅ Ρύθμιση Vercel για να δέχεται JSON body
+export const config = {
+  api: {
+    bodyParser: true,
+  },
+};
+
 export default async function handler(req, res) {
+  // ✅ Δέχεται μόνο POST requests
   if (req.method !== "POST") {
-    return res.status(405).json({ error: "Method not allowed" });
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Method not allowed. Use POST." });
   }
 
-  const { type, transcript, mission } = req.body;
+  const { type, transcript, mission } = req.body || {};
 
-  // Ελέγχει αν υπάρχει API key στο περιβάλλον του Vercel
+  // ✅ Έλεγχος για API key
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({ error: "Missing OpenAI API key." });
@@ -38,38 +47,29 @@ export default async function handler(req, res) {
         model: "gpt-4o-mini",
         temperature: 0,
         messages: [
-          { role: "system", content: "Επέστρεψε μόνο έγκυρο JSON, χωρίς σχόλια." },
+          { role: "system", content: "Επέστρεψε μόνο έγκυρο JSON, χωρίς σχόλια, εξηγήσεις ή backticks." },
           { role: "user", content: rubric },
-          { role: "user", content: `Αποστολή: ${mission.title} — ${mission.question}` },
-          { role: "user", content: `Απάντηση παίκτη: ${transcript}` }
+          { role: "user", content: `Αποστολή: ${mission?.title || ""} — ${mission?.question || ""}` },
+          { role: "user", content: `Απάντηση παίκτη: ${transcript || ""}` }
         ]
       });
 
-      let text = completion.choices[0].message.content.trim();
+      let text = completion.choices?.[0]?.message?.content?.trim() || "{}";
       text = text.replace(/```json|```/g, "").trim();
-      return res.status(200).json(JSON.parse(text));
+
+      try {
+        const json = JSON.parse(text);
+        return res.status(200).json(json);
+      } catch (err) {
+        console.error("❌ JSON Parse Error:", text);
+        return res.status(500).json({ error: "Invalid JSON returned by OpenAI." });
+      }
     }
 
     if (type === "comment") {
       // === Σχόλιο Σωκράτη ===
       const completion = await client.chat.completions.create({
         model: "gpt-4o-mini",
-        temperature: 0.5,
+        temperature: 0.6,
         messages: [
-          { role: "system", content: "Είσαι ο Σωκράτης. Σχολίασε με μαιευτικό ύφος, σε 1-2 προτάσεις. Χωρίς ```." },
-          { role: "user", content: `Αποστολή: ${mission.title} — ${mission.question}` },
-          { role: "user", content: `Απάντηση παίκτη: ${transcript}` }
-        ]
-      });
-
-      const text = completion.choices[0].message.content.trim();
-      return res.status(200).json({ comment: text });
-    }
-
-    return res.status(400).json({ error: "Άγνωστος τύπος αιτήματος." });
-
-  } catch (err) {
-    console.error("API Error:", err);
-    return res.status(500).json({ error: "Σφάλμα κατά την επικοινωνία με OpenAI." });
-  }
-}
+          { role: "system", content: "Είσαι ο Σωκράτης. Σχολίασε με μαιευτικό ύφος, σε 1-2 προτάσεις. Μ
