@@ -1,0 +1,1145 @@
+<!DOCTYPE html> 
+<html lang="el">
+<head>  
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AI Κριτής - Σωκράτης (Σταθερή Βαθμολογία + Σχόλιο)</title>
+  <style>  
+    body { font-family: system-ui, Arial, sans-serif; background:#173b88; color:#fff; margin:0; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .app { background:#0e2a66; border-radius:20px; padding:20px; max-width:420px; width:100%; box-shadow:0 8px 24px rgba(0,0,0,.3); }
+    h1 { font-size:22px; margin:0 0 5px 0; }
+    h2 { font-size:18px; margin:0 0 12px 0; color:#cfe0ff; }
+    select, textarea { width:100%; padding:10px; border-radius:10px; border:0; margin:10px 0; font-size:16px; }
+    button { width:100%; padding:14px; border-radius:20px; border:0; font-size:18px; margin:10px 0; cursor:pointer; }
+    .btn-primary { background:linear-gradient(135deg,#cde7ff,#caa5ff); color:#000; }
+    .btn-secondary { background:linear-gradient(135deg,#6ee0ff,#3db8ff); color:#002140; }
+
+/* === Βελτιωμένη εμφάνιση πίνακα βαθμολογίας === */
+.panel {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 15px;
+  padding: 16px 18px;
+  margin: 12px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(4px);
+  transition: 0.3s ease;
+}
+.panel:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+#criteriaPanel strong {
+  color: #6ee0ff;
+  font-size: 17px;
+}
+
+#criteriaList {
+  list-style: none;
+  margin: 8px 0 0 0;
+  padding: 0;
+}
+#criteriaList li {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+#criteriaList li::before {
+  content: "•";
+  color: #6ee0ff;
+  margin-right: 6px;
+}
+
+#socraticComment {
+  font-style: italic;
+  color: #e0ecff;
+  line-height: 1.5;
+  font-size: 16px;
+}
+
+/* === Εμφάνιση συνολικής βαθμολογίας === */
+#totalScore {
+  text-align: center;
+  background: linear-gradient(135deg, #ffd166, #ff7e5f);
+  color: #001;
+  border-radius: 20px;
+  padding: 14px;
+  margin-top: 15px;
+  font-size: 26px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+    
+    .tiny { font-size:12px; color:#cfe0ff; opacity:.9 }
+    .row { display:flex; gap:8px; }
+    .row > * { flex:1; }
+    .recording { position: relative; }
+    .recording::after{
+      content:"";
+      position:absolute;
+      top:-6px; right:-6px;
+      width:12px; height:12px;
+      background:#ff4d4d; border-radius:50%;
+      box-shadow:0 0 0 0 rgba(255,77,77,0.7);
+      animation:pulse 1.4s infinite;
+    }
+    @keyframes pulse{
+      0%{ box-shadow:0 0 0 0 rgba(255,77,77,0.7) }
+      70%{ box-shadow:0 0 0 12px rgba(255,77,77,0) }
+      100%{ box-shadow:0 0 0 0 rgba(255,77,77,0) }
+    }
+
+#timerPanel {
+  background: rgba(255, 255, 255, 0.15);
+  font-size: 18px;
+  text-align: center;
+  font-weight: bold;
+  margin-top: 10px;
+  border-radius: 12px;
+  padding: 10px;
+}
+
+    /* === Νέος σχεδιασμός βαθμολογίας === */
+#socraticPanel {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 15px;
+  margin-top: 15px;
+  position: relative;
+  border-left: 4px solid #f2c14e;
+}
+
+.socrates-header {
+  font-weight: 700;
+  color: #f2c14e;
+  margin-bottom: 8px;
+}
+
+.socrates-comment {
+  font-style: italic;
+  line-height: 1.4;
+  color: #ffffff;
+}
+
+/* Κριτήρια */
+#criteriaPanel {
+  background: rgba(255,255,255,0.08);
+  border-radius: 15px;
+  margin-top: 15px;
+  padding: 12px 15px;
+}
+
+.criteria-header {
+  font-weight: 700;
+  color: #6ee0ff;
+  margin-bottom: 8px;
+}
+
+#criteriaList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+#criteriaList li {
+  background: rgba(255,255,255,0.08);
+  border-radius: 10px;
+  padding: 6px 10px;
+  margin-bottom: 6px;
+  font-size: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#criteriaList li::before {
+  content: "•";
+  color: #6ee0ff;
+  margin-right: 6px;
+}
+
+/* Συνολικό σκορ */
+#scorePanel {
+  text-align: center;
+  background: linear-gradient(135deg,#ffd166,#ff7e5f);
+  border-radius: 20px;
+  padding: 12px;
+  margin-top: 15px;
+  color: #001;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+}
+
+.score-label {
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.score-value {
+  font-size: 26px;
+  font-weight: 800;
+}
+
+    
+#timer {
+  color: #ffde59;
+}
+
+#activePlayerBar .tiny { opacity:.9; }
+#activePlayerBar #bonusBtn[disabled] { opacity:.5; cursor:not-allowed; }
+
+/* Κάνει το setup screen scrollable */
+#setupScreen {
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+/* Εμφάνιση όταν επιλέγεται ένας χαρακτήρας */
+.character.selected {
+  outline: 4px solid white;
+  transform: scale(1.05);
+  transition: 0.2s;
+}
+
+  /* === Διάταξη χαρακτήρων σε πλέγμα === */
+#characterSelection {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(120px, 1fr));
+  gap: 20px;
+  justify-items: center;
+  margin-top: 20px;
+}
+
+.character {
+  background: rgba(255,255,255,0.1);
+  border-radius: 15px;
+  padding: 10px;
+  text-align: center;
+  width: 120px;
+}
+
+.character img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: contain;
+  background-color: #ffffff;
+  margin-bottom: 5px;
+  padding: 3px;
+  transition: transform 0.2s;
+}
+
+.character img:hover {
+  transform: scale(1.08);
+}
+
+/* === Εφέ εμφάνισης popup Σωκράτη === */
+#socratesPopup {
+  transition: opacity 1s, transform 1s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+#socratesPopup.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ✨ Λάμψη γύρω από το πλαίσιο */
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px #6ee0ff, 0 0 20px #6ee0ff; }
+  50% { box-shadow: 0 0 20px #6ee0ff, 0 0 30px #6ee0ff; }
+  100% { box-shadow: 0 0 10px #6ee0ff, 0 0 20px #6ee0ff; }
+}
+
+#socratesPopup.glow {
+  animation: glowPulse 2s infinite alternate;
+}
+    
+  </style>
+</head>
+<body>
+
+<!-- === ΑΡΧΙΚΗ ΟΘΟΝΗ (Welcome Screen) === -->
+<div id="welcomeScreen" style="
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#102a6d,#173b88);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:40px 20px 20px 20px;
+  text-align:center;
+  z-index:2000;
+">
+  <img src="images/Socrates.png" alt="Σωκράτης" style="width:160px;height:160px;border-radius:50%;margin-bottom:20px;object-fit:cover;">
+
+  <h1 style="font-size:24px;margin-bottom:10px;">AI Κριτής - Σωκράτης</h1>
+  <p style="font-size:15px;opacity:0.85;margin-bottom:25px;">
+    Ένα φιλοσοφικό παιχνίδι επιχειρηματολογίας για παιδιά και μεγάλους.
+  </p>
+
+  <!-- === ΚΟΥΜΠΙΑ ΑΡΧΙΚΗΣ ΟΘΟΝΗΣ (Main Buttons) === -->
+  <div class="button-container">
+    <button id="goToSetup">🎮 Νέο Παιχνίδι</button>
+    <button id="infoButton">ℹ️ Πληροφορίες</button>
+  </div>
+</div>
+
+<!-- === ΡΥΘΜΙΣΕΙΣ ΠΑΙΧΝΙΔΙΟΥ (Setup Screen) === -->
+<div id="setupScreen" style="
+  position:fixed;
+  inset:0;
+  background:rgba(10,20,60,0.95);
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  z-index:1000;
+  text-align:center;
+  padding:40px 20px 20px 20px;
+">
+
+  <h1 style="margin-bottom:20px;">🎮 Ρυθμίσεις Παιχνιδιού</h1>
+
+  <label>Αριθμός Παικτών:
+    <select id="playerCount" style="margin-left:10px;">
+      <option value="2" selected>2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+    </select>
+  </label>
+
+ <div id="characterSelection" style="margin:20px 0;">
+
+    <!-- Εδώ θα δημιουργηθούν τα avatars δυναμικά -->
+  </div>
+
+  <label>Αριθμός Γύρων:
+    <select id="roundCount" style="margin-left:10px;">
+      <option value="1">1</option>
+      <option value="2" selected>2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+    </select>
+  </label>
+
+  <label style="margin-top:15px;">
+    <input type="checkbox" id="useBonus" checked>
+    Χρήση καρτών +30″
+  </label>
+
+  <button id="startGameBtn" style="
+    margin-top:30px;
+    background:linear-gradient(135deg,#ffd166,#ff7e5f);
+    border:0;
+    border-radius:25px;
+    padding:12px 30px;
+    font-size:18px;
+    cursor:pointer;
+    color:#001;
+    font-weight:bold;
+  ">
+    🚀 Έναρξη Παιχνιδιού
+  </button>
+
+</div>
+
+<script>
+const characters = [
+  { name: "Λία", color: "#ffd166", img: "images/Lia.png" },
+  { name: "Ιάσωνας", color: "#06d6a0", img: "images/Jason.png" },
+  { name: "Τζέημς", color: "#118ab2", img: "images/James.png" },
+  { name: "Μάρκος", color: "#ef476f", img: "images/Marco.png" },
+  { name: "Άννα", color: "#a29bfe", img: "images/Anna.png" },
+  { name: "Μέι Λιν", color: "#ffb6b9", img: "images/May Lin.png" }
+];
+
+let selectedCharacters = []; // αποθηκεύει τις επιλογές
+
+function renderCharacterSelection() {
+  const container = document.getElementById("characterSelection");
+  const status = document.createElement("div");
+  status.id = "selectionStatus";
+  status.style.marginTop = "10px";
+  status.style.fontWeight = "bold";
+  status.style.textAlign = "center";
+  container.after(status);
+
+  container.innerHTML = "";
+  characters.forEach(ch => {
+    const btn = document.createElement("button");
+    btn.innerHTML = `
+      <img src="${ch.img}" style="width:60px;height:60px;border-radius:50%;display:block;margin:0 auto 5px;">
+      ${ch.name}
+    `;
+    btn.style.background = ch.color;
+    btn.style.border = "none";
+    btn.style.color = "#000";
+    btn.style.padding = "10px 15px";
+    btn.style.borderRadius = "15px";
+    btn.style.fontWeight = "700";
+    btn.style.cursor = "pointer";
+    btn.style.minWidth = "80px";
+
+    btn.dataset.id = ch.name.toLowerCase().replace(/\s+/g,"");
+btn.dataset.name = ch.name;
+btn.dataset.color = ch.color;
+btn.dataset.img = ch.img;
+btn.classList.add("character");
+
+btn.addEventListener("click", () => toggleCharacter(ch, btn));
+
+    container.appendChild(btn);
+  });
+
+  updateSelectionStatus();
+}
+
+function toggleCharacter(ch, btn) {
+  const playerSelect = document.getElementById("playerCount");
+  const count = parseInt(playerSelect.value);
+  const idx = selectedCharacters.findIndex(c => c.name === ch.name);
+
+  if (idx !== -1) {
+    // Αν είναι ήδη επιλεγμένος, τον αφαιρούμε
+    selectedCharacters.splice(idx, 1);
+    btn.style.outline = "none";
+    btn.classList.remove("selected");
+  } else {
+    // Αν δεν είναι επιλεγμένος
+    if (selectedCharacters.length >= count) {
+      alert(`Μπορείς να επιλέξεις έως ${count} χαρακτήρες.`);
+      return; // σταματάμε εδώ
+    }
+    selectedCharacters.push(ch);
+    btn.style.outline = "4px solid white";
+    btn.classList.add("selected");
+  }
+
+  updateSelectionStatus();
+}
+
+function updateSelectionStatus() {
+  const count = parseInt(document.getElementById("playerCount").value);
+  const status = document.getElementById("selectionStatus");
+  status.textContent = count === 1
+  ? `Έχεις επιλέξει ${selectedCharacters.length} χαρακτήρα.`
+  : `Έχεις επιλέξει ${selectedCharacters.length} από ${count} χαρακτήρες.`;
+
+
+const startBtn = document.getElementById("startGameBtn");
+startBtn.disabled = selectedCharacters.length < count;
+startBtn.style.opacity = startBtn.disabled ? "0.5" : "1";
+}
+renderCharacterSelection();
+
+document.getElementById("playerCount").addEventListener("change", () => {
+  // Αν μειωθεί ο αριθμός παικτών και έχουμε παραπάνω χαρακτήρες, αφαίρεσέ τους
+  const count = parseInt(document.getElementById("playerCount").value);
+  if (selectedCharacters.length > count) {
+    selectedCharacters = selectedCharacters.slice(0, count);
+  }
+  // Αφαίρεσε τα outlines από όσους “κόπηκαν”
+  document.querySelectorAll(".character").forEach(btn => {
+    const name = btn.textContent.trim();
+    if (!selectedCharacters.find(c => c.name === name)) {
+      btn.style.outline = "none";
+      btn.classList.remove("selected");
+    }
+  });
+  updateSelectionStatus();
+});
+
+</script>
+
+  <div class="app">
+  <h1 id="missionTitle">Αποστολή</h1>
+  <h2 id="missionQuestion">—</h2>
+
+<div class="panel" id="activePlayerBar">
+  <div style="display:flex; align-items:center; gap:10px; justify-content:space-between;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <div id="activeAvatar" style="width:36px;height:36px;border-radius:50%;background:#cfe0ff;color:#0e2a66;display:flex;align-items:center;justify-content:center;font-weight:700;">
+        Λ
+      </div>
+      <div>
+        <div style="font-weight:700;">Ενεργός Παίκτης: <span id="activePlayerName">—</span></div>
+        <div class="tiny">Γύρος: <span id="roundLabel">1</span>/<span id="roundTotal">2</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex; gap:8px;">
+      <button class="btn-secondary" id="bonusBtn" title="Κάρτα +30″" style="min-width:90px;">+30″</button>
+      <button class="btn-secondary" id="nextPlayerBtn" style="min-width:150px;">Επόμενος Παίκτης ⟶</button>
+    </div>
+  </div>
+</div>
+
+  <div class="row">
+    <select id="missionSelect"></select>
+    <select id="langSelect" title="Γλώσσα Ακρόασης">
+      <option value="el-GR" selected>Ελληνικά</option>
+      <option value="en-US">English</option>
+    </select>
+  </div>
+
+  <textarea id="transcript" placeholder="Μίλα στο μικρόφωνο ή γράψε εδώ την απάντηση του παίκτη…"></textarea>
+
+  <button class="btn-primary" id="listenBtn">🎙️ Ο Σωκράτης ακούει</button>
+  <button class="btn-secondary" id="scoreBtn">⚖️ Βαθμολογία</button>
+  <button class="btn-secondary" id="speakBtn">🔊 Άκου τον Σωκράτη</button>
+
+<div class="panel" id="timerPanel">
+  ⏳ Χρόνος: <span id="timer">1:30</span>
+  <button id="pauseBtn" class="btn-secondary" style="margin-left:10px;min-width:100px;">⏸️ Παύση</button>
+</div>
+
+<!-- 💬 Σχόλιο Σωκράτη -->
+<div class="panel" id="socraticPanel">
+  <div class="socrates-header">💬 Ο Σωκράτης σχολιάζει:</div>
+  <div id="socraticComment" class="socrates-comment">—</div>
+</div>
+
+<!-- ⚖️ Ανάλυση Βαθμολογίας -->
+<div class="panel" id="criteriaPanel">
+  <div class="criteria-header">⚖️ Ανάλυση Βαθμολογίας</div>
+  <ul id="criteriaList"></ul>
+</div>
+
+<!-- 🌟 Συνολικό Σκορ -->
+<div id="scorePanel">
+  <div class="score-label">Συνολική Βαθμολογία</div>
+  <div class="score-value" id="totalScore">—/10</div>
+</div>
+
+<script>
+/* ---------- Missions ---------- */
+const missions = [
+  {id:"M-001",title:"Δίκαιο",question:"Τι είναι δίκαιο;"},
+  {id:"M-002",title:"Φιλία",question:"Τι σημαίνει να είμαι φίλος;"},
+  {id:"M-003",title:"Επιτυχία",question:"Γιατί δεν μπορώ να τα έχω όλα;"},
+  {id:"M-004",title:"Ευγνωμοσύνη",question:"Γιατί λέμε \"ευχαριστώ\";"},
+  {id:"M-005",title:"Αλήθεια",question:"Πρέπει πάντα να λέμε την αλήθεια;"},
+  {id:"M-006",title:"Θάρρος",question:"Τι σημαίνει να είσαι γενναίος;"},
+  {id:"M-007",title:"Αποδοχή Ήττας",question:"Είναι δίκαιο να χάνω;"},
+  {id:"M-008",title:"Αγάπη",question:"Πώς δείχνουμε ότι αγαπάμε;"},
+  {id:"M-009",title:"Κανόνες",question:"Γιατί υπάρχουν κανόνες;"},
+  {id:"M-010",title:"Ευτυχία",question:"Τι σε κάνει πραγματικά χαρούμενο;"},
+  {id:"M-011",title:"Ελπίδα/Όνειρα",question:"Γιατί είναι σημαντικό να ονειρεύεσαι;"},
+  {id:"M-012",title:"Πραγματικότητα",question:"Τι είναι αληθινό;"},
+  {id:"M-013",title:"Σεβασμός",question:"Πώς δείχνεις σεβασμό;"},
+  {id:"M-014",title:"Αυτοσυνείδηση",question:"Πώς ξέρω ποιος είμαι;"},
+  {id:"M-015",title:"Ζήλεια",question:"Είναι κακό να ζηλεύω;"},
+  {id:"M-016",title:"Καλοσύνη",question:"Τι σημαίνει να είμαι καλός;"},
+  {id:"M-017",title:"Ελευθερία",question:"Τι είναι η Ελευθερία;"},
+  {id:"M-018",title:"Ψυχή",question:"Υπάρχει Ψυχή;"},
+  {id:"M-019",title:"Νόημα της Ζωής",question:"Έχει νόημα η Ζωή;"},
+  {id:"M-020",title:"Σωστό-Λάθος",question:"Ποιος αποφασίζει τι είναι σωστό;"},
+  {id:"M-021",title:"Τεχνητή Νοημοσύνη",question:"Πόση Τεχνητή Νοημοσύνη είναι αρκετή;"}
+];
+
+/* ---------- Εικόνες Φιλοσόφων ---------- */
+const philosopherImages = {
+  "Πλάτων": "images/philosophers/plato.png",
+  "Αριστοτέλης": "images/philosophers/aristotle.png",
+  "Σωκράτης": "images/philosophers/socrates.png",
+  "Επίκουρος": "images/philosophers/epicurus.png",
+  "Επίκτητος": "images/philosophers/epictetus.png"
+};
+  
+/* ---------- Ρήσεις ανά Αποστολή ---------- */
+const quotesByMission = {
+  "M-001": [
+    { author: "Πλάτων", quote: "Ο δίκαιος άνθρωπος δεν βλάπτει ποτέ κανέναν. (Πολιτεία)" },
+    { author: "Αριστοτέλης", quote: "Το δίκαιο είναι η αρχή της πολιτικής αρετής. (Ηθικά Νικομάχεια)" }
+  ],
+  "M-002": [
+    { author: "Αριστοτέλης", quote: "Η φιλία είναι μία ψυχή σε δύο σώματα." },
+    { author: "Επίκουρος", quote: "Από όλα όσα η σοφία μάς χαρίζει για την ευτυχία, το πολυτιμότερο είναι η φιλία." }
+  ],
+  "M-005": [
+    { author: "Πλάτων", quote: "Η αλήθεια είναι ο ήλιος του νου." },
+    { author: "Σωκράτης", quote: "Ένα μόνο ξέρω: ότι δεν ξέρω τίποτα. (Απολογία)" }
+  ],
+  "M-006": [
+    { author: "Αριστοτέλης", quote: "Η ανδρεία είναι το μέσο ανάμεσα στον φόβο και την τόλμη." }
+  ],
+  "M-010": [
+    { author: "Αριστοτέλης", quote: "Η ευτυχία είναι το τελικό αγαθό στο οποίο αποβλέπουν όλες οι πράξεις μας." },
+    { author: "Επίκουρος", quote: "Η ευτυχία δεν έρχεται με τα πλούτη, αλλά με τη γαλήνη της ψυχής." }
+  ],
+  "M-017": [
+    { author: "Επίκτητος", quote: "Ελεύθερος είναι όποιος δεν εξαρτάται από τα πάθη του." },
+    { author: "Πλάτων", quote: "Η ελευθερία είναι η τάξη της ψυχής που γνωρίζει το δίκαιο." }
+  ],
+  "M-019": [
+    { author: "Αριστοτέλης", quote: "Το νόημα της ζωής είναι να βρεις τον σκοπό σου και να του αφιερωθείς." },
+    { author: "Σωκράτης", quote: "Μη ζεις χωρίς να εξετάζεις τη ζωή σου. (Απολογία)" }
+  ]
+};
+  
+/* ---------- Game state ---------- */
+const game = {
+  players: [
+    { id: 'p1', name: 'Λία', color: '#ffd166', bonusLeft: 1 },
+    { id: 'p2', name: 'Ιάσωνας', color: '#06d6a0', bonusLeft: 1 }
+  ],
+  currentRound: 1,
+  totalRounds: 2,
+  activeIndex: 0,
+  baseTimeSec: 90,
+   scores: {}   // ✅ εδώ δηλώνουμε τον χώρο όπου θα αποθηκεύονται οι βαθμολογίες
+};
+
+function renderActivePlayer() {
+  const p = game.players[game.activeIndex];
+  document.getElementById('activePlayerName').textContent = p.name;
+  document.getElementById('activeAvatar').textContent = p.name[0] || 'Π';
+  document.getElementById('activeAvatar').style.background = p.color || '#cfe0ff';
+  document.getElementById('roundLabel').textContent = game.currentRound;
+  document.getElementById('roundTotal').textContent = game.totalRounds;
+  const bonusBtn = document.getElementById('bonusBtn');
+  bonusBtn.disabled = p.bonusLeft <= 0;
+}
+
+function loadMissions(){
+  const sel = document.getElementById("missionSelect");
+  sel.innerHTML = "";
+  missions.forEach(m=>{
+    const opt = document.createElement("option");
+    opt.value = m.id;
+    opt.textContent = `${m.id} — ${m.title}`;
+    sel.appendChild(opt);
+  });
+  renderMission(missions[0].id);
+}
+
+function renderMission(id){
+  const m = missions.find(x=>x.id===id);
+  document.getElementById("missionTitle").textContent = `Αποστολή ${m.id}`;
+  document.getElementById("missionQuestion").textContent = `${m.title}: ${m.question}`;
+  document.getElementById("missionSelect").value = id;
+}
+
+/* ---------- Τυχαία Σχόλια Σωκράτη ---------- */
+const socratesComments = [
+  "Η σιωπή είναι κι αυτή μια απάντηση.",
+  "Καλή σκέψη, αλλά μήπως έχει κι άλλη όψη;",
+  "Ο διάλογος ανοίγει τον δρόμο της σοφίας.",
+  "Η αλήθεια γεννιέται μέσα από ερωτήσεις.",
+  "Ο Σωκράτης χαμογελά – προχώρα έτσι!",
+  "Μερικές φορές, η γνώση ξεκινά από την απορία.",
+  "Σκέψου ξανά: ποιο είναι το γιατί πίσω από αυτό;",
+  "Κάθε ιδέα αξίζει να ακουστεί."
+];
+  
+/* ---------- Advance turn & round ---------- */
+function advanceTurn() {
+  // Ελέγχουμε αν ο τωρινός παίκτης ήταν ο τελευταίος του τελευταίου γύρου
+  const isLastPlayer = game.activeIndex === game.players.length - 1;
+  const isLastRound = game.currentRound === game.totalRounds;
+
+  if (isLastPlayer && isLastRound) {
+    showResultsSummary(); // ✅ τώρα τελειώνει αφού παίξουν όλοι στον τελευταίο γύρο
+    return;
+  }
+
+  // Διαφορετικά, απλώς αλλάζουμε παίκτη / γύρο
+  game.activeIndex++;
+
+  if (game.activeIndex >= game.players.length) {
+    game.activeIndex = 0;
+    game.currentRound++;
+  }
+
+  // 🧹 Καθαρισμός πεδίων για τον επόμενο παίκτη
+  document.getElementById("transcript").value = "";
+  document.getElementById("socraticComment").textContent = "—";
+  document.getElementById("criteriaList").innerHTML = "";
+  document.getElementById("totalScore").textContent = "—/10";
+
+  renderActivePlayer();
+}
+
+/* ---------- Εμφάνιση Popup Σωκράτη ---------- */
+function showSocratesPopup() {
+  const random = Math.floor(Math.random() * socratesComments.length);
+  const message = socratesComments[random];
+  const popup = document.getElementById("socratesPopup");
+  const text = document.getElementById("socratesPopupText");
+
+  text.textContent = message;
+  popup.style.display = "block";
+
+  // ✨ Προσθήκη κλάσεων για εφέ εμφάνισης & λάμψης
+  popup.classList.add("show", "glow");
+
+  // Μετά από 3 δευτερόλεπτα fade out
+  setTimeout(() => {
+    popup.classList.remove("glow");
+    popup.style.opacity = 0;
+    popup.style.transform = "translateY(20px)";
+    setTimeout(() => {
+      popup.style.display = "none";
+      popup.classList.remove("show");
+    }, 1000);
+  }, 3000);
+}
+
+  /* ---------- Αποτελέσματα Αποστολής ---------- */
+function showResultsSummary() {
+  const totalScores = {};
+  const playerSummaries = [];
+
+  game.players.forEach(p => {
+    const arr = game.scores[p.name] || [];
+    const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
+
+    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
+    const sum = validNumbers.reduce((a, b) => a + b, 0);
+    const average = validNumbers.length > 0 ? (sum / validNumbers.length).toFixed(1) : "—";
+
+    totalScores[p.name] = sum;
+
+    playerSummaries.push(`
+      <li style="margin-bottom:12px;">
+        <strong style="color:${p.color}">${p.name}</strong><br>
+        <span style="font-size:14px;opacity:0.9">${roundScores.join(" | ")}</span><br>
+        <span style="font-size:15px;">Σύνολο: <b>${sum}</b> — Μ.Ο.: <b>${average}</b></span>
+      </li>
+    `);
+  });
+
+// ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
+const currentMission = document.getElementById("missionSelect").value;
+const availableQuotes = quotesByMission[currentMission] || [];
+
+let quoteHTML = `<p style="font-style:italic;">«Ο διάλογος είναι η αρχή της σοφίας.»</p><p style="text-align:right;">— Σωκράτης</p>`;
+
+if (availableQuotes.length > 0) {
+  const random = Math.floor(Math.random() * availableQuotes.length);
+  const q = availableQuotes[random];
+  const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
+
+  quoteHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
+      <img src="${imgSrc}" alt="${q.author}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+      <div style="max-width:400px; text-align:left;">
+        <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
+        <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
+      </div>
+    </div>
+  `;
+}
+
+document.getElementById("socratesQuote").innerHTML = quoteHTML;
+
+// Δημιουργία λίστας αποτελεσμάτων
+const html = `
+  <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
+    ${playerSummaries.join("")}
+  </ul>
+  <p style="margin-top:15px; font-size:17px;">${winnerText}</p>
+`;
+
+// Εμφάνιση modal
+document.getElementById("resultsSummary").innerHTML = html;
+document.getElementById("resultModal").style.display = "flex";
+
+// ✅ Ήχος - Σωκράτειο Καμπανάκι
+try {
+  const audio = new Audio("sounds/philosophical_chime.mp3");
+  audio.volume = 0.6;          // 🎧 ήπια ένταση
+  audio.currentTime = 0;       // ξεκινά πάντα από την αρχή
+  audio.play().catch(err => console.warn("Audio blocked:", err));
+
+  // ✨ Εφέ λάμψης στο modal (αν υπάρχει)
+  const modalBox = document.querySelector("#resultModal > div");
+  if (modalBox) {
+    modalBox.classList.add("glow");
+    setTimeout(() => modalBox.classList.remove("glow"), 1500);
+  }
+
+} catch (e) {
+  console.warn("Audio failed:", e);
+}
+
+  // Επόμενη Αποστολή
+  document.getElementById("nextMissionBtn").onclick = () => {
+    document.getElementById("resultModal").style.display = "none";
+  };
+}
+
+  /* ---------- Timer ---------- */
+let timerInterval = null;
+let isTimerRunning = false;
+let remainingTime = 90;
+let isPaused = false;
+
+function startTimer(durationSec = 90) {
+  clearInterval(timerInterval);
+  isTimerRunning = true;
+  isPaused = false;
+  remainingTime = durationSec; // ✅ σωστό όνομα μεταβλητής
+
+  function updateDisplay() {
+    const minutes = Math.floor(remainingTime / 60);
+    const seconds = remainingTime % 60;
+    document.getElementById("timer").textContent =
+      `${minutes}:${seconds.toString().padStart(2, "0")}`;
+  }
+
+  updateDisplay();
+  timerInterval = setInterval(() => {
+    if (isPaused) return; // ⏸️ δεν μειώνει χρόνο αν έχει παύση
+    remainingTime--;
+
+if (remainingTime < 0) {
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  document.getElementById("timer").textContent = "⏰ Τέλος!";
+
+  // ✅ Ήχος λήξης χρόνου - Σωκράτειο Καμπανάκι
+  try {
+    const audio = new Audio("sounds/philosophical_chime.mp3");
+    audio.volume = 0.6;          // πιο ήπια ένταση
+    audio.currentTime = 0;       // ξεκινά πάντα απ’ την αρχή
+    audio.play().catch(err => console.warn("Audio blocked:", err));
+  } catch (e) {
+    console.warn("Audio error:", e);
+  }
+
+  // 🏛️ Σχόλιο Σωκράτη στο τέλος γύρου
+  showSocratesPopup();
+
+  try {
+    if (recognition && recognizing) recognition.stop();
+  } catch (e) {}
+
+  advanceTurn();  // ✅ ενημερώνει αυτόματα παίκτη & γύρο
+  return;
+}
+
+    updateDisplay();
+  }, 1000);
+}
+
+   /* ---------- Pause / Resume button ---------- */
+document.getElementById("pauseBtn").addEventListener("click", () => {
+  if (!isTimerRunning) return;
+  isPaused = !isPaused;
+  document.getElementById("pauseBtn").textContent = isPaused ? "▶️ Συνέχεια" : "⏸️ Παύση";
+});
+
+/* ---------- Text-to-Speech (Socrates) ---------- */
+document.getElementById("speakBtn").addEventListener("click", ()=>{
+  const comment = document.getElementById("socraticComment").textContent.trim();
+  if(!comment || comment==="—"){ 
+    alert("Δεν υπάρχει σχόλιο για να διαβαστεί.");
+    return;
+  }
+  const utterance = new SpeechSynthesisUtterance(comment);
+  const voices = speechSynthesis.getVoices();
+  const greekVoice = voices.find(v => v.lang.startsWith("el"));
+  if(greekVoice) utterance.voice = greekVoice;
+  speechSynthesis.speak(utterance);
+});
+
+/* ---------- Speech-to-Text ---------- */
+const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recognition = null;
+let recognizing = false;
+let finalTranscript = "";
+let shouldListen = false; // για αυτόματη επανεκκίνηση όσο “τρέχει” ο γύρος
+
+function initSTT(){
+  if(!SpeechRecognition){
+    alert("Ο browser δεν υποστηρίζει Speech Recognition. Πρότεινεται Chrome σε desktop/Android.");
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = document.getElementById("langSelect").value;
+
+  recognition.onstart = () => {
+    recognizing = true;
+    document.getElementById("listenBtn").classList.add("recording");
+    document.getElementById("listenBtn").textContent = "■ Σταμάτα την ακρόαση";
+  };
+
+  recognition.onend = () => {
+    recognizing = false;
+    // αν ο χρόνος “τρέχει” και θέλουμε να συνεχίσει η ακρόαση, ξαναξεκίνα
+    if (shouldListen && isTimerRunning) {
+      try { recognition.start(); return; } catch(e) {}
+    }
+    // αλλιώς, επανάφερε το κουμπί
+    document.getElementById("listenBtn").classList.remove("recording");
+    document.getElementById("listenBtn").textContent = "🎙️ Ο Σωκράτης ακούει";
+  };
+
+  recognition.onerror = (e) => {
+    console.warn("STT error:", e.error);
+  };
+
+  recognition.onresult = (event) => {
+    let interim = "";
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      const res = event.results[i];
+      if (res.isFinal) finalTranscript += res[0].transcript + " ";
+      else interim += res[0].transcript;
+    }
+    document.getElementById("transcript").value = (finalTranscript + " " + interim).trim();
+  };
+}
+
+document.getElementById("langSelect").addEventListener("change", () => {
+  if(recognition){ recognition.lang = document.getElementById("langSelect").value; }
+});
+ 
+/* ---------- Listen button ---------- */
+document.getElementById("listenBtn").addEventListener("click", ()=>{
+  if(!recognition){ initSTT(); }
+  if(!recognition){ return; }
+
+  if(!recognizing){
+    shouldListen = true;
+    finalTranscript = document.getElementById("transcript").value.trim() + " ";
+    recognition.start();
+    startTimer(game.baseTimeSec || 90);
+  }else{
+    shouldListen = false;
+    recognition.stop();
+    clearInterval(timerInterval);
+    isTimerRunning = false;
+  }
+});
+
+/* ---------- Mission select ---------- */
+document.getElementById("missionSelect").addEventListener("change", (e)=>{
+  renderMission(e.target.value);
+});
+
+/* ---------- Start timer on typing ---------- */
+document.getElementById("transcript").addEventListener("input", () => {
+  if (!isTimerRunning) {
+    startTimer(game.baseTimeSec || 90);
+  }
+});
+
+/* ---------- Server calls ---------- */
+async function getScore(transcript, mission) {
+  try {
+    const response = await fetch("/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "score", transcript, mission })
+    });
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    return { error: "Σφάλμα στη βαθμολογία.", raw: String(err) };
+  }
+}
+
+async function getComment(transcript, mission) {
+  try {
+    const response = await fetch("/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ type: "comment", transcript, mission })
+    });
+    const data = await response.json();
+    return data.comment || "—";
+  } catch (err) {
+    return "Σφάλμα στο σχόλιο.";
+  }
+}
+
+/* ---------- Score button ---------- */
+document.getElementById("scoreBtn").addEventListener("click", async ()=> {
+  const transcript = document.getElementById("transcript").value.trim();
+  const missionId = document.getElementById("missionSelect").value;
+  const mission = missions.find(m => m.id === missionId);
+
+  const scores = await getScore(transcript, mission);
+  const comment = await getComment(transcript, mission);
+
+  // Αν αποτύχει το API
+  if (scores.error) {
+    document.getElementById("socraticComment").textContent = scores.error;
+    document.getElementById("totalScore").textContent = "--/10";
+    document.getElementById("criteriaList").innerHTML = "";
+    return;
+  }
+
+  // Εμφάνισε σχόλιο
+  document.getElementById("socraticComment").textContent = comment;
+
+  // Ανάλυση κριτηρίων
+  const criteriaList = document.getElementById("criteriaList");
+  criteriaList.innerHTML = "";
+  if (scores.criteria) {
+    for (const [k, v] of Object.entries(scores.criteria)) {
+      const li = document.createElement("li");
+      li.textContent = `${k}: ${v}/2`;
+      criteriaList.appendChild(li);
+    }
+  }
+
+  // ✅ Μετατροπή βαθμολογίας σε αριθμό (ανεξαρτήτως μορφής)
+  let totalNum = 0;
+  if (scores.total) {
+    const match = String(scores.total).match(/\d+(\,\d+|\.\d+)?/);
+    if (match) totalNum = parseFloat(match[0].replace(",", "."));
+  }
+
+  // Εμφάνιση
+  document.getElementById("totalScore").textContent = `${totalNum}/10`;
+
+  // ✅ Αποθήκευση σκορ ανά παίκτη
+  const activePlayer = game.players[game.activeIndex].name;
+  if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
+  const roundIndex = game.currentRound - 1; // 0-based
+  game.scores[activePlayer][roundIndex] = totalNum;
+
+  console.log("✅ Αποθηκεύτηκε σκορ:", activePlayer, totalNum, game.scores);
+});
+
+/* ---------- Next player / Bonus ---------- */
+document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  isPaused = false;
+  remainingTime = game.baseTimeSec; // επαναφορά χρόνου
+
+  advanceTurn(); // ✅ ενιαία λογική αλλαγής παίκτη και γύρου
+  document.getElementById("timer").textContent = "1:30";
+});
+
+document.getElementById('bonusBtn').addEventListener('click', ()=>{
+  const p = game.players[game.activeIndex];
+  if(p.bonusLeft > 0){
+    p.bonusLeft--;
+    const timerEl = document.getElementById("timer").textContent;
+    if(/^\d+:\d+$/.test(timerEl)){
+      const [min, sec] = timerEl.split(":").map(Number);
+      let remainigTime = min*60 + sec + 30;
+      startTimer(remainigTime);
+    }
+    renderActivePlayer();
+  }
+});
+
+/* ---------- Boot ---------- */
+loadMissions();
+renderActivePlayer();
+
+/* ---------- Start Game (setup → app) ---------- */
+document.getElementById("startGameBtn").addEventListener("click", () => {
+  const playerCount = parseInt(document.getElementById("playerCount").value);
+  const roundCount = parseInt(document.getElementById("roundCount").value);
+  const useBonus = document.getElementById("useBonus").checked;
+
+  const selected = Array.from(document.querySelectorAll(".character.selected"));
+  if (selected.length < playerCount) {
+    alert("Παρακαλώ επίλεξε όσους χαρακτήρες όσοι είναι οι παίκτες!");
+    return;
+  }
+
+  game.players = selected.slice(0, playerCount).map(el => ({
+    id: el.dataset.id,
+    name: el.dataset.name,
+    color: el.dataset.color,
+    img: el.dataset.img,
+    bonusLeft: useBonus ? 1 : 0
+  }));
+  game.currentRound = 1;
+  game.totalRounds = roundCount;
+  game.activeIndex = 0;
+
+  document.getElementById("setupScreen").style.display = "none";
+  renderActivePlayer();
+});
+
+/* ---------- Welcome → Setup ---------- */
+document.getElementById("goToSetup").addEventListener("click", () => {
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("setupScreen").style.display = "flex";
+});
+
+/* ---------- Info ---------- */
+document.getElementById("infoButton").addEventListener("click", () => {
+  alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
+});
+
+</script>
+  
+<!-- === MODAL ΑΝΑΚΟΙΝΩΣΗΣ ΑΠΟΤΕΛΕΣΜΑΤΟΣ === -->
+<div id="resultModal" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3000;
+  color:white;
+  font-family: system-ui, Arial;
+  text-align:center;
+  padding:20px;
+">
+  <div style="background:#142f70; border-radius:20px; padding:30px; max-width:600px; box-shadow:0 0 30px rgba(0,0,0,0.4);">
+    <h2>📜 Η Σκέψη του Φιλοσόφου:</h2>
+    <p id="socratesQuote" style="font-style:italic; font-size:1.2em; margin:20px 0;"></p>
+    <h3>📜 Αποτελέσματα Αποστολής</h3>
+    <div id="resultsSummary" style="margin-top:10px;"></div>
+    <button id="nextMissionBtn" style="
+      margin-top:25px;
+      background:#f2c14e;
+      border:none;
+      padding:12px 25px;
+      border-radius:10px;
+      font-weight:bold;
+      cursor:pointer;
+      color:#000;
+    ">Επόμενη Αποστολή</button>
+  </div>
+</div>
+
+  <!-- Popup Σχολίου Σωκράτη -->
+<div id="socratesPopup" style="
+  display:none;
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  background:rgba(255,255,255,0.15);
+  border:2px solid #6ee0ff;
+  border-radius:15px;
+  padding:12px 18px;
+  color:#fff;
+  font-size:16px;
+  text-align:center;
+  backdrop-filter:blur(4px);
+  box-shadow:0 4px 10px rgba(0,0,0,0.3);
+  z-index: 4000;
+">
+  💬 <span id="socratesPopupText"></span>
+</div>
+
+
+</body>
+</html>
