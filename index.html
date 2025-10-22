@@ -1141,6 +1141,7 @@ async function getScore(transcript, mission) {
 
 /* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=> {
+  console.log("🟢 Πατήθηκε το κουμπί Βαθμολογία");
   try { if (recognition && recognizing) recognition.stop(); } catch {}
   isPaused = false;
   zeroTimer(); // μηδενίζει χρόνο & μπάρα
