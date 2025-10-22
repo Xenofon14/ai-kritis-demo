@@ -1168,9 +1168,6 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const activePlayer = game.players[game.activeIndex].name;
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
   const roundIndex = game.currentRound - 1;
-const activePlayer = game.players[game.activeIndex].name;
-if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
-const roundIndex = game.currentRound - 1;
 
 // 🧠 Έλεγχος για διπλομετρημένα επιχειρήματα
 if (game.currentRound > 1) {
