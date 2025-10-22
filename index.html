@@ -790,20 +790,18 @@ function showResultsSummary() {
     const arr = game.scores[p.name] || [];
     const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
 
-    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
-    const sum = validNumbers.reduce((a, b) => a + b, 0);
-    const average = validNumbers.length > 0 ? (sum / validNumbers.length).toFixed(1) : "—";
+ const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
+const sum = validNumbers.reduce((a, b) => a + b, 0);
 
-    totalScores[p.name] = sum;
+totalScores[p.name] = sum;
 
-    playerSummaries.push(`
-      <li style="margin-bottom:12px;">
-        <strong style="color:${p.color}">${p.name}</strong><br>
-        <span style="font-size:14px;opacity:0.9">${roundScores.join(" | ")}</span><br>
-        <span style="font-size:15px;">Σύνολο: <b>${sum}</b> — Μ.Ο.: <b>${average}</b></span>
-      </li>
-    `);
-  });
+playerSummaries.push(`
+  <li style="margin-bottom:12px;">
+    <strong style="color:${p.color}">${p.name}</strong><br>
+    <span style="font-size:14px;opacity:0.9">${roundScores.join(" | ")}</span><br>
+    <span style="font-size:15px;">Σύνολο: <b>${sum}</b></span>
+  </li>
+`);
 
 // ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
 const currentMission = document.getElementById("missionSelect").value;
@@ -816,15 +814,17 @@ if (availableQuotes.length > 0) {
   const q = availableQuotes[random];
   const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
 
-  quoteHTML = `
-    <div style="display:flex; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;">
-      <img src="${imgSrc}" alt="${q.author}" style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
-      <div style="max-width:400px; text-align:left;">
-        <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
-        <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
-      </div>
+quoteHTML = `
+  <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
+    <div style="position:relative; width:90px; height:90px;">
+      <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
     </div>
-  `;
+    <div style="max-width:420px; text-align:left;">
+      <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
+      <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
+    </div>
+  </div>
+`;
 }
 
 document.getElementById("socratesQuote").innerHTML = quoteHTML;
@@ -868,10 +868,17 @@ try {
   console.warn("Audio failed:", e);
 }
 
-  // Επόμενη Αποστολή
-  document.getElementById("nextMissionBtn").onclick = () => {
-    document.getElementById("resultModal").style.display = "none";
-  };
+// Επόμενη Αποστολή
+document.getElementById("nextMissionBtn").onclick = () => {
+  document.getElementById("resultModal").style.display = "none";
+  document.getElementById("welcomeScreen").style.display = "flex";
+  document.getElementById("setupScreen").style.display = "none";
+  document.querySelector(".app").scrollIntoView({ behavior: "smooth" });
+  game.scores = {};
+  game.currentRound = 1;
+  game.activeIndex = 0;
+  renderActivePlayer();
+};
 }
 
 /* ---------- Timer ---------- */
