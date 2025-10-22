@@ -1251,22 +1251,21 @@ async function getScore(transcript, mission) {
       "Αντίρρηση": (game.currentRound >= 2 && found.opposition_indicators) ? 2 : 0
     };
 
-    // ⚖️ Υπολογισμός συνολικού σκορ
-    const total = Object.values(criteria).reduce((a,b)=>a+b,0);
+// ⚖️ Υπολογισμός συνολικού σκορ
+const total = Object.values(criteria).reduce((a,b)=>a+b,0);
 
-    console.log("📊 Τελική βαθμολογία:", criteria, "➡️ Σύνολο:", total);
+console.log("📊 Τελική βαθμολογία:", criteria, "➡️ Σύνολο:", total);
 
-    // ⏳ Προσομοίωση μικρής καθυστέρησης
-    await new Promise(r => setTimeout(r, 500));
-    return { criteria, total };
-    
-    await new Promise(r => setTimeout(r, 500)); // καθυστέρηση για ρεαλισμό
-    return { criteria, total };
+// ⏳ Προσομοίωση μικρής καθυστέρησης
+await new Promise(r => setTimeout(r, 500));
 
-  } catch (err) {
-    console.error("❌ Σφάλμα getScore:", err);
-    return { error: "Σφάλμα στη βαθμολογία.", raw: String(err) };
-  }
+// ✅ Επιστρέφουμε και το feedback ώστε να το δει ο Σωκράτης
+return { criteria, total, feedback };
+
+} catch (err) {
+  console.error("❌ Σφάλμα getScore:", err);
+  return { error: "Σφάλμα στη βαθμολογία.", raw: String(err) };
+}
 }
 
 async function getComment(transcript, mission) {
@@ -1291,11 +1290,17 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   zeroTimer(); // μηδενίζει χρόνο & μπάρα
 
   const transcript = document.getElementById("transcript").value.trim();
-  const missionId = document.getElementById("missionSelect").value;
-  const mission = missions.find(m => m.id === missionId);
+const missionId = document.getElementById("missionSelect").value;
+const mission = missions.find(m => m.id === missionId);
 
-  const scores = await getScore(transcript, mission);
-  const comment = await getComment(transcript, mission);
+// 🔹 Παίρνουμε τη βαθμολογία και το feedback από τον αλγόριθμο
+const scores = await getScore(transcript, mission);
+
+// Αν η getScore() έχει παράξει feedback, χρησιμοποίησέ το.
+// Αν όχι (π.χ. δεν εντοπίστηκαν μοτίβα), τότε πάρε το παλιό σχόλιο.
+const comment = (scores.feedback && scores.feedback.trim() !== "")
+  ? scores.feedback
+  : await getComment(transcript, mission);
 
   if (scores.error) {
     document.getElementById("socraticComment").textContent = scores.error;
