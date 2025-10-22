@@ -711,24 +711,6 @@ const socratesComments = [
   "Κάθε ιδέα αξίζει να ακουστεί."
 ];
   
-/* ---------- Advance turn & round ---------- */
-function advanceTurn() {
-  const isLastPlayer = game.activeIndex === game.players.length - 1;
-  const isLastRound = game.currentRound === game.totalRounds;
-
-  if (isLastPlayer && isLastRound) {
-    console.log("📜 Όλοι οι παίκτες ολοκλήρωσαν! Εμφάνιση τελικής κάρτας...");
-    showResultsSummary();
-    return;
-  }
-
-  game.activeIndex++;
-  if (game.activeIndex >= game.players.length) {
-    game.activeIndex = 0;
-    game.currentRound++;
-    console.log(`🔁 Νέος γύρος: ${game.currentRound}/${game.totalRounds}`);
-  }
-
   // 🧹 Καθαρισμός πεδίων
   document.getElementById("transcript").value = "";
   document.getElementById("socraticComment").textContent = "—";
