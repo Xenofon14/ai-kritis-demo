@@ -760,33 +760,43 @@ function advanceTurn() {
     updateTimeBar(game.baseTimeSec); // ✅ Επαναφορά μπάρας χρόνου
 }
 
-/* ---------- Αναλυτική Βαθμολογία ---------- */
+/* ---------- Αναλυτική Βαθμολογία (με αναλυτικά κριτήρια) ---------- */
 function buildDetailsHTML() {
-  let html = `<table id="detailsTable">
+  let html = `<table id="detailsTable" style="width:100%;border-collapse:collapse;text-align:center;font-size:15px;">
     <thead>
-      <tr>
-        <th>Παίκτης</th>`;
+      <tr style="background:rgba(255,255,255,0.1);">
+        <th style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.2);">Παίκτης</th>`;
 
-  // Στήλες για κάθε γύρο
+  // Δημιουργία κεφαλίδων για γύρους
   for (let r = 1; r <= game.totalRounds; r++) {
-    html += `<th>Γύρος ${r}</th>`;
+    html += `<th style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.2);">Γύρος ${r}</th>`;
   }
 
-  // Τελική στήλη αθροίσματος
-  html += `<th>Σύνολο</th></tr></thead><tbody>`;
+  html += `<th style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.2);">Σύνολο</th>
+    </tr>
+    </thead><tbody>`;
 
-  // Σειρές παικτών
+  // Σειρές για κάθε παίκτη
   game.players.forEach(p => {
     const arr = game.scores[p.name] || [];
     const validNumbers = arr.map(v => (typeof v === "number" ? v : 0));
     const sum = validNumbers.reduce((a, b) => a + b, 0);
 
     html += `<tr>
-      <td style="color:${p.color};font-weight:bold;">${p.name}</td>`;
+      <td style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.1);color:${p.color};font-weight:bold;">${p.name}</td>`;
+
+    // Για κάθε γύρο, δείχνουμε σκορ και (αν υπάρχουν) τα επιμέρους κριτήρια
     for (let r = 0; r < game.totalRounds; r++) {
-      html += `<td>${validNumbers[r] ?? "—"}</td>`;
+      const roundData = (game.criteriaDetails?.[p.name]?.[r + 1]) || {};
+      const subCriteria = Object.entries(roundData)
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("<br>");
+      html += `<td style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.1);font-size:13px;">
+        <b>${validNumbers[r] ?? "—"}</b><br><span style="opacity:0.8;font-size:12px;">${subCriteria || ""}</span>
+      </td>`;
     }
-    html += `<td><b>${sum}</b></td></tr>`;
+
+    html += `<td style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.1);font-weight:bold;">${sum}</td></tr>`;
   });
 
   html += `</tbody></table>`;
