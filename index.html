@@ -1226,6 +1226,7 @@ renderActivePlayer();
 
 /* ---------- Start Game (setup → app) ---------- */
 document.getElementById("startGameBtn").addEventListener("click", () => {
+  document.getElementById("welcomeScreen").style.display = "none";
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
   const useBonus = document.getElementById("useBonus").checked;
