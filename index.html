@@ -1181,6 +1181,9 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   document.getElementById("totalScore").textContent = `${totalNum}/10`;
 
   const activePlayer = game.players[game.activeIndex].name;
+if (!game.criteriaDetails) game.criteriaDetails = {};
+if (!game.criteriaDetails[activePlayer]) game.criteriaDetails[activePlayer] = {};
+game.criteriaDetails[activePlayer][game.currentRound] = scores.criteria || {};
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
   const roundIndex = game.currentRound - 1;
 
