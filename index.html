@@ -1117,6 +1117,7 @@ async function getScore(transcript, mission) {
     });
 
     const data = await response.json();
+    console.log("🔍 Απάντηση από τον server:", data);
     return data;
 
   } catch (err) {
