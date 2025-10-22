@@ -1119,11 +1119,14 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const criteriaList = document.getElementById("criteriaList");
   criteriaList.innerHTML = "";
   if (scores.criteria) {
-    for (const [k, v] of Object.entries(scores.criteria)) {
-      const li = document.createElement("li");
-      li.textContent = `${k}: ${v}/2`;
-      criteriaList.appendChild(li);
-    }
+   for (const [k, v] of Object.entries(scores.criteria)) {
+  // ❗ Παράλειψη της "Αντίρρησης" στον 1ο γύρο
+  if (game.currentRound === 1 && k === "Αντίρρηση") continue;
+
+  const li = document.createElement("li");
+  li.textContent = `${k}: ${v}/2`;
+  criteriaList.appendChild(li);
+}
   }
 
   let totalNum = 0;
@@ -1136,6 +1139,33 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const activePlayer = game.players[game.activeIndex].name;
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
   const roundIndex = game.currentRound - 1;
+const activePlayer = game.players[game.activeIndex].name;
+if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
+const roundIndex = game.currentRound - 1;
+
+// 🧠 Έλεγχος για διπλομετρημένα επιχειρήματα
+if (game.currentRound > 1) {
+  const prevTranscript = (game.previousArguments?.[activePlayer] || "").toLowerCase();
+  const currentTranscript = transcript.toLowerCase();
+
+  const repeatedRatio = prevTranscript && currentTranscript
+    ? (currentTranscript.split(" ").filter(w => prevTranscript.includes(w)).length /
+       currentTranscript.split(" ").length)
+    : 0;
+
+  // Αν πάνω από 50% των λέξεων έχουν ήδη ειπωθεί → μείωση 1 πόντου
+  if (repeatedRatio > 0.5) {
+    console.log(`⚠️ ${activePlayer}: επαναλαμβάνει επιχειρήματα (${(repeatedRatio*100).toFixed(0)}%)`);
+    totalNum = Math.max(0, totalNum - 1);
+  }
+}
+
+// Αποθήκευση τρέχοντος επιχειρήματος για επόμενο έλεγχο
+if (!game.previousArguments) game.previousArguments = {};
+game.previousArguments[activePlayer] = transcript;
+
+game.scores[activePlayer][roundIndex] = totalNum;
+
   game.scores[activePlayer][roundIndex] = totalNum;
 
   console.log("✅ Αποθηκεύτηκε σκορ:", activePlayer, totalNum, game.scores);
