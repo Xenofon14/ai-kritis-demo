@@ -630,6 +630,20 @@ const quotesByMission = {
     { author: "Σωκράτης", quote: "Μη ζεις χωρίς να εξετάζεις τη ζωή σου. (Απολογία)" }
   ]
 };
+
+};
+
+/* ---------- Rubric & Σειρά Κριτηρίων ---------- */
+const RUBRIC = {
+  order: ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"],
+  weights: {
+    "Θέση": { min: 0, max: 2 },                 // αναφορά + σύντομη εξήγηση
+    "Τεκμηρίωση": { perArgument: 1, cap: null },// 1 βαθμός/μοναδικό επιχείρημα, χωρίς όριο
+    "Συνάφεια": { min: 0, max: 3 },             // λέξεις/ιδέες που ταιριάζουν με τη ρήση
+    "Σαφήνεια": { min: 0, max: 1 },             // δομή: αρχή-μέση-τέλος
+    "Αντίρρηση": { min: 0, max: 2 }             // παραλείπεται στον 1ο γύρο
+  }
+};
   
 /* ---------- Game state ---------- */
 const game = {
@@ -1099,16 +1113,29 @@ async function getScore(transcript, mission) {
     const response = await fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "score", transcript, mission })
+      body: JSON.stringify({
+        type: "score",
+        transcript,
+        mission,
+        round: game.currentRound,
+        rubric: RUBRIC,
+        philosopherHint: (() => {
+          const mid = document.getElementById("missionSelect").value;
+          const qs = quotesByMission[mid] || [];
+          return qs.length ? qs.map(q => ({ author: q.author, quote: q.quote })) : [];
+        })()
+      })
     });
+
     const data = await response.json();
     return data;
+
   } catch (err) {
     return { error: "Σφάλμα στη βαθμολογία.", raw: String(err) };
   }
 }
 
-async function getComment(transcript, mission) {
+  async function getComment(transcript, mission) {
   try {
     const response = await fetch("/api/score", {
       method: "POST",
