@@ -786,99 +786,103 @@ function showResultsSummary() {
   const totalScores = {};
   const playerSummaries = [];
 
+  // 🔹 Υπολογισμός πόντων για κάθε παίκτη
   game.players.forEach(p => {
     const arr = game.scores[p.name] || [];
     const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
 
- const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
-const sum = validNumbers.reduce((a, b) => a + b, 0);
+    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
+    const sum = validNumbers.reduce((a, b) => a + b, 0);
 
-totalScores[p.name] = sum;
+    totalScores[p.name] = sum;
 
-playerSummaries.push(`
-  <li style="margin-bottom:12px;">
-    <strong style="color:${p.color}">${p.name}</strong><br>
-    <span style="font-size:14px;opacity:0.9">${roundScores.join(" | ")}</span><br>
-    <span style="font-size:15px;">Σύνολο: <b>${sum}</b></span>
-  </li>
-`);
+    playerSummaries.push(`
+      <li style="margin-bottom:12px;">
+        <strong style="color:${p.color}">${p.name}</strong><br>
+        <span style="font-size:14px;opacity:0.9">${roundScores.join(" | ")}</span><br>
+        <span style="font-size:15px;">Σύνολο: <b>${sum}</b></span>
+      </li>
+    `);
+  }); // ✅ Κλείσιμο forEach
 
-// ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
-const currentMission = document.getElementById("missionSelect").value;
-const availableQuotes = quotesByMission[currentMission] || [];
+  // ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
+  const currentMission = document.getElementById("missionSelect").value;
+  const availableQuotes = quotesByMission[currentMission] || [];
 
-let quoteHTML = `<p style="font-style:italic;">«Ο διάλογος είναι η αρχή της σοφίας.»</p><p style="text-align:right;">— Σωκράτης</p>`;
+  let quoteHTML = ""; // δεν δείχνει τίποτα αν δεν υπάρχει quote
 
-if (availableQuotes.length > 0) {
-  const random = Math.floor(Math.random() * availableQuotes.length);
-  const q = availableQuotes[random];
-  const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
+  if (availableQuotes.length > 0) {
+    const random = Math.floor(Math.random() * availableQuotes.length);
+    const q = availableQuotes[random];
+    const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
 
-  quoteHTML = `
-    <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
-      <div style="position:relative; width:90px; height:90px;">
-        <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+    quoteHTML = `
+      <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
+        <div style="position:relative; width:90px; height:90px;">
+          <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+        </div>
+        <div style="max-width:420px; text-align:left;">
+          <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
+          <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
+        </div>
       </div>
-      <div style="max-width:420px; text-align:left;">
-        <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
-        <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
-      </div>
-    </div>
-  `;
-}
-
-document.getElementById("socratesQuote").innerHTML = quoteHTML;
-
-let winnerText = "—";
-const entries = Object.entries(totalScores);
-if (entries.length > 0) {
-  const [winner, score] = entries.sort((a,b)=>b[1]-a[1])[0];
-  winnerText = `🏆 Νικητής: ${winner} με σύνολο ${score} πόντους!`;
-} else {
-  winnerText = "Δεν υπάρχουν καταχωρημένα σκορ.";
-}
-  
-// Δημιουργία λίστας αποτελεσμάτων
-const html = `
-  <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
-    ${playerSummaries.join("")}
-  </ul>
-  <p style="margin-top:15px; font-size:17px;">${winnerText}</p>
-`;
-
-// Εμφάνιση modal
-document.getElementById("resultsSummary").innerHTML = html;
-document.getElementById("resultModal").style.display = "flex";
-
-// ✅ Ήχος - Σωκράτειο Καμπανάκι
-try {
-  const audio = new Audio("sounds/philosophical_chime.mp3");
-  audio.volume = 0.6;          // 🎧 ήπια ένταση
-  audio.currentTime = 0;       // ξεκινά πάντα από την αρχή
-  audio.play().catch(err => console.warn("Audio blocked:", err));
-
-  // ✨ Εφέ λάμψης στο modal (αν υπάρχει)
-  const modalBox = document.querySelector("#resultModal > div");
-  if (modalBox) {
-    modalBox.classList.add("glow");
-    setTimeout(() => modalBox.classList.remove("glow"), 1500);
+    `;
   }
 
-} catch (e) {
-  console.warn("Audio failed:", e);
-}
+  document.getElementById("socratesQuote").innerHTML = quoteHTML;
 
-// Επόμενη Αποστολή
-document.getElementById("nextMissionBtn").onclick = () => {
-  document.getElementById("resultModal").style.display = "none";
-  document.getElementById("welcomeScreen").style.display = "flex";
-  document.getElementById("setupScreen").style.display = "none";
-  document.querySelector(".app").scrollIntoView({ behavior: "smooth" });
-  game.scores = {};
-  game.currentRound = 1;
-  game.activeIndex = 0;
-  renderActivePlayer();
-};
+  // 🏆 Εύρεση νικητή
+  let winnerText = "—";
+  const entries = Object.entries(totalScores);
+  if (entries.length > 0) {
+    const [winner, score] = entries.sort((a, b) => b[1] - a[1])[0];
+    winnerText = `🏆 Νικητής: ${winner} με σύνολο ${score} πόντους!`;
+  } else {
+    winnerText = "Δεν υπάρχουν καταχωρημένα σκορ.";
+  }
+
+  // 📋 Δημιουργία λίστας αποτελεσμάτων
+  const html = `
+    <ul style="list-style:none; padding:0; text-align:left; margin-top:15px;">
+      ${playerSummaries.join("")}
+    </ul>
+    <p style="margin-top:15px; font-size:17px;">${winnerText}</p>
+  `;
+
+  // 🪄 Εμφάνιση modal
+  document.getElementById("resultsSummary").innerHTML = html;
+  document.getElementById("resultModal").style.display = "flex";
+
+  // 🔔 Ήχος - Σωκράτειο Καμπανάκι
+  try {
+    const audio = new Audio("sounds/philosophical_chime.mp3");
+    audio.volume = 0.6;
+    audio.currentTime = 0;
+    audio.play().catch(err => console.warn("Audio blocked:", err));
+
+    // ✨ Εφέ λάμψης στο modal
+    const modalBox = document.querySelector("#resultModal > div");
+    if (modalBox) {
+      modalBox.classList.add("glow");
+      setTimeout(() => modalBox.classList.remove("glow"), 1500);
+    }
+  } catch (e) {
+    console.warn("Audio failed:", e);
+  }
+
+  // 🔁 Επόμενη Αποστολή → Επιστροφή στην αρχική οθόνη
+  document.getElementById("nextMissionBtn").onclick = () => {
+    document.getElementById("resultModal").style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
+    document.getElementById("setupScreen").style.display = "none";
+    document.querySelector(".app").scrollIntoView({ behavior: "smooth" });
+
+    // Επαναφορά παιχνιδιού
+    game.scores = {};
+    game.currentRound = 1;
+    game.activeIndex = 0;
+    renderActivePlayer();
+  };
 }
 
 /* ---------- Timer ---------- */
