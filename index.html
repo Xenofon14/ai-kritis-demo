@@ -1261,7 +1261,6 @@ function removeSocratesPauseMessage() {
   const old = document.getElementById("pauseMessage");
   if (old) old.remove();
 }
-
   
 </script>
   
@@ -1284,6 +1283,16 @@ function removeSocratesPauseMessage() {
     <p id="socratesQuote" style="font-style:italic; font-size:1.2em; margin:20px 0;"></p>
     <h3>📜 Αποτελέσματα Αποστολής</h3>
     <div id="resultsSummary" style="margin-top:10px;"></div>
+    <button id="showDetailsBtn" style="
+  margin-top:15px;
+  background:#6ee0ff;
+  border:none;
+  padding:10px 22px;
+  border-radius:10px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#001;
+">📊 Αναλυτική Βαθμολογία</button>
     <button id="nextMissionBtn" style="
       margin-top:25px;
       background:#f2c14e;
@@ -1293,10 +1302,38 @@ function removeSocratesPauseMessage() {
       font-weight:bold;
       cursor:pointer;
       color:#000;
+
     ">Επόμενη Αποστολή</button>
   </div>
 </div>
 
+<!-- === MODAL ΑΝΑΛΥΤΙΚΗΣ ΒΑΘΜΟΛΟΓΙΑΣ === -->
+<div id="detailsModal" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.85);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:3100;
+  color:white;
+  font-family: system-ui, Arial;
+  text-align:left;
+  padding:20px;
+">
+  <div style="background:#0e2a66; border-radius:20px; padding:24px; max-width:720px; width:95%; box-shadow:0 0 30px rgba(0,0,0,0.4);">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+      <h3 style="margin:0;">📊 Αναλυτική Βαθμολογία</h3>
+      <button id="closeDetailsBtn" style="
+        background:#ff7e5f; border:none; padding:8px 14px; border-radius:10px;
+        font-weight:bold; cursor:pointer; color:#001;
+      ">Κλείσιμο</button>
+    </div>
+    <div id="detailsBody" style="max-height:60vh; overflow:auto; line-height:1.5;"></div>
+  </div>
+</div>
+
+    
   <!-- Popup Σχολίου Σωκράτη -->
 <div id="socratesPopup" style="
   display:none;
