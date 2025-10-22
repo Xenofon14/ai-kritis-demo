@@ -897,6 +897,16 @@ if (winners.length === 1) {
     renderActivePlayer();
   };
 }
+  
+/* ---------- Κουμπιά για αναλυτική βαθμολογία ---------- */
+document.getElementById("showDetailsBtn").addEventListener("click", () => {
+  document.getElementById("detailsBody").innerHTML = buildDetailsHTML();
+  document.getElementById("detailsModal").style.display = "flex";
+});
+
+document.getElementById("closeDetailsBtn").addEventListener("click", () => {
+  document.getElementById("detailsModal").style.display = "none";
+});
 
 /* === ΝΕΕΣ ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ === */
 function updateTimeBar(durationSec) {
