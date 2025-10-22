@@ -697,21 +697,6 @@ const socratesComments = [
   "Κάθε ιδέα αξίζει να ακουστεί."
 ];
   
-  // 🧹 Καθαρισμός πεδίων
-  document.getElementById("transcript").value = "";
-  document.getElementById("socraticComment").textContent = "—";
-  document.getElementById("criteriaList").innerHTML = "";
-  document.getElementById("totalScore").textContent = "—/10";
-  document.getElementById("timer").textContent = "1:30";
-
-  remainingTime = game.baseTimeSec;
-  clearInterval(timerInterval);
-  isTimerRunning = false;
-  isPaused = false;
-
-  renderActivePlayer();
-}
-
 /* ---------- Εμφάνιση Popup Σωκράτη ---------- */
 function showSocratesPopup() {
   const random = Math.floor(Math.random() * socratesComments.length);
