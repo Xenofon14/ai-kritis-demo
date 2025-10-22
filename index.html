@@ -1241,15 +1241,25 @@ async function getScore(transcript, mission) {
     return data;
     */
 
-    // 🔸 Demo: τυχαία βαθμολογία
+      // ✅ ΣΤΑΘΕΡΗ ΒΑΘΜΟΛΟΓΙΑ βάσει μοτίβων (deterministic)
+
     const criteria = {
-      "Θέση": Math.floor(Math.random() * 3),
-      "Τεκμηρίωση": Math.floor(Math.random() * 4),
-      "Συνάφεια": Math.floor(Math.random() * 4),
-      "Σαφήνεια": Math.floor(Math.random() * 2),
-      "Αντίρρηση": Math.floor(Math.random() * 3)
+      "Θέση": found.position_indicators ? 2 : 0,
+      "Τεκμηρίωση": found.argument_indicators ? 1 : 0,
+      "Συνάφεια": found.relevance_indicators ? 2 : 0,
+      "Σαφήνεια": found.clarity_indicators ? 1 : 0,
+      "Αντίρρηση": (game.currentRound >= 2 && found.opposition_indicators) ? 2 : 0
     };
+
+    // ⚖️ Υπολογισμός συνολικού σκορ
     const total = Object.values(criteria).reduce((a,b)=>a+b,0);
+
+    console.log("📊 Τελική βαθμολογία:", criteria, "➡️ Σύνολο:", total);
+
+    // ⏳ Προσομοίωση μικρής καθυστέρησης
+    await new Promise(r => setTimeout(r, 500));
+    return { criteria, total };
+    
     await new Promise(r => setTimeout(r, 500)); // καθυστέρηση για ρεαλισμό
     return { criteria, total };
 
