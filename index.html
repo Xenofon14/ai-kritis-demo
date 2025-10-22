@@ -766,35 +766,33 @@ function buildDetailsHTML() {
     <thead>
       <tr>
         <th>Παίκτης</th>`;
-  ...
-  html += `</tbody
 
-  // Συγκεντρώνουμε ανά παίκτη και γύρο τα αποθηκευμένα σκορ
-  let html = "";
+  // Στήλες για κάθε γύρο
+  for (let r = 1; r <= game.totalRounds; r++) {
+    html += `<th>Γύρος ${r}</th>`;
+  }
 
-  html += `<div style="font-size:14px;opacity:0.85;margin-bottom:10px;">
-    Αποστολή: <b>${document.getElementById("missionTitle").textContent}</b>
-  </div>`;
+  // Τελική στήλη αθροίσματος
+  html += `<th>Σύνολο</th></tr></thead><tbody>`;
 
+  // Σειρές παικτών
   game.players.forEach(p => {
     const arr = game.scores[p.name] || [];
-    const rounds = arr
-      .map((v, i) => `<li style="margin:4px 0;">Γύρος ${i+1}: <b>${(v ?? "—")}</b> / 10</li>`)
-      .join("");
+    const validNumbers = arr.map(v => (typeof v === "number" ? v : 0));
+    const sum = validNumbers.reduce((a, b) => a + b, 0);
 
-    html += `
-      <div style="background:rgba(255,255,255,0.08);padding:12px 14px;border-radius:12px;margin:10px 0;">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-          <div style="width:10px;height:10px;border-radius:50%;background:${p.color};"></div>
-          <div style="font-weight:700;">${p.name}</div>
-        </div>
-        <ul style="margin:0;padding-left:18px;">${rounds}</ul>
-      </div>
-    `;
+    html += `<tr>
+      <td style="color:${p.color};font-weight:bold;">${p.name}</td>`;
+    for (let r = 0; r < game.totalRounds; r++) {
+      html += `<td>${validNumbers[r] ?? "—"}</td>`;
+    }
+    html += `<td><b>${sum}</b></td></tr>`;
   });
 
+  html += `</tbody></table>`;
   return html;
 }
+
   
 function showResultsSummary() {
   const totalScores = {};
