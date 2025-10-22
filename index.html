@@ -1183,6 +1183,7 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
   const activePlayer = game.players[game.activeIndex].name;
 if (!game.criteriaDetails) game.criteriaDetails = {};
 if (!game.criteriaDetails[activePlayer]) game.criteriaDetails[activePlayer] = {};
+  console.log("📊 Αποθήκευση αναλυτικών κριτηρίων:", scores.criteria);
 game.criteriaDetails[activePlayer][game.currentRound] = scores.criteria || {};
   if (!game.scores[activePlayer]) game.scores[activePlayer] = [];
   const roundIndex = game.currentRound - 1;
