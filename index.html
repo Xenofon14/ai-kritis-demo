@@ -688,10 +688,44 @@ function loadMissions(){
   renderMission(missions[0].id);
 }
 
+  /* ---------- Φόρτωση Ρήσεων Φιλοσόφων από εξωτερικό αρχείο ---------- */
+async function loadPhilosopherPositions(missionId) {
+  try {
+    const response = await fetch("data/philosopherPositions.json");
+    const allData = await response.json();
+
+    if (!allData[missionId]) {
+      console.warn(`Δεν υπάρχουν δεδομένα για ${missionId}`);
+      return [];
+    }
+
+    const philosophers = Object.entries(allData[missionId]).map(([name, quote]) => ({
+      name,
+      quote
+    }));
+
+    console.log("📜 Ρήσεις Φιλοσόφων:", philosophers);
+    return philosophers;
+
+  } catch (err) {
+    console.error("Σφάλμα στη φόρτωση philosopherPositions.json:", err);
+    return [];
+  }
+}
+
 function renderMission(id){
   const m = missions.find(x=>x.id===id);
   document.getElementById("missionTitle").textContent = `Αποστολή ${m.id}`;
   document.getElementById("missionQuestion").textContent = `${m.title}: ${m.question}`;
+  // 📖 Φόρτωση ρήσεων φιλοσόφων για τη συγκεκριμένη αποστολή
+  loadPhilosopherPositions(id).then(data => {
+    if (data.length > 0) {
+      const first = data[0];
+      document.getElementById("philosopherHint").innerHTML =
+        `💬 Ξεκίνα αναφέροντας τον φιλόσοφό σου και τη ρήση του.<br>Παράδειγμα: «${first.name} είπε: ${first.quote}»`;
+    }
+  });
+ 
   document.getElementById("missionSelect").value = id;
 }
 
