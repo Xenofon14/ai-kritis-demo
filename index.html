@@ -647,7 +647,20 @@ const game = {
 function renderActivePlayer() {
   const p = game.players[game.activeIndex];
   document.getElementById('activePlayerName').textContent = p.name;
-  document.getElementById('activeAvatar').textContent = p.name[0] || 'Π';
+
+  // Εμφάνιση εικόνας φιλοσόφου ή fallback γράμμα
+const avatar = document.getElementById('activeAvatar');
+if (p.img) {
+  avatar.innerHTML = `
+    <img src="${p.img}" alt="${p.name}" 
+      style="width:100%;height:100%;border-radius:50%;object-fit:cover;
+      border:3px solid ${p.color || '#6ee0ff'};box-shadow:0 0 10px ${p.color || '#6ee0ff'};">
+  `;
+} else {
+  avatar.textContent = p.name[0] || 'Π';
+  avatar.style.color = "#0e2a66";
+}
+
   document.getElementById('activeAvatar').style.background = p.color || '#cfe0ff';
   document.getElementById('roundLabel').textContent = game.currentRound;
   document.getElementById('roundTotal').textContent = game.totalRounds;
@@ -781,7 +794,6 @@ function advanceTurn() {
   renderActivePlayer();
 }
 
-/* ---------- Αποτελέσματα Αποστολής ---------- */
 function showResultsSummary() {
   const totalScores = {};
   const playerSummaries = [];
@@ -803,13 +815,13 @@ function showResultsSummary() {
         <span style="font-size:15px;">Σύνολο: <b>${sum}</b></span>
       </li>
     `);
-  }); // ✅ Κλείσιμο forEach
+  });
 
   // ✅ Επιλογή ρήσης και εικόνας φιλοσόφου
   const currentMission = document.getElementById("missionSelect").value;
   const availableQuotes = quotesByMission[currentMission] || [];
 
-  let quoteHTML = ""; // δεν δείχνει τίποτα αν δεν υπάρχει quote
+  let quoteHTML = ""; // χωρίς fallback
 
   if (availableQuotes.length > 0) {
     const random = Math.floor(Math.random() * availableQuotes.length);
@@ -819,7 +831,9 @@ function showResultsSummary() {
     quoteHTML = `
       <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
         <div style="position:relative; width:90px; height:90px;">
-          <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+          <img src="${imgSrc}" alt="${q.author}" 
+               style="width:90px;height:90px;border-radius:50%;
+               object-fit:cover;border:3px solid #6ee0ff;">
         </div>
         <div style="max-width:420px; text-align:left;">
           <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
@@ -860,7 +874,6 @@ function showResultsSummary() {
     audio.currentTime = 0;
     audio.play().catch(err => console.warn("Audio blocked:", err));
 
-    // ✨ Εφέ λάμψης στο modal
     const modalBox = document.querySelector("#resultModal > div");
     if (modalBox) {
       modalBox.classList.add("glow");
@@ -870,14 +883,12 @@ function showResultsSummary() {
     console.warn("Audio failed:", e);
   }
 
-  // 🔁 Επόμενη Αποστολή → Επιστροφή στην αρχική οθόνη
+  // 🔁 Επόμενη Αποστολή → Επιστροφή στην αρχική
   document.getElementById("nextMissionBtn").onclick = () => {
     document.getElementById("resultModal").style.display = "none";
     document.getElementById("welcomeScreen").style.display = "flex";
     document.getElementById("setupScreen").style.display = "none";
     document.querySelector(".app").scrollIntoView({ behavior: "smooth" });
-
-    // Επαναφορά παιχνιδιού
     game.scores = {};
     game.currentRound = 1;
     game.activeIndex = 0;
