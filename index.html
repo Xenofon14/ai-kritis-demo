@@ -1187,6 +1187,47 @@ document.getElementById("transcript").addEventListener("input", () => {
 /* ---------- Server calls (offline demo version) ---------- */
 async function getScore(transcript, mission) {
   console.log("⚙️ Εκτελείται getScore() (offline demo)");
+  // 🧠 Νέα Λογική: Ανίχνευση Εκφράσεων και Ανατροφοδότηση
+  const lower = transcript.toLowerCase();
+  const found = checkPatterns(lower, argumentPatterns);
+
+  let score = {
+    position: 0,
+    relevance: 0,
+    arguments: 0,
+    objection: 0,
+    clarity: 0,
+    total: 0
+  };
+
+  // Ανίχνευση μοτίβων (patterns)
+  if (found.argument_indicators) score.arguments += 1;
+  if (found.opposition_indicators && game.currentRound >= 2) score.objection += 1;
+  if (found.clarity_indicators) score.clarity += 1;
+
+  const isUncertain = found.uncertainty_indicators;
+
+  // Πρόχειρος υπολογισμός συνολικού σκορ (θα βελτιωθεί αργότερα)
+  score.total = score.position + score.relevance + score.arguments + score.objection + score.clarity;
+
+  // 💬 Επιλογή σχολίου Σωκράτη
+  let feedback = "";
+  if (score.arguments === 0 && !isUncertain) {
+    feedback = feedbackMessages.weak_argument;
+  } else if (isUncertain) {
+    feedback = feedbackMessages.no_position;
+  } else if (score.arguments > 0 && score.relevance > 0) {
+    feedback = feedbackMessages.good_reference;
+  } else if (score.objection === 0 && game.currentRound >= 2) {
+    feedback = feedbackMessages.missing_opposition;
+  } else {
+    feedback = feedbackMessages.excellent;
+  }
+
+  console.log("🧩 Εντοπισμένα μοτίβα:", found);
+  console.log("📊 Προκαταρκτικό σκορ:", score);
+  console.log("💬 Προτεινόμενο σχόλιο:", feedback);
+  
   try {
     // Αν υπάρχει server, επανενεργοποιείς το fetch πιο κάτω:
     /*
