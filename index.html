@@ -1215,7 +1215,8 @@ if (game.currentRound > 1) {
 // Αποθήκευση τρέχοντος επιχειρήματος για επόμενο έλεγχο
 if (!game.previousArguments) game.previousArguments = {};
 game.previousArguments[activePlayer] = transcript;
-
+if (!Array.isArray(game.scores[activePlayer])) game.scores[activePlayer] = [];
+console.log("💾 Αποθήκευση σκορ για", activePlayer, ":", totalNum);
 game.scores[activePlayer][roundIndex] = totalNum;
 
   console.log("✅ Αποθηκεύτηκε σκορ:", activePlayer, totalNum, game.scores);
