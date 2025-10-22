@@ -761,6 +761,21 @@ function renderMission(id){
   document.getElementById("missionSelect").value = id;
 }
 
+/* ---------- Έλεγχος παρουσίας εκφράσεων (pattern detection) ---------- */
+function checkPatterns(answerText, patterns) {
+  const text = answerText.toLowerCase();
+  const found = {};
+
+  for (const [category, expressions] of Object.entries(patterns)) {
+    found[category] = expressions.some(expr => text.includes(expr));
+  }
+
+  return found;
+}
+
+/* ---------- Τυχαία Σχόλια Σωκράτη ---------- */
+const socratesComments = [
+
 /* ---------- Τυχαία Σχόλια Σωκράτη ---------- */
 const socratesComments = [
   "Η σιωπή είναι κι αυτή μια απάντηση.",
