@@ -545,6 +545,13 @@ document.getElementById("playerCount").addEventListener("change", () => {
 </div>
 
 <script>
+
+/* ---------- Timer (globals first) ---------- */
+let timerInterval = null;
+let isTimerRunning = false;
+let remainingTime = 90;
+let isPaused = false;
+  
 /* ---------- Missions ---------- */
 const missions = [
   {id:"M-001",title:"Δίκαιο",question:"Τι είναι δίκαιο;"},
@@ -877,12 +884,6 @@ if (winners.length === 1) {
   };
 }
 
-/* ---------- Timer ---------- */
-let timerInterval = null;
-let isTimerRunning = false;
-let remainingTime = 90;
-let isPaused = false;
-
 /* === ΝΕΕΣ ΒΟΗΘΗΤΙΚΕΣ ΣΥΝΑΡΤΗΣΕΙΣ === */
 function updateTimeBar(durationSec) {
   const bar = document.getElementById("timeBar");
@@ -1171,12 +1172,12 @@ document.getElementById('bonusBtn').addEventListener('click', ()=>{
   if(p.bonusLeft > 0){
     p.bonusLeft--;
     const timerEl = document.getElementById("timer").textContent;
-    if(/^\d+:\d+$/.test(timerEl)){
-      const [min, sec] = timerEl.split(":").map(Number);
-      let remainingTime = min*60 + sec + 30;
-      startTimer(remainingTime);
-    }
-    renderActivePlayer();
+  if(/^\d+:\d+$/.test(timerEl)){
+  const [min, sec] = timerEl.split(":").map(Number);
+  remainingTime = min*60 + sec + 30;
+  startTimer(remainingTime);
+}
+renderActivePlayer();
   }
 });
 
