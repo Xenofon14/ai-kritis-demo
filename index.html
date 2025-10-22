@@ -713,6 +713,38 @@ async function loadPhilosopherPositions(missionId) {
   }
 }
 
+/* ---------- Φόρτωση Εκφράσεων και Μηνυμάτων Ανατροφοδότησης ---------- */
+let argumentPatterns = {};
+let feedbackMessages = {};
+
+async function loadArgumentPatterns() {
+  try {
+    const response = await fetch("data/argumentPatterns.json");
+    argumentPatterns = await response.json();
+    console.log("🧠 Εκφράσεις επιχειρημάτων φορτώθηκαν:", argumentPatterns);
+  } catch (err) {
+    console.error("Σφάλμα στη φόρτωση argumentPatterns.json:", err);
+  }
+}
+
+async function loadFeedbackMessages() {
+  try {
+    const response = await fetch("data/feedbackMessages.json");
+    feedbackMessages = await response.json();
+    console.log("💬 Μηνύματα ανατροφοδότησης φορτώθηκαν:", feedbackMessages);
+  } catch (err) {
+    console.error("Σφάλμα στη φόρτωση feedbackMessages.json:", err);
+  }
+}
+
+/* Εκτελούμε και τα δύο όταν φορτώνει η σελίδα */
+window.addEventListener("load", async () => {
+  await Promise.all([
+    loadArgumentPatterns(),
+    loadFeedbackMessages()
+  ]);
+});
+  
 function renderMission(id){
   const m = missions.find(x=>x.id===id);
   document.getElementById("missionTitle").textContent = `Αποστολή ${m.id}`;
