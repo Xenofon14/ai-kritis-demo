@@ -814,17 +814,17 @@ if (availableQuotes.length > 0) {
   const q = availableQuotes[random];
   const imgSrc = philosopherImages[q.author] || "images/Socrates.png";
 
-quoteHTML = `
-  <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
-    <div style="position:relative; width:90px; height:90px;">
-      <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+  quoteHTML = `
+    <div style="display:flex; align-items:center; justify-content:center; gap:16px; flex-wrap:wrap;">
+      <div style="position:relative; width:90px; height:90px;">
+        <img src="${imgSrc}" alt="${q.author}" style="width:90px;height:90px;border-radius:50%;object-fit:cover;border:3px solid #6ee0ff;">
+      </div>
+      <div style="max-width:420px; text-align:left;">
+        <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
+        <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
+      </div>
     </div>
-    <div style="max-width:420px; text-align:left;">
-      <p style="font-style:italic; font-size:18px; margin:0;">«${q.quote}»</p>
-      <p style="text-align:right; margin-top:6px; font-weight:bold;">— ${q.author}</p>
-    </div>
-  </div>
-`;
+  `;
 }
 
 document.getElementById("socratesQuote").innerHTML = quoteHTML;
