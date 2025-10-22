@@ -1194,8 +1194,8 @@ document.getElementById('bonusBtn').addEventListener('click', ()=>{
     const timerEl = document.getElementById("timer").textContent;
     if(/^\d+:\d+$/.test(timerEl)){
       const [min, sec] = timerEl.split(":").map(Number);
-      let remainigTime = min*60 + sec + 30;
-      startTimer(remainigTime);
+      let remainingTime = min*60 + sec + 30;
+      startTimer(remainingTime);
     }
     renderActivePlayer();
   }
