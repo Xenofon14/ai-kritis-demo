@@ -757,6 +757,7 @@ function advanceTurn() {
   isPaused = false;
 
   renderActivePlayer();
+    updateTimeBar(game.baseTimeSec); // ✅ Επαναφορά μπάρας χρόνου
 }
 
 /* ---------- Αναλυτική Βαθμολογία ---------- */
