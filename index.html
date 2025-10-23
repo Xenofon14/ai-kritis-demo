@@ -1337,7 +1337,7 @@ async function getComment(transcript, mission) {
     const response = await fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ type: "comment", transcript, mission })
+      body: JSON.stringify({ transcript, mission })
     });
     const data = await response.json();
     return data.comment || "—";
