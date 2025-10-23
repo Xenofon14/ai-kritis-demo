@@ -67,10 +67,13 @@ if (!transcript || transcript.trim() === "") {
       };
     }
 
+  // Αν όλα πάνε καλά, στέλνουμε πίσω την απάντηση του AI
     res.status(200).json(data);
+
   } catch (err) {
-    console.error("❌ Σφάλμα AI Κριτή:", err);
+    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
