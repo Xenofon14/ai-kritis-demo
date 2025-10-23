@@ -59,36 +59,32 @@ if (!transcript || transcript.trim() === "") {
       temperature: 0.3
     });
 
-    // Λαμβάνουμε την απάντηση
-    const aiText = completion.choices[0].message.content.trim();
-      console.log("📩 AI raw output:", aiText);
+ // Λαμβάνουμε την απάντηση
+const aiText = completion.choices[0].message.content.trim();
+console.log("📩 AI raw output:", aiText);
 
-    // Προσπάθεια μετατροπής του σε JSON
-    let data;
-    try {
-      data = JSON.parse(aiText);
-    } catch (err) {
-      // Αν το AI δεν δώσει καθαρό JSON, επιστρέφουμε απλό feedback
-      data = {
-        criteria: {},
-        total: 0,
-        feedback: aiText
-      };
-    }
+// ✨ Καθαρισμός απάντησης αν περιέχει markdown code block (```json ... ```)
+const cleaned = aiText.replace(/```json|```/g, "").trim();
 
-  // Αν όλα πάνε καλά, στέλνουμε πίσω την απάντηση του AI
-    res.status(200).json(data);
-
-  } catch (err) {
-    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-    res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
-  }
+// Προσπάθεια μετατροπής του σε JSON
+let data;
+try {
+  data = JSON.parse(cleaned);
+} catch (err) {
+  console.warn("⚠️ AI έδωσε μη έγκυρο JSON:", aiText);
+  // Αν το AI δεν δώσει καθαρό JSON, επιστρέφουμε απλό feedback
+  data = {
+    criteria: {},
+    total: 0,
+    feedback: aiText
+  };
 }
 
+// Αν όλα πάνε καλά, στέλνουμε πίσω την απάντηση του AI
+res.status(200).json(data);
 
-
-
-
-
-
-
+} catch (err) {
+  console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
+  res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+}
+}
