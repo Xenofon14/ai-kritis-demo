@@ -13,13 +13,19 @@ const client = new OpenAI({
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
   try {
-    // Λαμβάνουμε το κείμενο και την αποστολή από το frontend
-    const { transcript, mission } = req.body;
+    // Λαμβάνουμε το κείμενο και την αποστολή από το frontend (JSON parsing)
+let body;
+try {
+  body = await req.json();
+} catch {
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
 
-    // Αν δεν υπάρχει απάντηση
-    if (!transcript || transcript.trim() === "") {
-      return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
-    }
+const { transcript, mission } = body || {};
+
+if (!transcript || transcript.trim() === "") {
+  return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
+}
 
     // ✅ Prompt για το μοντέλο
     const prompt = `
@@ -67,3 +73,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
