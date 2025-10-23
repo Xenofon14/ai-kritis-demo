@@ -1258,10 +1258,7 @@ async function getScore(transcript, mission) {
       const response = await fetch("/api/score", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          transcript,
-          mission,
-        })
+      body: JSON.stringify({ transcript, mission })
       });
 
       const data = await response.json();
