@@ -1284,11 +1284,7 @@ async function getScore(transcript, mission) {
     }
   }
 
-  // Αν το κουτάκι "AI Mode" είναι απενεργοποιημένο, χρησιμοποιούμε offline rubric
-  return await getOfflineScore(transcript, mission);
-}
- 
-  // Ανίχνευση λέξεων-δεικτών
+    // Ανίχνευση λέξεων-δεικτών
   const found = checkPatterns(text, argumentPatterns);
   console.log("🧩 Εντοπισμένα μοτίβα:", found);
 
