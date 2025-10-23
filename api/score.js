@@ -14,19 +14,12 @@ const client = new OpenAI({
 export default async function handler(req, res) {
 
     try {
-    // Λαμβάνουμε το κείμενο και την αποστολή από το frontend (ανεξάρτητα από runtime)
-    let body = {};
-    try {
-      if (req.body) {
-        body = req.body; // Node.js περιβάλλον
-      } else {
-        const text = await req.text(); // Edge περιβάλλον
-        body = text ? JSON.parse(text) : {};
-      }
-    } catch {
-      return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-    }
-
+   let body;
+try {
+  body = await req.json();
+} catch {
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
     const { transcript, mission } = body;
 
 if (!transcript || transcript.trim() === "") {
@@ -81,6 +74,7 @@ if (!transcript || transcript.trim() === "") {
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
