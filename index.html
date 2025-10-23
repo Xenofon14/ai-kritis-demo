@@ -596,6 +596,7 @@ let timerInterval = null;
 let isTimerRunning = false;
 let remainingTime = 90;
 let isPaused = false;
+let useAI = false;  // ✅ Ελέγχει αν ο Σωκράτης θα λειτουργήσει με ΤΝ
   
 /* ---------- Missions ---------- */
 const missions = [
@@ -1482,6 +1483,8 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
   const useBonus = document.getElementById("useBonus").checked;
+  useAI = document.getElementById("useAICheckbox").checked;
+console.log("🤖 Λειτουργία ΤΝ:", useAI ? "Ενεργή" : "Ανενεργή");
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
