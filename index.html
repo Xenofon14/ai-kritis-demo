@@ -1248,11 +1248,7 @@ document.getElementById("transcript").addEventListener("input", () => {
 
   }
 
-  // Αν το κουτάκι "AI Mode" είναι απενεργοποιημένο, χρησιμοποιούμε offline rubric
-  return await getOfflineScore(transcript, mission);
-}
-
-/* ---------- Αξιολόγηση Σωκράτη (AI ή Offline) ---------- */
+ /* ---------- Αξιολόγηση Σωκράτη (AI ή Offline) ---------- */
 async function getScore(transcript, mission) {
   console.log("⚙️ Εκτελείται getScore() — Λειτουργία:", useAI ? "AI" : "Offline Rubric");
 
