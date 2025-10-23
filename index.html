@@ -1257,9 +1257,15 @@ async function getScore(transcript, mission) {
       console.log("📘 mission:", mission);
       const response = await fetch("/api/score", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ transcript, mission })
-      });
+        headers: { 
+          "Accept: "application/json"
+          "Content-Type": "application/json" 
+        },
+      body: JSON.stringify({
+        transcript: transcript || "",
+        mission: mission || "" {}
+      })
+  });;
 
       const data = await response.json();
       console.log("🤖 Απάντηση από API:", data);
