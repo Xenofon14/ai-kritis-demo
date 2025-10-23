@@ -278,6 +278,30 @@ button.recording {
 #socratesPopup.glow {
   animation: glowPulse 2s infinite alternate;
 }
+
+/* === Glow για την επιλογή Τεχνητής Νοημοσύνης === */
+#useAICheckboxContainer {
+  background: rgba(255,255,255,0.08);
+  border-radius: 15px;
+  padding: 12px 16px;
+  margin-top: 20px;
+  box-shadow: 0 0 10px rgba(110,224,255,0.3);
+  transition: box-shadow 1.2s ease-in-out;
+}
+
+#useAICheckboxContainer:hover {
+  box-shadow: 0 0 20px rgba(110,224,255,0.6);
+}
+
+@keyframes softPulse {
+  0% { box-shadow: 0 0 8px rgba(110,224,255,0.3); }
+  50% { box-shadow: 0 0 18px rgba(110,224,255,0.6); }
+  100% { box-shadow: 0 0 8px rgba(110,224,255,0.3); }
+}
+
+#useAICheckboxContainer.glow {
+  animation: softPulse 3s ease-in-out infinite;
+}
     
   </style>
 </head>
@@ -359,12 +383,12 @@ button.recording {
   </label>
 
 <!-- 💡 Επιλογή Λειτουργίας Κριτή -->
-<div style="margin-top:15px;">
-  <label style="font-size:17px;">
-    <input type="checkbox" id="useAICheckbox" checked style="transform:scale(1.3); margin-right:8px;">
+<div id="useAICheckboxContainer" class="glow">
+  <label style="font-size:17px; display:flex; align-items:center; gap:8px;">
+    <input type="checkbox" id="useAICheckbox" checked style="transform:scale(1.3);">
     💡 Ενεργοποίηση Σωκράτη με Τεχνητή Νοημοσύνη
   </label>
-  <p style="font-size:14px; opacity:0.8; margin-left:25px;">
+  <p style="font-size:14px; opacity:0.8; margin-left:30px; margin-top:6px;">
     Απαιτεί σύνδεση στο διαδίκτυο.
   </p>
 </div>
