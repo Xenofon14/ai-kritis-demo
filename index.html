@@ -564,6 +564,17 @@ document.getElementById("playerCount").addEventListener("change", () => {
   <button class="btn-secondary" id="scoreBtn">⚖️ Βαθμολογία</button>
   <button class="btn-secondary" id="speakBtn">🔊 Άκου τον Σωκράτη</button>
 
+    <p id="aiModeIndicator" style="
+  text-align:center;
+  font-size:14px;
+  color:#6ee0ff;
+  margin-top:-5px;
+  margin-bottom:10px;
+  opacity:0.85;
+">
+  🤖 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη
+</p>
+  
 <div class="panel" id="timerPanel">
   ⏳ Χρόνος: <span id="timer">1:30</span>
   <div id="timeBarContainer">
@@ -712,6 +723,21 @@ if (p.img) {
   bonusBtn.disabled = p.bonusLeft <= 0;
 }
 
+function updateAIModeIndicator() {
+  const indicator = document.getElementById("aiModeIndicator");
+  if (!indicator) return;
+
+  if (useAI) {
+    indicator.innerHTML = "🤖 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη";
+    indicator.style.color = "#6ee0ff";
+    indicator.style.opacity = "1";
+  } else {
+    indicator.innerHTML = "📘 Ο Σωκράτης χρησιμοποιεί το σχολικό rubric";
+    indicator.style.color = "#ffd166";
+    indicator.style.opacity = "0.9";
+  }
+}
+  
 function loadMissions(){
   const sel = document.getElementById("missionSelect");
   sel.innerHTML = "";
@@ -1556,6 +1582,7 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   const useBonus = document.getElementById("useBonus").checked;
   useAI = document.getElementById("useAICheckbox").checked;
 console.log("🤖 Λειτουργία ΤΝ:", useAI ? "Ενεργή" : "Ανενεργή");
+  updateAIModeIndicator();
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
