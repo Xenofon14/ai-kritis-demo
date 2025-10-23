@@ -16,10 +16,9 @@ export default async function handler(req, res) {
     try {
 let body;
 try {
-  const text = await req.text();
-  body = JSON.parse(text);
+  body = await req.json();
 } catch (err) {
-  console.error("❌ Αποτυχία ανάλυσης body:", err);
+  console.error("❌ Σφάλμα στην ανάγνωση JSON:", err);
   return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
 }
       
@@ -78,6 +77,7 @@ if (!transcript || transcript.trim() === "") {
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
