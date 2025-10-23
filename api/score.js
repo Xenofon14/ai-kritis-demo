@@ -52,6 +52,7 @@ if (!transcript || transcript.trim() === "") {
 
     // Λαμβάνουμε την απάντηση
     const aiText = completion.choices[0].message.content.trim();
+      console.log("📩 AI raw output:", aiText);
 
     // Προσπάθεια μετατροπής του σε JSON
     let data;
@@ -74,6 +75,7 @@ if (!transcript || transcript.trim() === "") {
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
