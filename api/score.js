@@ -12,15 +12,22 @@ const client = new OpenAI({
 
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
-
     try {
 let body;
 try {
-  body = await req.json();
+  if (req.body) {
+    // Αν το body υπάρχει ήδη (π.χ. σε Node runtime)
+    body = req.body;
+  } else {
+    // Διαφορετικά, διάβασε το ως text και κάνε parse
+    const text = await req.text();
+    body = JSON.parse(text);
+  }
 } catch (err) {
-  console.error("❌ Σφάλμα στην ανάγνωση JSON:", err);
+  console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
   return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
 }
+
       
     const { transcript, mission } = body;
 
@@ -77,6 +84,7 @@ if (!transcript || transcript.trim() === "") {
     res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
