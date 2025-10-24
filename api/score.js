@@ -174,6 +174,48 @@ if (typeof data.feedback === "string") {
 
 console.log("💬 Καθαρό feedback:", data.feedback);
 
+    // ✅ Οριστικός καθαριστής feedback JSON string ή ημι-JSON
+if (typeof data.feedback === "string") {
+  let fb = data.feedback.replace(/```json|```/g, "").trim();
+
+  // 1️⃣ Αν ξεκινά με { και περιέχει ζεύγη "κλειδί": "τιμή"
+  if (fb.startsWith("{") && fb.includes('"Θέση"')) {
+    try {
+      // Αν φαίνεται σαν μικρό JSON αντικείμενο χωρίς πλήρη δομή
+      const maybeInner = JSON.parse(fb);
+      if (maybeInner.feedback) data.feedback = maybeInner.feedback;
+      if (maybeInner.criteria) data.criteria = maybeInner.criteria;
+      if (maybeInner.total) data.total = maybeInner.total;
+      // Αν έχει απλώς τα κριτήρια ως επίπεδο αντικείμενο
+      if (!maybeInner.criteria && maybeInner["Θέση"] !== undefined) {
+        data.criteria = {
+          Θέση: maybeInner["Θέση"] ?? 0,
+          Τεκμηρίωση: maybeInner["Τεκμηρίωση"] ?? 0,
+          Συνάφεια: maybeInner["Συνάφεια"] ?? 0,
+          Σαφήνεια: maybeInner["Σαφήνεια"] ?? 0,
+          Αντίρρηση: maybeInner["Αντίρρηση"] ?? 0
+        };
+      }
+    } catch {
+      // Αν αποτύχει η ανάλυση, καθάρισε το string
+      fb = fb.replace(/[{}"]/g, " ").trim();
+      data.feedback = fb;
+    }
+  } else {
+    data.feedback = fb;
+  }
+
+  // 2️⃣ Αφαιρούμε ό,τι μοιάζει με δομή JSON αλλά δεν είναι καθαρό κείμενο
+  data.feedback = data.feedback
+    .replace(/"criteria".*?"feedback":/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/\\n/g, " ")
+    .trim();
+}
+
+console.log("💬 Καθαρό feedback:", data.feedback);
+
+
     // ✅ Τελική απάντηση
     return res.status(200).json(data);
 
@@ -182,5 +224,6 @@ console.log("💬 Καθαρό feedback:", data.feedback);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
