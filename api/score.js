@@ -123,36 +123,40 @@ if (typeof data.feedback === "string") {
     data.feedback = lines.join(" ").trim();
   }
 }
-// 🧩 Καθαρισμός και αποσυμπίεση του feedback
+
+
+   // 🧩 Καθαρισμός και αποσυμπίεση του feedback
 if (typeof data.feedback === "string") {
-  // Αν περιέχει JSON, το κάνουμε parse
-  if (data.feedback.trim().startsWith("{")) {
+  let cleanedFb = data.feedback.replace(/```json|```/g, "").trim();
+
+  // Αν όλο το feedback μοιάζει με JSON (δηλαδή ξεκινά με { και περιέχει "Θέση")
+  if (cleanedFb.startsWith("{") && cleanedFb.includes('"Θέση"')) {
     try {
-      const nested = JSON.parse(data.feedback);
-      if (nested.feedback) data.feedback = nested.feedback;
-      if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
-      if (nested.total && !data.total) data.total = nested.total;
+      const inner = JSON.parse(cleanedFb);
+      // Αν αυτό το JSON περιέχει κανονικά πεδία, αντικατέστησε τα
+      if (inner.feedback) data.feedback = inner.feedback;
+      if (inner.criteria) data.criteria = inner.criteria;
+      if (inner.total !== undefined) data.total = inner.total;
+      // Αν δεν υπάρχει πεδίο feedback, κράτα μόνο το καθαρό κείμενο (αν υπάρχει)
+      if (!inner.feedback) {
+        const textOnly = Object.values(inner)
+          .filter(v => typeof v === "string")
+          .join(" ")
+          .trim();
+        if (textOnly) data.feedback = textOnly;
+      }
     } catch {
-      // αγνόησέ το και συνέχισε
+      // Αν δεν γίνεται parse, απλά κράτα το καθαρισμένο string
+      data.feedback = cleanedFb;
     }
-  }
-
-  // Αφαίρεση πιθανών code fences ```json``` ή ```
-  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-
-  // Αν ακόμη μοιάζει με JSON, καθάρισε γραμμές που δεν είναι σχόλιο
-  if (data.feedback.includes('"criteria"') || data.feedback.includes('"total"')) {
-    const lines = data.feedback
-      .split("\n")
-      .filter(l => !l.includes('"criteria"') && !l.includes('"total"') && !l.includes("{") && !l.includes("}"));
-    data.feedback = lines.join(" ").trim();
+  } else {
+    data.feedback = cleanedFb;
   }
 }
 
 // ✅ Επιστροφή κανονικής απάντησης
 return res.status(200).json(data);
-
-    
+ 
   
 
   } catch (err) {
@@ -160,6 +164,7 @@ return res.status(200).json(data);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
