@@ -81,6 +81,17 @@ max_tokens: 350  // ✅ ήταν 200, τώρα επιτρέπει πλήρες f
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
     console.log("📩 AI raw output:", aiText);
 
+    / ✅ ΝΕΟΣ καθαρισμός JSON πριν το parsing
+let cleaned = (aiText || "")
+  .replace(/```json|```/g, "")
+  .replace(/^[^{]*({[\s\S]*})[^}]*$/m, "$1") // κρατά μόνο το πρώτο JSON αντικείμενο
+  .trim();
+
+if (!aiText) {
+  console.error("❌ Κενή απάντηση από το μοντέλο:", completion);
+  return res.status(502).json({ error: "Κενή απάντηση από το μοντέλο." });
+}
+
 if (!aiText) {
   console.error("❌ Κενή απάντηση από το μοντέλο:", completion);
   return res.status(502).json({ error: "Κενή απάντηση από το μοντέλο." });
@@ -158,6 +169,7 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
