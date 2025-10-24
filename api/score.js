@@ -79,21 +79,24 @@ export default async function handler(req, res) {
         // αγνόησε
       }
     }
-
-    // ✅ Καθαρισμός feedback
-    if (typeof data.feedback === "string") {
-      data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-    }
-
-    console.log("💬 Καθαρό feedback:", data.feedback);
-
-    const duration = Date.now() - start;
-    console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
-
-    return res.status(200).json(data);
-
-  } catch (err) {
-    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-    return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
-  }
+// ✅ Καθαρισμός feedback
+if (typeof data.feedback === "string") {
+  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
 }
+
+console.log("💬 Καθαρό feedback:", data.feedback);
+
+const duration = Date.now() - start;
+console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+
+return res.status(200).json(data);
+
+} catch (err) {
+  console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
+  return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+} finally {
+  const totalTime = Date.now() - start;
+  console.log("⏱️ Συνολικός χρόνος εκτέλεσης /api/score:", totalTime, "ms");
+}
+
+ 
