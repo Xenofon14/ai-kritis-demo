@@ -16,10 +16,8 @@ export default async function handler(req, res) {
     let body;
     try {
       if (req.body) {
-        // Αν το body υπάρχει ήδη (π.χ. σε Node runtime)
         body = req.body;
       } else {
-        // Διαφορετικά, διάβασε το ως text και κάνε parse
         const text = await req.text();
         body = JSON.parse(text);
       }
@@ -29,7 +27,6 @@ export default async function handler(req, res) {
     }
 
     const { transcript, mission } = body;
-
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
@@ -47,12 +44,13 @@ export default async function handler(req, res) {
     Ερώτημα: ${mission?.question || "—"}
     Απάντηση: ${transcript}
     `;
+
     console.log("═════════════════════════════════════");
     console.log("🧠 Νέα Αξιολόγηση AI Κριτή Σωκράτη");
     console.log("📜 Ερώτημα:", mission?.question);
     console.log("👤 Απόκριση μαθητή:", transcript.slice(0, 100) + "...");
 
-    const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
+    const start = Date.now();
     let completion;
 
     try {
@@ -74,8 +72,8 @@ export default async function handler(req, res) {
 
     } finally {
       const duration = Date.now() - start;
-      console.warn("⏱️ Χρόνος απάντησης OpenAI:", duration + " ms");
-      process.stdout.write(`🔥 AI Response Time: ${duration} ms\n`);
+      console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+      console.warn("⚙️ Χρόνος (ms):", duration);
     }
 
     if (!completion || !completion.choices || !completion.choices[0]) {
@@ -86,14 +84,15 @@ export default async function handler(req, res) {
     const aiText = completion.choices[0].message.content.trim();
     console.log("📩 AI raw output:", aiText);
 
-    // ✨ Καθαρισμός από code blocks
-    const cleaned = aiText.replace(/```json|```/g, "").trim();
+    // ✨ Καθαρισμός και μετατροπή JSON
+    let cleaned = aiText.replace(/```json|```/g, "").trim();
 
     let data;
     try {
       data = JSON.parse(cleaned);
     } catch (err) {
       console.warn("⚠️ AI έδωσε μη έγκυρο JSON:", aiText);
+      // Αν το AI δεν δώσει καθαρό JSON, επιστρέφουμε απλό feedback
       data = {
         criteria: {},
         total: 0,
@@ -101,12 +100,12 @@ export default async function handler(req, res) {
       };
     }
 
-    // ✨ Εξασφάλιση ότι το feedback είναι καθαρό string
+    // ✅ Εξασφάλιση καθαρού feedback
     if (typeof data.feedback === "string") {
       data.feedback = data.feedback.replace(/```json|```/g, "").trim();
     }
 
-    // ✅ Επιστροφή αποτελέσματος
+    // ✅ Επιστροφή κανονικής απάντησης
     return res.status(200).json(data);
 
   } catch (err) {
@@ -114,3 +113,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
