@@ -1553,6 +1553,25 @@ window.addEventListener('DOMContentLoaded', () => {
 });
   
 </script>
+
+    <!-- 🔥 Προθέρμανση AI API -->
+<script>
+window.addEventListener("load", async () => {
+  try {
+    await fetch("/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: "ping",
+        mission: { title: "prewarm", question: "test" }
+      })
+    });
+    console.log("⚡️ Προθέρμανση API ολοκληρώθηκε");
+  } catch (err) {
+    console.warn("Προθέρμανση απέτυχε:", err);
+  }
+});
+</script>
   
 <!-- === MODAL ΑΝΑΚΟΙΝΩΣΗΣ ΑΠΟΤΕΛΕΣΜΑΤΟΣ === -->
 <div id="resultModal" style="
