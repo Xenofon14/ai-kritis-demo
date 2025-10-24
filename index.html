@@ -1394,17 +1394,34 @@ const comment = (scores.feedback && scores.feedback.trim() !== "")
     return;
   }
 
-// 🧹 Καθαρισμός και έλεγχος για JSON
-let cleanComment = comment.replace(/```json|```/g, "").trim();
-try {
-  const parsed = JSON.parse(cleanComment);
-  if (parsed && typeof parsed === "object" && parsed.feedback) {
-    cleanComment = parsed.feedback;
-  }
-} catch (err) {
-  // Αν δεν είναι JSON, κρατάμε το καθαρό κείμενο όπως είναι
+// 🧹 Εξυπνότερος καθαρισμός feedback (JSON ή απλό κείμενο)
+let cleanComment = comment;
+
+// 1️⃣ Αν το feedback περιέχει backticks ή JSON block, καθάρισέ τα
+if (typeof cleanComment === "string") {
+  cleanComment = cleanComment.replace(/```json|```/g, "").trim();
 }
-document.getElementById("socraticComment").textContent = cleanComment;
+
+// 2️⃣ Αν μοιάζει με JSON (ξεκινάει με { και τελειώνει με }), προσπάθησε να το διαβάσεις
+if (typeof cleanComment === "string" && cleanComment.startsWith("{") && cleanComment.endsWith("}")) {
+  try {
+    const parsed = JSON.parse(cleanComment);
+    if (parsed && typeof parsed === "object" && parsed.feedback) {
+      cleanComment = parsed.feedback;
+    }
+  } catch {
+    // Αν δεν είναι σωστό JSON, το κρατάμε όπως είναι
+  }
+}
+
+// 3️⃣ Αν εξακολουθεί να έχει περίεργα code fences, ξανακαθάρισε
+if (typeof cleanComment === "string") {
+  cleanComment = cleanComment.replace(/```json|```/g, "").trim();
+}
+
+// 4️⃣ Τελική εμφάνιση
+document.getElementById("socraticComment").textContent = cleanComment || "—";
+
 
   const criteriaList = document.getElementById("criteriaList");
   criteriaList.innerHTML = "";
