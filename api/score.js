@@ -54,14 +54,18 @@ const start = Date.now(); // 🕒 Έναρξη μέτρησης
 
 let completion;
 try {
-  completion = await client.chat.completions.create({
-    model: "gpt-4-turbo",
-    messages: [
-      { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-      { role: "user", content: prompt }
-    ],
-    temperature: 0.3
-  });
+  const completion = await client.chat.completions.create({
+  model: "gpt-4-turbo",
+  messages: [
+    { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
+    { role: "user", content: prompt }
+  ],
+  temperature: 0.3,
+  max_tokens: 250,          // ✂️ περιορίζει το μέγεθος της απάντησης
+  presence_penalty: 0,      // σταθερό ύφος
+  frequency_penalty: 0      // αποφυγή επαναλήψεων
+});
+
 } finally {
 const duration = Date.now() - start;
 console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
@@ -98,6 +102,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
