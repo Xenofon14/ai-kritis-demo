@@ -12,17 +12,18 @@ const client = new OpenAI({
 
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
-   const start = Date.now();
+  const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
   try {
     let body;
 try {
-  if (req.body) {
-    body = req.body;
-  } else {
-    let rawBody = "";
-    for await (const chunk of req) rawBody += chunk;
-    body = JSON.parse(rawBody || "{}");
-  }
+ if (req.body && typeof req.body === "object") {
+  body = req.body;
+} else {
+  let rawBody = "";
+  for await (const chunk of req) rawBody += chunk;
+  body = JSON.parse(rawBody || "{}");
+}
+
 } catch (err) {
   console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
   return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
@@ -107,4 +108,5 @@ return res.status(200).json(data);
     console.warn("⚙️ Σύνολο (ms):", totalTime);
   }
 }
+
 
