@@ -100,31 +100,66 @@ export default async function handler(req, res) {
       };
     }
 
-    // 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά
-if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
-  try {
-    const nested = JSON.parse(data.feedback);
-    if (nested.feedback) data.feedback = nested.feedback;
-    if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
-    if (nested.total && !data.total) data.total = nested.total;
-  } catch {
-    // αγνόησέ το αν δεν είναι καθαρό JSON
+// 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά και καθάρισε το περιεχόμενο
+if (typeof data.feedback === "string") {
+  // Αν περιέχει ενσωματωμένο JSON
+  if (data.feedback.trim().startsWith("{")) {
+    try {
+      const nested = JSON.parse(data.feedback);
+      if (nested.feedback) data.feedback = nested.feedback;
+      if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
+      if (nested.total && !data.total) data.total = nested.total;
+    } catch {
+      // αγνόησέ το, συνεχίζουμε παρακάτω
+    }
+  }
+
+  // Αφαίρεση πιθανών code fences ```json ... ```
+  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
+
+  // Αν μετά το καθάρισμα μοιάζει ακόμα με JSON (π.χ. περιέχει "criteria" ή "total")
+  if (data.feedback.includes('"criteria"') || data.feedback.includes('"total"')) {
+    const lines = data.feedback.split("\n").filter(l => !l.includes('"criteria"') && !l.includes('"total"'));
+    data.feedback = lines.join(" ").trim();
+  }
+}
+// 🧩 Καθαρισμός και αποσυμπίεση του feedback
+if (typeof data.feedback === "string") {
+  // Αν περιέχει JSON, το κάνουμε parse
+  if (data.feedback.trim().startsWith("{")) {
+    try {
+      const nested = JSON.parse(data.feedback);
+      if (nested.feedback) data.feedback = nested.feedback;
+      if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
+      if (nested.total && !data.total) data.total = nested.total;
+    } catch {
+      // αγνόησέ το και συνέχισε
+    }
+  }
+
+  // Αφαίρεση πιθανών code fences ```json``` ή ```
+  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
+
+  // Αν ακόμη μοιάζει με JSON, καθάρισε γραμμές που δεν είναι σχόλιο
+  if (data.feedback.includes('"criteria"') || data.feedback.includes('"total"')) {
+    const lines = data.feedback
+      .split("\n")
+      .filter(l => !l.includes('"criteria"') && !l.includes('"total"') && !l.includes("{") && !l.includes("}"));
+    data.feedback = lines.join(" ").trim();
   }
 }
 
+// ✅ Επιστροφή κανονικής απάντησης
+return res.status(200).json(data);
 
-    // ✅ Εξασφάλιση καθαρού feedback
-    if (typeof data.feedback === "string") {
-      data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-    }
-
-    // ✅ Επιστροφή κανονικής απάντησης
-    return res.status(200).json(data);
+    
+  
 
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
