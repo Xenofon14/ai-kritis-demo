@@ -139,6 +139,40 @@ if (typeof data.feedback === "string") {
     data.feedback = fb;
   }
 }
+// ✅ Διορθωτής για nested feedback JSON (οριστική έκδοση)
+if (typeof data.feedback === "string") {
+  let fb = data.feedback.replace(/```json|```/g, "").trim();
+
+  // 1️⃣ Αν περιέχει JSON, προσπάθησε να το ξεδιπλώσεις
+  if (fb.startsWith("{") && fb.includes('"feedback"')) {
+    try {
+      const inner = JSON.parse(fb);
+      // Μεταφέρουμε τα εσωτερικά πεδία στο κύριο αντικείμενο
+      if (inner.feedback) data.feedback = inner.feedback;
+      if (inner.criteria) data.criteria = inner.criteria;
+      if (inner.total) data.total = inner.total;
+    } catch {
+      data.feedback = fb;
+    }
+  } else {
+    data.feedback = fb;
+  }
+
+  // 2️⃣ Αν μετά τον καθαρισμό ακόμα μοιάζει με JSON, κράτα μόνο καθαρό κείμενο
+  if (data.feedback.includes('"criteria"') || data.feedback.includes('"total"')) {
+    const lines = data.feedback
+      .split("\n")
+      .filter(l => !l.includes('"criteria"') && !l.includes('"total"'))
+      .join(" ")
+      .trim();
+    data.feedback = lines;
+  }
+
+  // 3️⃣ Καθαρισμός από escape χαρακτήρες
+  data.feedback = data.feedback.replace(/\\n/g, " ").replace(/\s+/g, " ").trim();
+}
+
+console.log("💬 Καθαρό feedback:", data.feedback);
 
     // ✅ Τελική απάντηση
     return res.status(200).json(data);
@@ -148,4 +182,5 @@ if (typeof data.feedback === "string") {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
