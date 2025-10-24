@@ -48,30 +48,43 @@ if (!process.env.OPENAI_API_KEY) {
     `;
 
     const start = Date.now();
-const completion = await client.chat.completions.create({
+
+ const completion = await client.chat.completions.create({
   model: "gpt-4-turbo",
   messages: [
     {
       role: "system",
-      content:
-        "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής. " +
-        "Απαντάς ΑΠΟΚΛΕΙΣΤΙΚΑ σε ΕΓΚΥΡΟ JSON, χωρίς καμία επιπλέον πρόταση ή επεξήγηση, " +
-        "στην ακριβή μορφή: " +
-        '{"criteria":{"Θέση":0,"Τεκμηρίωση":0,"Συνάφεια":0,"Σαφήνεια":0,"Αντίρρηση":0},"total":0,"feedback":"κείμενο"}'
+      content: `
+        Είσαι ο φιλόσοφος Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής.
+        Πρέπει να επιστρέφεις ΜΟΝΟ ένα ΕΓΚΥΡΟ JSON με τα εξής πεδία:
+        {
+          "criteria": { "Θέση": 0-2, "Τεκμηρίωση": 0-2, "Συνάφεια": 0-2, "Σαφήνεια": 0-2, "Αντίρρηση": 0-2 },
+          "total": άθροισμα όλων,
+          "feedback": "ένα σύντομο σχόλιο του Σωκράτη προς τον μαθητή, σε φυσική ελληνική γλώσσα"
+        }
+        ⚠️ Το feedback είναι ΚΕΙΜΕΝΟ, όχι JSON, όχι πίνακας, όχι επανάληψη της δομής criteria.
+        Δεν πρέπει να ξεκινά με '{' ή να περιέχει JSON μέσα του.
+      `
     },
-    { role: "user", content: prompt + "\n\n" +
-        "ΠΑΡΑΚΑΛΩ ΕΠΙΣΤΡΕΨΕ ΜΟΝΟ ΕΝΑ ΕΓΚΥΡΟ JSON OBJECT με διπλά εισαγωγικά, " +
-        "χωρίς κώδικα, χωρίς markdown, χωρίς σχόλια και χωρίς πρόσθετο κείμενο." }
+    {
+      role: "user",
+      content: `
+        Αποστολή: ${mission?.title || "—"}
+        Ερώτημα: ${mission?.question || "—"}
+        Απάντηση μαθητή: ${transcript}
+        Επιστρέψτε μόνο το JSON, χωρίς markdown, χωρίς περιττό κείμενο.
+      `
+    }
   ],
-  // ✅ ΖΗΤΑΕΙ ΑΥΣΤΗΡΑ JSON ΑΠΟ ΤΟ ΜΟΝΤΕΛΟ
   response_format: { type: "json_object" },
   temperature: 0,
-  max_tokens: 200
+  max_tokens: 250
 });
 
- 
 
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
+    console.log("📩 AI raw output:", aiText);
+
 if (!aiText) {
   console.error("❌ Κενή απάντηση από το μοντέλο:", completion);
   return res.status(502).json({ error: "Κενή απάντηση από το μοντέλο." });
@@ -145,6 +158,7 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
