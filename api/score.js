@@ -22,6 +22,10 @@ try {
 }
 
     const { transcript, mission } = body;
+if (!process.env.OPENAI_API_KEY) {
+  console.error("❌ Λείπει το OPENAI_API_KEY στο περιβάλλον!");
+  return res.status(500).json({ error: "API key λείπει από το περιβάλλον." });
+}
 
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
@@ -52,7 +56,12 @@ try {
       max_tokens: 250
     });
 
-    const aiText = completion.choices[0].message.content.trim();
+    const aiText = (completion.choices?.[0]?.message?.content || "").trim();
+if (!aiText) {
+  console.error("❌ Κενή απάντηση από το μοντέλο:", completion);
+  return res.status(502).json({ error: "Κενή απάντηση από το μοντέλο." });
+}
+
     console.log("📩 AI raw output:", aiText);
 
     // ✅ Καθαρισμός JSON
@@ -96,4 +105,5 @@ try {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
