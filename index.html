@@ -1396,7 +1396,9 @@ const comment = (scores.feedback && scores.feedback.trim() !== "")
     return;
   }
 
-  document.getElementById("socraticComment").textContent = comment;
+ // Καθαρισμός από περιττά markdown code fences
+const cleanComment = comment.replace(/```json|```/g, "").trim();
+document.getElementById("socraticComment").textContent = cleanComment;
 
   const criteriaList = document.getElementById("criteriaList");
   criteriaList.innerHTML = "";
