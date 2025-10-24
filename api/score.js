@@ -13,14 +13,13 @@ const client = new OpenAI({
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
   try {
-    let body;
-    try {
-      const text = await req.text();
-      body = JSON.parse(text);
-    } catch (err) {
-      console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
-      return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-    }
+   let body;
+try {
+  body = await req.json();
+} catch (err) {
+  console.error("❌ Αποτυχία ανάγνωσης JSON body:", err);
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
 
     const { transcript, mission } = body;
 
@@ -97,3 +96,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
