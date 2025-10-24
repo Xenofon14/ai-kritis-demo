@@ -753,7 +753,8 @@ function loadMissions(){
   /* ---------- Φόρτωση Ρήσεων Φιλοσόφων από εξωτερικό αρχείο ---------- */
 async function loadPhilosopherPositions(missionId) {
   try {
-   const response = await fetch("https://ai-kritis-demo.vercel.app/data/philosopherPositions.json");
+   const base = window.location.origin;
+const response = await fetch(`${base}/data/philosopherPositions.json`);
     console.log("🔍 Απάντηση από server:", response.url, response.status);
     const allData = await response.json();
 
