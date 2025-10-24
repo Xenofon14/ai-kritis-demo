@@ -15,12 +15,18 @@ export default async function handler(req, res) {
   const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
   try {
     let body;
-    try {
-      body = await req.json();
-    } catch {
-      console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body");
-      return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-    }
+   try {
+  if (req.body && typeof req.body === "object") {
+    body = req.body; // έρχεται ήδη ως αντικείμενο
+  } else {
+    let rawBody = "";
+    for await (const chunk of req) rawBody += chunk;
+    body = JSON.parse(rawBody || "{}");
+  }
+} catch (err) {
+  console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
 
     const { transcript, mission } = body;
 
@@ -101,6 +107,7 @@ return res.status(200).json(data);
     console.warn("⚙️ Σύνολο (ms):", totalTime);
   }
 }
+
 
 
 
