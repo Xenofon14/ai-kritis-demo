@@ -71,13 +71,24 @@ if (!aiText) {
     let cleaned = aiText.replace(/```json|```/g, "").trim();
     let data;
 
-    try {
-      data = JSON.parse(cleaned);
-    } catch (err) {
-      console.warn("⚠️ Μη έγκυρο JSON, προσπάθεια εξαγωγής...");
-      const match = cleaned.match(/\{[\s\S]*\}/);
-      data = match ? JSON.parse(match[0]) : { criteria: {}, total: 0, feedback: cleaned };
-    }
+   try {
+  // Δοκιμάζουμε πρώτα κανονικά
+  data = JSON.parse(cleaned);
+} catch (err) {
+  console.warn("⚠️ Μη έγκυρο JSON από AI:", err.message);
+  // Καθαρίζουμε πιθανά “έξυπνα” εισαγωγικά ή άκυρους χαρακτήρες
+  const fixed = cleaned
+    .replace(/[“”]/g, '"')   // αντικαθιστά ελληνικά/τυπογραφικά εισαγωγικά
+    .replace(/(\r\n|\n|\r)/gm, " ")  // αφαιρεί αλλαγές γραμμής
+    .replace(/'/g, '"');     // μονά εισαγωγικά → διπλά
+  try {
+    data = JSON.parse(fixed);
+  } catch (err2) {
+    console.error("❌ Αποτυχία parsing μετά τον καθαρισμό:", fixed);
+    data = { criteria: {}, total: 0, feedback: fixed };
+  }
+}
+
 
     // ✅ Αν υπάρχει nested feedback, διάβασε το
     if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
@@ -108,6 +119,7 @@ if (!aiText) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
