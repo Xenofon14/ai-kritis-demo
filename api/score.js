@@ -78,7 +78,7 @@ if (!process.env.OPENAI_API_KEY) {
   ],
  response_format: { type: "json_object" },
 temperature: 0,
-max_tokens: 500  // ✅ ήταν 200, τώρα επιτρέπει πλήρες feedback
+max_tokens: 350  // ✅ ήταν 200, τώρα επιτρέπει πλήρες feedback
    });
 
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
@@ -161,6 +161,7 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
