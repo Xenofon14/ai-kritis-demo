@@ -27,6 +27,7 @@ export default async function handler(req, res) {
     }
 
     const { transcript, mission } = body;
+
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
@@ -50,7 +51,7 @@ export default async function handler(req, res) {
     console.log("📜 Ερώτημα:", mission?.question);
     console.log("👤 Απόκριση μαθητή:", transcript.slice(0, 100) + "...");
 
-    const start = Date.now();
+    const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
     let completion;
 
     try {
@@ -65,11 +66,9 @@ export default async function handler(req, res) {
         presence_penalty: 0,
         frequency_penalty: 0
       });
-
     } catch (error) {
       console.error("❌ Σφάλμα OpenAI API:", error);
       return res.status(500).json({ error: "Πρόβλημα με τον AI Κριτή." });
-
     } finally {
       const duration = Date.now() - start;
       console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
@@ -84,99 +83,48 @@ export default async function handler(req, res) {
     const aiText = completion.choices[0].message.content.trim();
     console.log("📩 AI raw output:", aiText);
 
-    // ✨ Καθαρισμός και μετατροπή JSON
+    // ✨ Καθαρισμός απάντησης
     let cleaned = aiText.replace(/```json|```/g, "").trim();
-
     let data;
+
     try {
       data = JSON.parse(cleaned);
-    } catch (err) {
-      console.warn("⚠️ AI έδωσε μη έγκυρο JSON:", aiText);
-      // Αν το AI δεν δώσει καθαρό JSON, επιστρέφουμε απλό feedback
-      data = {
-        criteria: {},
-        total: 0,
-        feedback: aiText
-      };
-    }
-
-// 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά και καθάρισε το περιεχόμενο
-if (typeof data.feedback === "string") {
-  // Αν περιέχει ενσωματωμένο JSON
-  if (data.feedback.trim().startsWith("{")) {
-    try {
-      const nested = JSON.parse(data.feedback);
-      if (nested.feedback) data.feedback = nested.feedback;
-      if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
-      if (nested.total && !data.total) data.total = nested.total;
     } catch {
-      // αγνόησέ το, συνεχίζουμε παρακάτω
-    }
-  }
-
-  // Αφαίρεση πιθανών code fences ```json ... ```
-  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-
-  // Αν μετά το καθάρισμα μοιάζει ακόμα με JSON (π.χ. περιέχει "criteria" ή "total")
-  if (data.feedback.includes('"criteria"') || data.feedback.includes('"total"')) {
-    const lines = data.feedback.split("\n").filter(l => !l.includes('"criteria"') && !l.includes('"total"'));
-    data.feedback = lines.join(" ").trim();
-  }
-}
-
-// 🧩 Καθαρισμός και αποσυμπίεση του feedback
-if (typeof data.feedback === "string") {
-  let cleanedFb = data.feedback.replace(/```json|```/g, "").trim();
-
-  // Αν όλο το feedback μοιάζει με JSON (δηλαδή ξεκινά με { και περιέχει "Θέση")
-  if (cleanedFb.startsWith("{") && cleanedFb.includes('"Θέση"')) {
-    try {
-      const inner = JSON.parse(cleanedFb);
-
-      // Αν υπάρχουν πεδία βαθμολόγησης, κράτα τα
-      if (inner.Θέση !== undefined) data.criteria = inner;
-      if (inner.total !== undefined) data.total = inner.total;
-
-      // Αν υπάρχει κείμενο σχολίου (feedback), κράτα το, αλλιώς δημιουργούμε ένα συνοπτικό
-      if (inner.feedback) {
-        data.feedback = inner.feedback;
+      const match = cleaned.match(/\{[\s\S]*\}/);
+      if (match) {
+        try {
+          data = JSON.parse(match[0]);
+        } catch {
+          data = { criteria: {}, total: 0, feedback: cleaned };
+        }
       } else {
-        data.feedback =
-          "Ο Σωκράτης σε βαθμολόγησε. Θέση: " +
-          (inner.Θέση ?? "-") +
-          ", Τεκμηρίωση: " +
-          (inner.Τεκμηρίωση ?? "-") +
-          ", Συνάφεια: " +
-          (inner.Συνάφεια ?? "-") +
-          ", Σαφήνεια: " +
-          (inner.Σαφήνεια ?? "-") +
-          ", Αντίρρηση: " +
-          (inner.Αντίρρηση ?? "-") +
-          ".";
+        data = { criteria: {}, total: 0, feedback: cleaned };
       }
-    } catch {
-      // Αν δεν γίνεται parse, απλά κράτα το καθαρισμένο string
-      data.feedback = cleanedFb;
     }
-  } else {
-    data.feedback = cleanedFb;
-  }
-}
 
-// ✅ Επιστροφή κανονικής απάντησης
-return res.status(200).json(data);
+    // ✅ Καθαρισμός feedback (για περιπτώσεις που επιστρέφει JSON μέσα στο feedback)
+    if (typeof data.feedback === "string") {
+      const fb = data.feedback.replace(/```json|```/g, "").trim();
+      try {
+        if (fb.startsWith("{") && fb.includes('"Θέση"')) {
+          const inner = JSON.parse(fb);
+          if (inner.feedback) data.feedback = inner.feedback;
+          else data.feedback = "Η απάντησή σου αξιολογήθηκε επιτυχώς.";
+          if (inner.criteria) data.criteria = inner.criteria;
+          if (inner.total !== undefined) data.total = inner.total;
+        } else {
+          data.feedback = fb;
+        }
+      } catch {
+        data.feedback = fb;
+      }
+    }
 
-   
- 
-  
+    // ✅ Τελική απάντηση
+    return res.status(200).json(data);
 
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
-
-
-
-
-
