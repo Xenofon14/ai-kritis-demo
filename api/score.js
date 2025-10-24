@@ -50,6 +50,7 @@ if (!transcript || transcript.trim() === "") {
     `;
 
     // 🧠 Κλήση στο OpenAI API
+      console.time("AI_Kritis_Completion");  // ⏱️ Ξεκινά μέτρηση χρόνου
     const completion = await client.chat.completions.create({
       model: "gpt-4-turbo",
       messages: [
@@ -58,6 +59,7 @@ if (!transcript || transcript.trim() === "") {
       ],
       temperature: 0.3
     });
+     console.timeEnd("AI_Kritis_Completion"); // 🧭 Τερματίζει και εμφανίζει πόσο πήρε 
 
  // Λαμβάνουμε την απάντηση
 const aiText = completion.choices[0].message.content.trim();
@@ -88,3 +90,4 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
