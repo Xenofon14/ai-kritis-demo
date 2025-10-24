@@ -98,14 +98,13 @@ console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
 
 return res.status(200).json(data);
 
-} catch (err) {
-  console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-  return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
-} finally {
-  const totalTime = Date.now() - start;
-  console.log("⏱️ Συνολικός χρόνος εκτέλεσης /api/score:", totalTime, "ms");
+   } catch (err) {
+    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
+    return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+  } finally {
+    const totalTime = Date.now() - start;
+    console.log("⏱️ Συνολικός χρόνος εκτέλεσης /api/score:", totalTime, "ms");
+    console.warn("⚙️ Σύνολο (ms):", totalTime);
+  }
 }
-
- 
-
 
