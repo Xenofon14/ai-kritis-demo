@@ -89,18 +89,18 @@ if (!aiText) {
   }
 }
 
-
-    // ✅ Αν υπάρχει nested feedback, διάβασε το
-    if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
-      try {
-        const nested = JSON.parse(data.feedback);
-        if (nested.feedback) data.feedback = nested.feedback;
-        if (nested.criteria) data.criteria = nested.criteria;
-        if (nested.total) data.total = nested.total;
-      } catch {
-        // αγνόησε
-      }
-    }
+// ✅ Αν το feedback περιέχει JSON (π.χ. η ΤΝ έβαλε μέσα πάλι αντικείμενο)
+if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
+  try {
+    const nested = JSON.parse(data.feedback);
+    if (nested.criteria) data.criteria = nested.criteria;
+    if (nested.total) data.total = nested.total;
+    if (nested.feedback) data.feedback = nested.feedback;
+  } catch (err) {
+    console.warn("⚠️ Δεν έγινε parse nested feedback:", err.message);
+  }
+}
+ 
 
     // ✅ Καθαρισμός feedback
     if (typeof data.feedback === "string") {
@@ -119,6 +119,7 @@ if (!aiText) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
