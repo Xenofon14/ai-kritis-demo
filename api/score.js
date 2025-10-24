@@ -49,17 +49,19 @@ if (!transcript || transcript.trim() === "") {
     Απάντηση: ${transcript}
     `;
 
-    // 🧠 Κλήση στο OpenAI API
-      console.time("AI_Kritis_Completion");  // ⏱️ Ξεκινά μέτρηση χρόνου
-    const completion = await client.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages: [
-        { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.3
-    });
-     console.timeEnd("AI_Kritis_Completion"); // 🧭 Τερματίζει και εμφανίζει πόσο πήρε 
+   // 🧠 Κλήση στο OpenAI API — μέτρηση χρόνου
+const start = Date.now(); // 🕒 Έναρξη μέτρησης
+const completion = await client.chat.completions.create({
+  model: "gpt-4-turbo",
+  messages: [
+    { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
+    { role: "user", content: prompt }
+  ],
+  temperature: 0.3
+});
+const duration = Date.now() - start;
+console.log(`⏱️ Χρόνος απάντησης OpenAI: ${duration} ms`);
+
 
  // Λαμβάνουμε την απάντηση
 const aiText = completion.choices[0].message.content.trim();
@@ -90,4 +92,5 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
