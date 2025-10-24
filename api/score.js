@@ -48,16 +48,28 @@ if (!process.env.OPENAI_API_KEY) {
     `;
 
     const start = Date.now();
+const completion = await client.chat.completions.create({
+  model: "gpt-4-turbo",
+  messages: [
+    {
+      role: "system",
+      content:
+        "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής. " +
+        "Απαντάς ΑΠΟΚΛΕΙΣΤΙΚΑ σε ΕΓΚΥΡΟ JSON, χωρίς καμία επιπλέον πρόταση ή επεξήγηση, " +
+        "στην ακριβή μορφή: " +
+        '{"criteria":{"Θέση":0,"Τεκμηρίωση":0,"Συνάφεια":0,"Σαφήνεια":0,"Αντίρρηση":0},"total":0,"feedback":"κείμενο"}'
+    },
+    { role: "user", content: prompt + "\n\n" +
+        "ΠΑΡΑΚΑΛΩ ΕΠΙΣΤΡΕΨΕ ΜΟΝΟ ΕΝΑ ΕΓΚΥΡΟ JSON OBJECT με διπλά εισαγωγικά, " +
+        "χωρίς κώδικα, χωρίς markdown, χωρίς σχόλια και χωρίς πρόσθετο κείμενο." }
+  ],
+  // ✅ ΖΗΤΑΕΙ ΑΥΣΤΗΡΑ JSON ΑΠΟ ΤΟ ΜΟΝΤΕΛΟ
+  response_format: { type: "json_object" },
+  temperature: 0,
+  max_tokens: 200
+});
 
-    const completion = await client.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages: [
-        { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.3,
-      max_tokens: 250
-    });
+ 
 
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
 if (!aiText) {
@@ -119,6 +131,7 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
