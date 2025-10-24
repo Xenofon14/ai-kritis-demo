@@ -49,38 +49,43 @@ if (!transcript || transcript.trim() === "") {
     Απάντηση: ${transcript}
     `;
 
-  // 🧠 Κλήση στο OpenAI API — μέτρηση χρόνου
-const start = Date.now(); // 🕒 Έναρξη μέτρησης
+const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
 
-let completion;
+let completion; // δηλώνουμε μεταβλητή εδώ για να είναι ορατή και στο finally
+
 try {
-  const completion = await client.chat.completions.create({
-  model: "gpt-4-turbo",
-  messages: [
-    { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-    { role: "user", content: prompt }
-  ],
-  temperature: 0.3,
-  max_tokens: 250,          // ✂️ περιορίζει το μέγεθος της απάντησης
-  presence_penalty: 0,      // σταθερό ύφος
-  frequency_penalty: 0      // αποφυγή επαναλήψεων
-});
+  completion = await client.chat.completions.create({
+    model: "gpt-4-turbo",
+    messages: [
+      { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.3,
+    max_tokens: 250,          // ✂️ περιορίζει το μέγεθος της απάντησης
+    presence_penalty: 0,      // σταθερό ύφος
+    frequency_penalty: 0      // αποφυγή επαναλήψεων
+  });
+
+} catch (error) {
+  console.error("❌ Σφάλμα OpenAI API:", error);
+  return res.status(500).json({ error: "Πρόβλημα με τον AI Κριτή." });
 
 } finally {
-const duration = Date.now() - start;
-console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
-console.warn("⚙️ Χρόνος (ms):", duration); // επιπλέον log που η Vercel πάντα εμφανίζει
+  // 🧭 Μετράει χρόνο σε κάθε περίπτωση (ακόμη κι αν γίνει σφάλμα)
+  const duration = Date.now() - start;
+  console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+  console.warn("⚙️ Χρόνος (ms):", duration); // ✅ το βλέπεις πάντα στα Vercel Runtime Logs
 }
 
-
- // Λαμβάνουμε την απάντηση
+// ✅ Μόνο μετά από εδώ είναι ασφαλές να διαβάσεις το completion
 if (!completion || !completion.choices || !completion.choices[0]) {
   console.error("⚠️ Το AI δεν επέστρεψε απάντηση:", completion);
   return res.status(500).json({ error: "Δεν λήφθηκε απάντηση από τον AI Κριτή." });
 }
-const aiText = completion.choices[0].message.content.trim();
 
+const aiText = completion.choices[0].message.content.trim();
 console.log("📩 AI raw output:", aiText);
+
 
 // ✨ Καθαρισμός απάντησης αν περιέχει markdown code block (```json ... ```)
 const cleaned = aiText.replace(/```json|```/g, "").trim();
@@ -107,6 +112,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
