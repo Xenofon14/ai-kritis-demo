@@ -101,18 +101,32 @@ if (!aiText) {
   }
 }
 
-// ✅ Αν το feedback περιέχει JSON (π.χ. η ΤΝ έβαλε μέσα πάλι αντικείμενο)
+// ✅ Αν το feedback περιέχει JSON μέσα του (όπως τώρα συμβαίνει)
 if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
   try {
-    const nested = JSON.parse(data.feedback);
+    // Προσπάθεια για καθαρό parsing
+    const nestedText = data.feedback
+      .replace(/[“”]/g, '"')
+      .replace(/(\r\n|\n|\r)/gm, " ")
+      .replace(/'/g, '"');
+    const nested = JSON.parse(nestedText);
+
+    // Αν μέσα έχει βαθμολογία, πάρε την
     if (nested.criteria) data.criteria = nested.criteria;
     if (nested.total) data.total = nested.total;
-    if (nested.feedback) data.feedback = nested.feedback;
+
+    // Αν έχει κανονικό feedback, κράτα αυτό ως κείμενο
+    if (nested.feedback && typeof nested.feedback === "string") {
+      data.feedback = nested.feedback;
+    } else {
+      // Αν όχι, φτιάξε σύντομο κείμενο από τα ίδια τα δεδομένα
+      data.feedback = "Ο Σωκράτης αξιολόγησε την απάντηση και υπολόγισε τη βαθμολογία.";
+    }
   } catch (err) {
     console.warn("⚠️ Δεν έγινε parse nested feedback:", err.message);
   }
 }
- 
+
 
     // ✅ Καθαρισμός feedback
     if (typeof data.feedback === "string") {
@@ -131,6 +145,7 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
