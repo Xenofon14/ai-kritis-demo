@@ -90,23 +90,40 @@ if (!completion || !completion.choices || !completion.choices[0]) {
 const aiText = completion.choices[0].message.content.trim();
 console.log("📩 AI raw output:", aiText);
 
-
 // ✨ Καθαρισμός απάντησης αν περιέχει markdown code block (```json ... ```)
-const cleaned = aiText.replace(/```json|```/g, "").trim();
+let cleaned = aiText.trim();
 
-// Προσπάθεια μετατροπής του σε JSON
+// 1️⃣ Αφαίρεση code fences (```json ... ```)
+if (cleaned.startsWith("```")) {
+  cleaned = cleaned.replace(/```json|```/g, "").trim();
+}
+
+// 2️⃣ Αν περιέχει JSON μέσα σε feedback string, απομόνωσέ το
 let data;
 try {
+  // Αν είναι έγκυρο JSON, τέλεια
   data = JSON.parse(cleaned);
-} catch (err) {
-  console.warn("⚠️ AI έδωσε μη έγκυρο JSON:", aiText);
-  // Αν το AI δεν δώσει καθαρό JSON, επιστρέφουμε απλό feedback
-  data = {
-    criteria: {},
-    total: 0,
-    feedback: aiText
-  };
+} catch {
+  // Αν όχι, έλεγξε μήπως έχει JSON μέσα του
+  const innerMatch = cleaned.match(/\{[\s\S]*\}/);
+  if (innerMatch) {
+    try {
+      data = JSON.parse(innerMatch[0]);
+    } catch {
+      data = { criteria: {}, total: 0, feedback: cleaned };
+    }
+  } else {
+    data = { criteria: {}, total: 0, feedback: cleaned };
+  }
 }
+
+// 3️⃣ Αν έχει feedback που ξεκινά με ```json, καθάρισέ το
+if (typeof data.feedback === "string") {
+  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
+}
+
+res.status(200).json(data);
+
 
 // Αν όλα πάνε καλά, στέλνουμε πίσω την απάντηση του AI
 res.status(200).json(data);
@@ -116,6 +133,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
