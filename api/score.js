@@ -13,13 +13,15 @@ const client = new OpenAI({
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
   try {
-   let body;
+  let body;
 try {
-  body = await req.json();
+  const text = await req.text();
+  body = JSON.parse(text);
 } catch (err) {
-  console.error("❌ Αποτυχία ανάγνωσης JSON body:", err);
+  console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
   return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
 }
+
 
     const { transcript, mission } = body;
 if (!process.env.OPENAI_API_KEY) {
@@ -105,5 +107,6 @@ if (!aiText) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
