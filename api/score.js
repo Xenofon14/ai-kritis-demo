@@ -74,7 +74,12 @@ console.warn("⚙️ Χρόνος (ms):", duration); // επιπλέον log π�
 
 
  // Λαμβάνουμε την απάντηση
+if (!completion || !completion.choices || !completion.choices[0]) {
+  console.error("⚠️ Το AI δεν επέστρεψε απάντηση:", completion);
+  return res.status(500).json({ error: "Δεν λήφθηκε απάντηση από τον AI Κριτή." });
+}
 const aiText = completion.choices[0].message.content.trim();
+
 console.log("📩 AI raw output:", aiText);
 
 // ✨ Καθαρισμός απάντησης αν περιέχει markdown code block (```json ... ```)
@@ -102,6 +107,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
