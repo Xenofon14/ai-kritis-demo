@@ -1336,8 +1336,6 @@ async function getOfflineScore(transcript, mission) {
   return { criteria, total, feedback };
 }
 
- 
-
 async function getComment(transcript, mission) {
   try {
     const response = await fetch("/api/score", {
@@ -1396,8 +1394,16 @@ const comment = (scores.feedback && scores.feedback.trim() !== "")
     return;
   }
 
- // Καθαρισμός από περιττά markdown code fences
-const cleanComment = comment.replace(/```json|```/g, "").trim();
+// 🧹 Καθαρισμός και έλεγχος για JSON
+let cleanComment = comment.replace(/```json|```/g, "").trim();
+try {
+  const parsed = JSON.parse(cleanComment);
+  if (parsed && typeof parsed === "object" && parsed.feedback) {
+    cleanComment = parsed.feedback;
+  }
+} catch (err) {
+  // Αν δεν είναι JSON, κρατάμε το καθαρό κείμενο όπως είναι
+}
 document.getElementById("socraticComment").textContent = cleanComment;
 
   const criteriaList = document.getElementById("criteriaList");
