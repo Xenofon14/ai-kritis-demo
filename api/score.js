@@ -12,15 +12,21 @@ const client = new OpenAI({
 
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
+   const start = Date.now();
   try {
     let body;
-    try {
-      const text = await req.text();
-      body = JSON.parse(text);
-    } catch (err) {
-      console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
-      return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-    }
+try {
+  if (req.body) {
+    body = req.body;
+  } else {
+    let rawBody = "";
+    for await (const chunk of req) rawBody += chunk;
+    body = JSON.parse(rawBody || "{}");
+  }
+} catch (err) {
+  console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
 
     const { transcript, mission } = body;
 
@@ -41,7 +47,7 @@ export default async function handler(req, res) {
     Απάντηση: ${transcript}
     `;
 
-    const start = Date.now();
+   
 
     const completion = await client.chat.completions.create({
       model: "gpt-4-turbo",
@@ -100,3 +106,4 @@ return res.status(200).json(data);
 }
 
  
+
