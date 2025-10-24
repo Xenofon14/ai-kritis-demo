@@ -99,60 +99,30 @@ if (!aiText) {
 
     console.log("📩 AI raw output:", aiText);
 
-    // ✅ Καθαρισμός JSON
-    let cleaned = aiText.replace(/```json|```/g, "").trim();
-    // Αν το JSON κόπηκε από το μοντέλο, συμπλήρωσε το τελευταίο κλείσιμο
-if (!cleaned.trim().endsWith("}")) {
-  cleaned = cleaned.trim() + "}";
-}
-    let data;
+    // ✅ ΝΕΟΣ καθαρισμός JSON πριν το parsing
+let cleaned = (aiText || "")
+  .replace(/```json|```/g, "")
+  .trim();
 
-   try {
-  // Δοκιμάζουμε πρώτα κανονικά
+// Αν η απάντηση περιέχει ΠΕΡΙΣΣΟΤΕΡΑ από ένα { ή }, πάρε μόνο το πρώτο πλήρες JSON
+const firstBrace = cleaned.indexOf("{");
+const lastBrace = cleaned.lastIndexOf("}");
+if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {
+  cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+}
+
+console.log("🧹 Καθαρισμένο JSON:", cleaned);
+
+let data;
+try {
   data = JSON.parse(cleaned);
 } catch (err) {
-  console.warn("⚠️ Μη έγκυρο JSON από AI:", err.message);
-  // Καθαρίζουμε πιθανά “έξυπνα” εισαγωγικά ή άκυρους χαρακτήρες
-  const fixed = cleaned
-    .replace(/[“”]/g, '"')   // αντικαθιστά ελληνικά/τυπογραφικά εισαγωγικά
-    .replace(/(\r\n|\n|\r)/gm, " ")  // αφαιρεί αλλαγές γραμμής
-    .replace(/'/g, '"');     // μονά εισαγωγικά → διπλά
-  try {
-    data = JSON.parse(fixed);
-  } catch (err2) {
-    console.error("❌ Αποτυχία parsing μετά τον καθαρισμό:", fixed);
-    data = { criteria: {}, total: 0, feedback: fixed };
-  }
-}
-
-// ✅ Αν το feedback περιέχει JSON μέσα του (όπως τώρα συμβαίνει)
-if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
-  try {
-    // Προσπάθεια για καθαρό parsing
-    const nestedText = data.feedback
-      .replace(/[“”]/g, '"')
-      .replace(/(\r\n|\n|\r)/gm, " ")
-      .replace(/'/g, '"');
-    const nested = JSON.parse(nestedText);
-
-    // Αν μέσα έχει βαθμολογία, πάρε την
-    if (nested.criteria) data.criteria = nested.criteria;
-    if (nested.total) data.total = nested.total;
-
-    // Αν έχει κανονικό feedback, κράτα αυτό ως κείμενο
-    if (nested.feedback && typeof nested.feedback === "string") {
-      data.feedback = nested.feedback;
-    } else {
-      // Αν όχι, φτιάξε σύντομο κείμενο από τα ίδια τα δεδομένα
-      data.feedback = "Ο Σωκράτης αξιολόγησε την απάντηση και υπολόγισε τη βαθμολογία.";
-    }
-  } catch (err) {
-    console.warn("⚠️ Δεν έγινε parse nested feedback:", err.message);
-  }
+  console.error("❌ Αποτυχία parsing JSON:", cleaned);
+  data = { criteria: {}, total: 0, feedback: cleaned };
 }
 
 
-    // ✅ Καθαρισμός feedback
+       // ✅ Καθαρισμός feedback
     if (typeof data.feedback === "string") {
       data.feedback = data.feedback.replace(/```json|```/g, "").trim();
     }
@@ -169,12 +139,6 @@ if (typeof data.feedback === "string" && data.feedback.includes('"criteria"')) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
-
-
-
-
-
-
 
 
 
