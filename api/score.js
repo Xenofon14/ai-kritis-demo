@@ -94,6 +94,7 @@ console.log("💬 Καθαρό feedback:", data.feedback);
 
 const duration = Date.now() - start;
 console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+    console.warn("⚙️ Χρόνος (ms):", duration);
 
 return res.status(200).json(data);
 
@@ -106,4 +107,5 @@ return res.status(200).json(data);
 }
 
  
+
 
