@@ -90,32 +90,46 @@ if (!completion || !completion.choices || !completion.choices[0]) {
 const aiText = completion.choices[0].message.content.trim();
 console.log("📩 AI raw output:", aiText);
 
-// ✨ Καθαρισμός απάντησης αν περιέχει markdown code block (```json ... ```)
-let cleaned = aiText.trim();
+// ✨ Επεξεργασία και καθαρισμός απάντησης του AI
+let cleaned = aiText.replace(/```json|```/g, "").trim();
 
-// 1️⃣ Αφαίρεση code fences (```json ... ```)
-if (cleaned.startsWith("```")) {
-  cleaned = cleaned.replace(/```json|```/g, "").trim();
-}
-
-// 2️⃣ Αν περιέχει JSON μέσα σε feedback string, απομόνωσέ το
 let data;
 try {
-  // Αν είναι έγκυρο JSON, τέλεια
   data = JSON.parse(cleaned);
-} catch {
-  // Αν όχι, έλεγξε μήπως έχει JSON μέσα του
-  const innerMatch = cleaned.match(/\{[\s\S]*\}/);
-  if (innerMatch) {
-    try {
-      data = JSON.parse(innerMatch[0]);
-    } catch {
+} catch (err) {
+  console.warn("⚠️ Δεν ήταν καθαρό JSON — πιθανόν JSON μέσα στο feedback.");
+  try {
+    const parsed = JSON.parse(cleaned);
+    data = parsed;
+  } catch {
+    // 👉 Προσπάθεια να διαβάσουμε JSON μέσα στο πεδίο feedback
+    const match = cleaned.match(/\{[\s\S]*\}/);
+    if (match) {
+      try {
+        data = JSON.parse(match[0]);
+      } catch {
+        data = { criteria: {}, total: 0, feedback: cleaned };
+      }
+    } else {
       data = { criteria: {}, total: 0, feedback: cleaned };
     }
-  } else {
-    data = { criteria: {}, total: 0, feedback: cleaned };
   }
 }
+
+// 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά
+if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
+  try {
+    const nested = JSON.parse(data.feedback);
+    if (nested.feedback) data.feedback = nested.feedback;
+    if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
+    if (nested.total && !data.total) data.total = nested.total;
+  } catch {
+    // αγνόησέ το
+  }
+}
+
+res.status(200).json(data);
+
 
 // 3️⃣ Αν έχει feedback που ξεκινά με ```json, καθάρισέ το
 if (typeof data.feedback === "string") {
@@ -133,6 +147,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
