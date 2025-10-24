@@ -13,17 +13,18 @@ const client = new OpenAI({
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
   try {
-  let body;
+let body;
 try {
-  const text = await req.text();
-  body = JSON.parse(text);
+  // Αν το req.body υπάρχει ήδη (π.χ. σε Vercel), το χρησιμοποιούμε
+  body = typeof req.body === "object" && req.body !== null
+    ? req.body
+    : JSON.parse(await req.text());
 } catch (err) {
   console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
   return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
 }
 
-
-    const { transcript, mission } = body;
+ const { transcript, mission } = body;
 if (!process.env.OPENAI_API_KEY) {
   console.error("❌ Λείπει το OPENAI_API_KEY στο περιβάλλον!");
   return res.status(500).json({ error: "API key λείπει από το περιβάλλον." });
@@ -107,6 +108,7 @@ if (!aiText) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
