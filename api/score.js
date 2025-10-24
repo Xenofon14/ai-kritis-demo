@@ -100,6 +100,19 @@ export default async function handler(req, res) {
       };
     }
 
+    // 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά
+if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
+  try {
+    const nested = JSON.parse(data.feedback);
+    if (nested.feedback) data.feedback = nested.feedback;
+    if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
+    if (nested.total && !data.total) data.total = nested.total;
+  } catch {
+    // αγνόησέ το αν δεν είναι καθαρό JSON
+  }
+}
+
+
     // ✅ Εξασφάλιση καθαρού feedback
     if (typeof data.feedback === "string") {
       data.feedback = data.feedback.replace(/```json|```/g, "").trim();
@@ -113,4 +126,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
