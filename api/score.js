@@ -49,18 +49,23 @@ if (!transcript || transcript.trim() === "") {
     Απάντηση: ${transcript}
     `;
 
-   // 🧠 Κλήση στο OpenAI API — μέτρηση χρόνου
+  // 🧠 Κλήση στο OpenAI API — μέτρηση χρόνου
 const start = Date.now(); // 🕒 Έναρξη μέτρησης
-const completion = await client.chat.completions.create({
-  model: "gpt-4-turbo",
-  messages: [
-    { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-    { role: "user", content: prompt }
-  ],
-  temperature: 0.3
-});
-const duration = Date.now() - start;
-console.log(`⏱️ Χρόνος απάντησης OpenAI: ${duration} ms`);
+
+let completion;
+try {
+  completion = await client.chat.completions.create({
+    model: "gpt-4-turbo",
+    messages: [
+      { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
+      { role: "user", content: prompt }
+    ],
+    temperature: 0.3
+  });
+} finally {
+  const duration = Date.now() - start;
+  console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+}
 
 
  // Λαμβάνουμε την απάντηση
@@ -92,5 +97,6 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
