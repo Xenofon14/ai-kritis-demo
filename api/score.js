@@ -124,8 +124,7 @@ if (typeof data.feedback === "string") {
   }
 }
 
-
-   // 🧩 Καθαρισμός και αποσυμπίεση του feedback
+// 🧩 Καθαρισμός και αποσυμπίεση του feedback
 if (typeof data.feedback === "string") {
   let cleanedFb = data.feedback.replace(/```json|```/g, "").trim();
 
@@ -133,17 +132,27 @@ if (typeof data.feedback === "string") {
   if (cleanedFb.startsWith("{") && cleanedFb.includes('"Θέση"')) {
     try {
       const inner = JSON.parse(cleanedFb);
-      // Αν αυτό το JSON περιέχει κανονικά πεδία, αντικατέστησε τα
-      if (inner.feedback) data.feedback = inner.feedback;
-      if (inner.criteria) data.criteria = inner.criteria;
+
+      // Αν υπάρχουν πεδία βαθμολόγησης, κράτα τα
+      if (inner.Θέση !== undefined) data.criteria = inner;
       if (inner.total !== undefined) data.total = inner.total;
-      // Αν δεν υπάρχει πεδίο feedback, κράτα μόνο το καθαρό κείμενο (αν υπάρχει)
-      if (!inner.feedback) {
-        const textOnly = Object.values(inner)
-          .filter(v => typeof v === "string")
-          .join(" ")
-          .trim();
-        if (textOnly) data.feedback = textOnly;
+
+      // Αν υπάρχει κείμενο σχολίου (feedback), κράτα το, αλλιώς δημιουργούμε ένα συνοπτικό
+      if (inner.feedback) {
+        data.feedback = inner.feedback;
+      } else {
+        data.feedback =
+          "Ο Σωκράτης σε βαθμολόγησε. Θέση: " +
+          (inner.Θέση ?? "-") +
+          ", Τεκμηρίωση: " +
+          (inner.Τεκμηρίωση ?? "-") +
+          ", Συνάφεια: " +
+          (inner.Συνάφεια ?? "-") +
+          ", Σαφήνεια: " +
+          (inner.Σαφήνεια ?? "-") +
+          ", Αντίρρηση: " +
+          (inner.Αντίρρηση ?? "-") +
+          ".";
       }
     } catch {
       // Αν δεν γίνεται parse, απλά κράτα το καθαρισμένο string
@@ -156,6 +165,8 @@ if (typeof data.feedback === "string") {
 
 // ✅ Επιστροφή κανονικής απάντησης
 return res.status(200).json(data);
+
+   
  
   
 
@@ -164,6 +175,7 @@ return res.status(200).json(data);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
