@@ -37,7 +37,7 @@ export default async function handler(req, res) {
     // ✅ Prompt για το μοντέλο
     const prompt = `
     Είσαι ο φιλόσοφος Σωκράτης.
-    Αξιολογείς μια απάντηση μαθητή σε μια φιλοσοφική αποστολή,
+    Αξιολογείς μια απάντηση μαθητή σε μια φιλοσοφική αποστολή, 
     με βάση τα κριτήρια:
     Θέση (0-2), Τεκμηρίωση (0-2), Συνάφεια (0-2), Σαφήνεια (0-2), Αντίρρηση (0-2).
     Επιστρέφεις JSON αυτής της μορφής:
@@ -54,86 +54,10 @@ export default async function handler(req, res) {
     console.log("👤 Απόκριση μαθητή:", transcript.slice(0, 100) + "...");
 
     const start = Date.now(); // 🕒 Έναρξη μέτρησης χρόνου
-    let completion; // δηλώνεται εδώ για να είναι ορατή παντού
-    let aiText = ""; // δηλώνεται εδώ για ασφάλεια
+    let completion; // δηλώνουμε μεταβλητή εδώ για να είναι ορατή και στο finally
 
     try {
       completion = await client.chat.completions.create({
         model: "gpt-4-turbo",
         messages: [
-          { role: "system", content: "Είσαι ο Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής." },
-          { role: "user", content: prompt }
-        ],
-        temperature: 0.3,
-        max_tokens: 250,
-        presence_penalty: 0,
-        frequency_penalty: 0
-      });
-
-      aiText = completion.choices?.[0]?.message?.content?.trim() || "";
-
-    } catch (error) {
-      console.error("❌ Σφάλμα OpenAI API:", error);
-      return res.status(500).json({ error: "Πρόβλημα με τον AI Κριτή." });
-    } finally {
-      const duration = Date.now() - start;
-      console.warn("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
-      console.warn("⚙️ Χρόνος (ms):", duration);
-    }
-
-    if (!aiText) {
-      console.error("⚠️ Το AI δεν επέστρεψε απάντηση:", completion);
-      return res.status(500).json({ error: "Δεν λήφθηκε απάντηση από τον AI Κριτή." });
-    }
-
-    console.log("📩 AI raw output:", aiText);
-
-    // ✨ Καθαρισμός απάντησης (αν περιέχει ```json ... ```)
-    let cleaned = aiText.replace(/```json|```/g, "").trim();
-
-    // ✨ Προσπάθεια μετατροπής σε JSON
-    let data;
-    try {
-      data = JSON.parse(cleaned);
-    } catch {
-      console.warn("⚠️ Μη έγκυρο top-level JSON, δοκιμή για nested...");
-      const inner = cleaned.match(/\{[\s\S]*\}/);
-      if (inner) {
-        try {
-          data = JSON.parse(inner[0]);
-        } catch {
-          data = { criteria: {}, total: 0, feedback: cleaned };
-        }
-      } else {
-        data = { criteria: {}, total: 0, feedback: cleaned };
-      }
-    }
-
-    // 🧩 Αν το feedback περιέχει JSON string, διάβασέ το ξανά
-    if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
-      try {
-        const nested = JSON.parse(data.feedback);
-        console.log("🔍 Εντοπίστηκε nested JSON στο feedback:", nested);
-
-        if (nested.criteria) data.criteria = nested.criteria;
-        if (nested.total) data.total = nested.total;
-        if (nested.feedback) data.feedback = nested.feedback;
-      } catch (err) {
-        console.warn("⚠️ Αποτυχία parsing nested feedback:", err.message);
-      }
-    }
-
-    // Καθαρισμός feedback από ```json``` αν υπάρχει
-    if (typeof data.feedback === "string") {
-      data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-    }
-
-    console.log("🤖 Τελική απάντηση προς client:", data);
-
-    res.status(200).json(data);
-
-  } catch (err) {
-    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-    res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
-  }
-}
+          { role: "system
