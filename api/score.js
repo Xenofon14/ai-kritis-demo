@@ -63,8 +63,9 @@ try {
     temperature: 0.3
   });
 } finally {
-  const duration = Date.now() - start;
-  console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+const duration = Date.now() - start;
+console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+console.warn("⚙️ Χρόνος (ms):", duration); // επιπλέον log που η Vercel πάντα εμφανίζει
 }
 
 
@@ -97,6 +98,7 @@ res.status(200).json(data);
   res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
 }
 }
+
 
 
 
