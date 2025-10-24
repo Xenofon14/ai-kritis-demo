@@ -16,17 +16,11 @@ export default async function handler(req, res) {
   try {
     let body;
     try {
-   let body;
-try {
-  body = await req.json();
-} catch {
-  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-}
-   
-} catch (err) {
-  console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body:", err);
-  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
-}
+      body = await req.json();
+    } catch {
+      console.error("❌ Αποτυχία ανάγνωσης ή ανάλυσης body");
+      return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+    }
 
     const { transcript, mission } = body;
 
@@ -107,6 +101,7 @@ return res.status(200).json(data);
     console.warn("⚙️ Σύνολο (ms):", totalTime);
   }
 }
+
 
 
 
