@@ -90,45 +90,6 @@ if (!completion || !completion.choices || !completion.choices[0]) {
 const aiText = completion.choices[0].message.content.trim();
 console.log("📩 AI raw output:", aiText);
 
-// ✨ Επεξεργασία και καθαρισμός απάντησης του AI
-let cleaned = aiText.replace(/```json|```/g, "").trim();
-
-let data;
-try {
-  data = JSON.parse(cleaned);
-} catch (err) {
-  console.warn("⚠️ Δεν ήταν καθαρό JSON — πιθανόν JSON μέσα στο feedback.");
-  try {
-    const parsed = JSON.parse(cleaned);
-    data = parsed;
-  } catch {
-    // 👉 Προσπάθεια να διαβάσουμε JSON μέσα στο πεδίο feedback
-    const match = cleaned.match(/\{[\s\S]*\}/);
-    if (match) {
-      try {
-        data = JSON.parse(match[0]);
-      } catch {
-        data = { criteria: {}, total: 0, feedback: cleaned };
-      }
-    } else {
-      data = { criteria: {}, total: 0, feedback: cleaned };
-    }
-  }
-}
-
-// 🧩 Αν το feedback είναι JSON string, διάβασέ το ξανά
-if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
-  try {
-    const nested = JSON.parse(data.feedback);
-    if (nested.feedback) data.feedback = nested.feedback;
-    if (nested.criteria && !data.criteria?.Θέση) data.criteria = nested.criteria;
-    if (nested.total && !data.total) data.total = nested.total;
-  } catch {
-    // αγνόησέ το
-  }
-}
-
-res.status(200).json(data);
 
 
 // 3️⃣ Αν έχει feedback που ξεκινά με ```json, καθάρισέ το
@@ -136,11 +97,6 @@ if (typeof data.feedback === "string") {
   data.feedback = data.feedback.replace(/```json|```/g, "").trim();
 }
 
-res.status(200).json(data);
-
-
-// Αν όλα πάνε καλά, στέλνουμε πίσω την απάντηση του AI
-res.status(200).json(data);
 
 } catch (err) {
   console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
@@ -148,6 +104,46 @@ res.status(200).json(data);
 }
 }
 
+
+// ✨ Επεξεργασία και καθαρισμός απάντησης του AI
+let cleaned = aiText.replace(/```json|```/g, "").trim();
+
+// ✨ Προσπάθεια μετατροπής απάντησης σε JSON (ακόμα κι αν είναι nested)
+let data;
+try {
+  data = JSON.parse(cleaned);
+} catch (err) {
+  console.warn("⚠️ Μη έγκυρο top-level JSON, δοκιμή για nested JSON...");
+  const inner = cleaned.match(/\{[\s\S]*\}/);
+  if (inner) {
+    try {
+      data = JSON.parse(inner[0]);
+    } catch {
+      data = { criteria: {}, total: 0, feedback: cleaned };
+    }
+  } else {
+    data = { criteria: {}, total: 0, feedback: cleaned };
+  }
+}
+
+// 🧩 Αν το feedback περιέχει JSON string, διάβασέ το ξανά
+if (typeof data.feedback === "string" && data.feedback.trim().startsWith("{")) {
+  try {
+    const nested = JSON.parse(data.feedback);
+    console.log("🔍 Εντοπίστηκε nested JSON στο feedback:", nested);
+
+    if (nested.criteria) data.criteria = nested.criteria;
+    if (nested.total) data.total = nested.total;
+    if (nested.feedback) data.feedback = nested.feedback;
+  } catch (err) {
+    console.warn("⚠️ Αποτυχία parsing nested feedback:", err.message);
+  }
+}
+
+// 🔎 Debug για έλεγχο
+console.log("🤖 Τελική απάντηση προς client:", data);
+
+res.status(200).json(data);
 
 
 
