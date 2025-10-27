@@ -699,6 +699,10 @@ const game = {
    scores: {}   // ✅ εδώ δηλώνουμε τον χώρο όπου θα αποθηκεύονται οι βαθμολογίες
 };
 
+  /* ---------- Μνήμη Θέσεων Φιλοσόφων ---------- */
+// Αποθηκεύει για κάθε παίκτη τη φιλοσοφική του θέση (μόνο την πρώτη φορά)
+const playerPositions = {};
+  
 function renderActivePlayer() {
   const p = game.players[game.activeIndex];
   document.getElementById('activePlayerName').textContent = p.name;
@@ -1455,6 +1459,15 @@ if (game.currentRound > 1) {
   }
 }
 
+// ✅ Αν είναι ο πρώτος γύρος, αποθήκευσε τη θέση του παίκτη
+if (game.currentRound === 1 && !playerPositions[activePlayer]) {
+  playerPositions[activePlayer] = {
+    philosopher: document.getElementById("philosopherHint").textContent || "Άγνωστος Φιλόσοφος",
+    thesis: transcript
+  };
+  console.log(`📚 Θέση καταγράφηκε για ${activePlayer}:`, playerPositions[activePlayer]);
+}
+  
 // Αποθήκευση τρέχοντος επιχειρήματος για επόμενο έλεγχο
 if (!game.previousArguments) game.previousArguments = {};
 game.previousArguments[activePlayer] = transcript;
