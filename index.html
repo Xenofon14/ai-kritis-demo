@@ -1368,11 +1368,12 @@ async function getAIScore(transcript, mission) {
     const response = await fetch("/api/score", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        transcript,
-        mission,
-        memory
-      })
+     body: JSON.stringify({
+  transcript,
+  mission,
+  philosopher: memory.philosopher || null,
+  initial_thesis: memory.thesis || null
+})
     });
 
     if (!response.ok) {
