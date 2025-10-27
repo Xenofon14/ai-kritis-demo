@@ -1373,6 +1373,31 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
     return;
   }
 
+document.getElementById("scoreBtn").addEventListener("click", async ()=> {
+
+  // 🚫 Αν έχει ήδη ολοκληρώσει αυτόν τον γύρο, μην επιτρέπεις νέα βαθμολογία
+  const currentPlayer = game.players[game.activeIndex].name;
+  if (game.completedRounds?.[currentPlayer]?.includes(game.currentRound)) {
+    alert(`Ο ${currentPlayer} έχει ήδη ολοκληρώσει αυτόν τον γύρο.`);
+    return;
+  }
+
+  // 🧠 Έλεγχος ύπαρξης ενεργού παίκτη και απάντησης
+  if (!currentPlayer) {
+    alert("Δεν υπάρχει ενεργός παίκτης!");
+    return;
+  }
+
+  const transcript = document.getElementById("transcript").value.trim();
+  if (!transcript) {
+    alert("Ο Σωκράτης δεν άκουσε τίποτα για να αξιολογήσει!");
+    return;
+  }
+
+  const button = document.getElementById("scoreBtn");
+  button.disabled = true;
+  button.textContent = "⏳ Ο Σωκράτης σκέφτεται...";
+  
    const button = document.getElementById("scoreBtn");
   button.disabled = true;
   button.textContent = "⏳ Ο Σωκράτης σκέφτεται...";
