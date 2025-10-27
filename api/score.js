@@ -46,6 +46,8 @@ if (isWarmup) {
   }
 }
 
+    const { transcript, mission } = body;
+
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
@@ -139,5 +141,6 @@ if (isWarmup) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
