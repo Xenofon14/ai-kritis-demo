@@ -1338,15 +1338,21 @@ async function getAIScore(transcript, mission) {
 }
   
 /* ---------- Επιλογή τρόπου Κριτή ---------- */
-// 0 = AI (API), 1 = Offline (Τοπικός), 2 = Manual (Ανθρώπινος)
-let judgeMode = 0; 
+// ai = API, offline = Τοπικός (rubric), manual = Ανθρώπινος Κριτής
+let judgeMode = "ai"; 
 
-// Συνάρτηση για να αλλάζει ο τρόπος
 function setJudgeMode(mode) {
   judgeMode = mode;
-  const modeNames = ["AI Κριτής", "Τοπικός Κριτής", "Ανθρώπινος Κριτής"];
-  console.log(`⚙️ Επιλέχθηκε: ${modeNames[mode]}`);
-  document.getElementById("judgeModeIndicator").textContent = `Λειτουργία: ${modeNames[mode]}`;
+  const modeNames = {
+    ai: "🤖 AI Κριτής (API)",
+    offline: "💻 Τοπικός Κριτής (Rubric)",
+    manual: "👤 Ανθρώπινος Κριτής"
+  };
+  console.log(`⚙️ Επιλέχθηκε: ${modeNames[mode] || "Άγνωστος Κριτής"}`);
+  const indicator = document.getElementById("judgeModeIndicator");
+  if (indicator) {
+    indicator.textContent = `Λειτουργία: ${modeNames[mode] || "—"}`;
+  }
 }
 
 /* ---------- Offline Rubric (Αξιολόγηση χωρίς API) ---------- */
