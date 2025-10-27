@@ -1464,6 +1464,16 @@ document.getElementById("socraticComment").textContent = cleanComment || "—";
   }
   document.getElementById("totalScore").textContent = `${totalNum}/10`;
 
+// ⚠️ Αν ο παίκτης έχει ήδη βαθμολογηθεί σε αυτόν τον γύρο, σταμάτα
+const roundIndex = game.currentRound - 1;
+if (game.scores[activePlayer] && typeof game.scores[activePlayer][roundIndex] === "number") {
+  alert(`Ο ${activePlayer} έχει ήδη βαθμολογηθεί σε αυτόν τον γύρο.`);
+  button.disabled = false;
+  button.textContent = "⚖️ Βαθμολογία";
+  button.style.opacity = "1";
+  return;
+}
+    
   const activePlayer = game.players[game.activeIndex].name;
 if (!game.criteriaDetails) game.criteriaDetails = {};
 if (!game.criteriaDetails[activePlayer]) game.criteriaDetails[activePlayer] = {};
