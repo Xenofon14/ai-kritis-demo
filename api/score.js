@@ -121,19 +121,26 @@ if (isWarmup) {
 
     console.log("🧹 Καθαρισμένο JSON:", cleaned);
 
-    let data;
-    try {
-      data = JSON.parse(cleaned);
-    } catch (err) {
-      console.error("❌ Αποτυχία parsing JSON:", cleaned);
-      data = { criteria: {}, total: 0, feedback: cleaned };
-    }
+   let data;
+try {
+  data = JSON.parse(cleaned);
+} catch (err) {
+  console.error("❌ Αποτυχία parsing JSON:", cleaned);
+  data = { criteria: {}, total: 0, feedback: cleaned };
+}
 
-    if (typeof data.feedback === "string") {
-      data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-    }
+// ✅ Καθαρισμός feedback
+if (typeof data.feedback === "string") {
+  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
+}
 
-    console.log("💬 Καθαρό feedback:", data.feedback);
+// ✅ Νέος έλεγχος: αν το feedback είναι κατά λάθος JSON, αντικατάστησέ το
+if (data.feedback.startsWith("{")) {
+  data.feedback = "⚠️ Το σχόλιο δεν διαβάστηκε σωστά.";
+}
+
+console.log("💬 Καθαρό feedback:", data.feedback);
+   
 
     const duration = Date.now() - start;
     console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
@@ -144,7 +151,3 @@ if (isWarmup) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
-
-
-
-
