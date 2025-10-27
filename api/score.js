@@ -25,12 +25,26 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
     }
 
-    const { transcript, mission } = body;
+   const isWarmup = req.query?.warmup === "1" || body?.warmup === true;
 
-    if (!process.env.OPENAI_API_KEY) {
-      console.error("❌ Λείπει το OPENAI_API_KEY στο περιβάλλον!");
-      return res.status(500).json({ error: "API key λείπει από το περιβάλλον." });
-    }
+if (isWarmup) {
+  try {
+    const warm = await client.chat.completions.create({
+      model: "gpt-4-turbo",
+      messages: [
+        { role: "system", content: "Return only valid JSON: {\"ok\":true}" },
+        { role: "user", content: "Ping" }
+      ],
+      response_format: { type: "json_object" },
+      temperature: 0,
+      max_tokens: 5
+    });
+    return res.status(200).json({ ok: true, warmed: true });
+  } catch (e) {
+    // ακόμη κι αν αποτύχει, μην μπλοκάρεις το app
+    return res.status(200).json({ ok: false, warmed: false });
+  }
+}
 
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
@@ -125,4 +139,5 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
