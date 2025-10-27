@@ -157,11 +157,21 @@ console.log("💬 Καθαρό feedback:", data.feedback);
     const duration = Date.now() - start;
     console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
 
+// ✅ Αν η απάντηση δεν έχει τα σωστά πεδία, βάλε fallback
+if (!data.criteria || typeof data.total === "undefined") {
+  data = {
+    criteria: {},
+    total: 0,
+    feedback: "⚠️ Ο Σωκράτης σιώπησε, η απάντηση δεν αξιολογήθηκε σωστά."
+  };
+}
+    
     return res.status(200).json(data);
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
