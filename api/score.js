@@ -48,6 +48,13 @@ if (isWarmup) {
 
     const { transcript, mission, philosopher, initial_thesis } = body;
 
+    console.log("📥 Λήψη δεδομένων για αξιολόγηση:");
+console.log("   transcript:", transcript);
+console.log("   mission:", mission?.title || "—");
+console.log("   philosopher:", philosopher || "(κανένας)");
+console.log("   initial_thesis:", initial_thesis || "(καμία)");
+
+
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
@@ -156,4 +163,5 @@ console.log("💬 Καθαρό feedback:", data.feedback);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
