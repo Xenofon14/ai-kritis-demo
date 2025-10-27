@@ -1359,6 +1359,20 @@ async function getOfflineScore(transcript, mission) {
   
 /* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=> {
+   
+  // 🧠 Έλεγχοι πριν την αξιολόγηση
+  const currentPlayer = game.players[game.activeIndex].name;
+  if (!currentPlayer) {
+    alert("Δεν υπάρχει ενεργός παίκτης!");
+    return;
+  }
+
+  const transcript = document.getElementById("transcript").value.trim();
+  if (!transcript) {
+    alert("Ο Σωκράτης δεν άκουσε τίποτα για να αξιολογήσει!");
+    return;
+  }
+
    const button = document.getElementById("scoreBtn");
   button.disabled = true;
   button.textContent = "⏳ Ο Σωκράτης σκέφτεται...";
