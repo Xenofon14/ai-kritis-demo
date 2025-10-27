@@ -1709,6 +1709,21 @@ window.addEventListener("load", async () => {
   💬 <span id="socratesPopupText"></span>
 </div>
 
+<script>
+window.addEventListener('load', () => {
+  try {
+    fetch("/api/score?warmup=1", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: "ok",
+        mission: { title: "-", question: "-" },
+        warmup: true
+      })
+    }).catch(() => {});
+  } catch (e) {}
+});
+</script>
 
 </body>
 </html>
