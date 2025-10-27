@@ -83,7 +83,7 @@ export default async function handler(req, res) {
       ],
       response_format: { type: "json_object" },
       temperature: 0,
-      max_tokens: 350
+      max_tokens: 250
     });
 
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
@@ -125,3 +125,4 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
