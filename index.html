@@ -466,6 +466,7 @@ function toggleCharacter(ch, btn) {
   const idx = selectedCharacters.findIndex(c => c.name === ch.name);
 
   if (idx !== -1) {
+    
     // Αν είναι ήδη επιλεγμένος, τον αφαιρούμε
     selectedCharacters.splice(idx, 1);
     btn.style.outline = "none";
@@ -513,6 +514,24 @@ document.getElementById("playerCount").addEventListener("change", () => {
     }
   });
   updateSelectionStatus();
+  // ✅ Αν ο αριθμός παικτών είναι 6, επίλεξε αυτόματα όλους τους χαρακτήρες
+if (count === 6) {
+  selectedCharacters = [...characters];
+  document.querySelectorAll(".character").forEach(btn => {
+    btn.classList.add("selected");
+    btn.style.outline = "4px solid white";
+  });
+  updateSelectionStatus();
+}
+  // 🚫 Αν μειωθεί ο αριθμός παικτών κάτω από 6, αποεπιλογή όλων
+if (count < 6) {
+  selectedCharacters = [];
+  document.querySelectorAll(".character").forEach(btn => {
+    btn.classList.remove("selected");
+    btn.style.outline = "none";
+  });
+  updateSelectionStatus();
+}
 });
 
 </script>
