@@ -1459,51 +1459,71 @@ async function getOfflineScore(transcript, mission) {
   return { criteria, total, feedback };
 }
 
-  /* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
+/* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
 async function getManualScore() {
-  const criteria = ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
+  // 🔹 Όλα τα πιθανά κριτήρια
+  const allCriteria = ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
+
+  // 🔸 Φιλτράρουμε ανάλογα με τον γύρο
+  const isFirstRound = game.currentRound === 1;
+  const criteria = isFirstRound
+    ? allCriteria.filter(c => c !== "Αντίρρηση")
+    : allCriteria.filter(c => c !== "Θέση");
+
   const scores = {};
 
-  let inputs = "";
+  // Δημιουργία πεδίων στο modal
+  const container = document.getElementById("manualInputs");
+  container.innerHTML = "";
+
+  const roundLabel = isFirstRound
+    ? "🔹 1ος γύρος (χωρίς αντεπιχειρήματα)"
+    : `🔸 ${game.currentRound}ος γύρος (χωρίς επανάληψη θέσης)`;
+
+  const header = document.createElement("p");
+  header.textContent = roundLabel;
+  header.style.fontStyle = "italic";
+  header.style.opacity = "0.9";
+  container.appendChild(header);
+
   criteria.forEach(c => {
-    inputs += `${c}: <input id="crit_${c}" type="number" min="0" max="2" step="1" value="0" style="width:40px; text-align:center;"> /2<br>`;
+    const row = document.createElement("div");
+    row.innerHTML = `${c}: <input id="crit_${c}" type="number" min="0" max="2" step="1" value="0" style="width:40px;text-align:center;"> /2`;
+    container.appendChild(row);
   });
 
-  const html = `
-    <div style="text-align:left;">
-      <p>Δώσε βαθμολογία (0–2) για κάθε κριτήριο:</p>
-      ${inputs}
-      <button id="manualSubmit" style="margin-top:10px;">Υπολογισμός</button>
-    </div>
-  `;
+  // Εμφάνιση modal
+  const modal = document.getElementById("manualModal");
+  modal.style.display = "flex";
 
-  // Δημιουργία προσωρινού popup
-  const popup = document.createElement("div");
-  popup.innerHTML = html;
-  popup.style.position = "fixed";
-  popup.style.top = "50%";
-  popup.style.left = "50%";
-  popup.style.transform = "translate(-50%, -50%)";
-  popup.style.background = "#142f70";
-  popup.style.padding = "20px";
-  popup.style.borderRadius = "15px";
-  popup.style.color = "white";
-  popup.style.zIndex = "9999";
-  document.body.appendChild(popup);
-
-  // Περιμένει το πάτημα “Υπολογισμός”
   return new Promise(resolve => {
-    document.getElementById("manualSubmit").addEventListener("click", () => {
+    document.getElementById("manualSubmit").onclick = () => {
       let total = 0;
       criteria.forEach(c => {
         const val = parseInt(document.getElementById(`crit_${c}`).value) || 0;
         scores[c] = val;
         total += val;
       });
-      document.body.removeChild(popup);
-      const feedback = "📋 Οι βαθμοί καταχωρήθηκαν από τον Κριτή.";
-      resolve({ criteria: scores, total, feedback });
-    });
+
+      // Περιορισμός στο 10
+      if (total > 10) total = 10;
+
+      modal.style.display = "none";
+      resolve({
+        criteria: scores,
+        total,
+        feedback: "📋 Οι βαθμοί καταχωρήθηκαν από τον Κριτή."
+      });
+    };
+
+    document.getElementById("manualCancel").onclick = () => {
+      modal.style.display = "none";
+      resolve({
+        criteria: {},
+        total: 0,
+        feedback: "⏸️ Η αξιολόγηση ακυρώθηκε."
+      });
+    };
   });
 }
 
