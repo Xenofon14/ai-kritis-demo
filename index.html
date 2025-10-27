@@ -1392,6 +1392,15 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
     alert(`Ο ${currentPlayer} έχει ήδη ολοκληρώσει αυτόν τον γύρο.`);
     return;
   }
+  
+  // ⛔ Αν ο παίκτης έχει ήδη βαθμολογηθεί σε αυτόν τον γύρο
+  if (
+    game.scores[currentPlayer] &&
+    typeof game.scores[currentPlayer][game.currentRound - 1] === "number"
+  ) {
+    const retry = confirm(`Ο ${currentPlayer} έχει ήδη βαθμολογηθεί σε αυτόν τον γύρο.\nΘες να επαναβαθμολογηθεί;`);
+    if (!retry) return; // ❌ σταμάτα αν ο χρήστης πατήσει "Άκυρο"
+  }
 
   // 🧠 Έλεγχος ύπαρξης ενεργού παίκτη και απάντησης
   if (!currentPlayer) {
