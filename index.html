@@ -1488,7 +1488,20 @@ async function getManualScore() {
 
   criteria.forEach(c => {
     const row = document.createElement("div");
-    row.innerHTML = `${c}: <input id="crit_${c}" type="number" min="0" max="2" step="1" value="0" style="width:40px;text-align:center;"> /2`;
+    row.innerHTML = `
+  ${c}: 
+  <input 
+    id="crit_${c}" 
+    type="number" 
+    min="0" 
+    max="2" 
+    step="1" 
+    value="0" 
+    style="width:45px;text-align:center;"
+    oninput="if (this.value > 2) this.value = 2; if (this.value < 0) this.value = 0;"
+  > 
+  /2`;
+
     container.appendChild(row);
   });
 
