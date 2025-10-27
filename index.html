@@ -1261,17 +1261,28 @@ async function getScore(transcript, mission) {
     try {
       console.log("🧾 transcript:", transcript);
       console.log("📘 mission:", mission);
-      const response = await fetch("/api/score", {
-        method: "POST",
-        headers: {
-  "Accept": "application/json",
-  "Content-Type": "application/json"
-},
-      body: JSON.stringify({
-  transcript: transcript || "",
-  mission: mission || {}
-})
-  });
+      // 🧠 Αν υπάρχει αποθηκευμένη φιλοσοφική θέση για τον παίκτη, πέρασέ την στο prompt
+const activePlayer = game.players[game.activeIndex].name;
+const memory = playerPositions[activePlayer] || {};
+
+// ✅ Προετοιμασία δεδομένων για το API
+const response = await fetch("/api/score", {
+  method: "POST",
+  headers: {
+    "Accept": "application/json",
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    transcript: transcript || "",
+    mission: mission || {},
+    philosopher: memory.philosopher || "",
+    initial_thesis: memory.thesis || ""
+  })
+});
+
+
+
+      
 
       const data = await response.json();
       console.log("🤖 Απάντηση από API:", data);
