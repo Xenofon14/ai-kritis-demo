@@ -1060,7 +1060,7 @@ function showResultsSummary() {
     const arr = game.scores[p.name] || [];
     const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
 
-    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/10`);
+    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/8`);
     const sum = validNumbers.reduce((a, b) => a + b, 0);
 
     totalScores[p.name] = sum;
@@ -1713,13 +1713,7 @@ if (scores.criteria) {
     // === Διόρθωση εμφάνισης συνολικής βαθμολογίας ===
 const total = Number(scores.total ?? 0);
 const out_of = Number(scores.out_of ?? 8);
-const scaled =
-  typeof scores.scaled !== "undefined"
-    ? scores.scaled
-    : Math.round((total / out_of) * 10);
-
-document.getElementById("totalScore").textContent = `${total}/${out_of} (${scaled}/10)`;
-
+document.getElementById("totalScore").textContent = `${total}/${out_of}`;
 
     // 💾 Αποθήκευση αποτελεσμάτων
     if (!game.scores[currentPlayer]) game.scores[currentPlayer] = [];
