@@ -727,15 +727,22 @@ const quotesByMission = {
 
 /* ---------- Rubric & Σειρά Κριτηρίων ---------- */
 const RUBRIC = {
+  // ✅ Ορισμός όλων των πιθανών κριτηρίων
   order: ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"],
+
+  // ✅ Εύρος βαθμολογίας ανά κριτήριο
   weights: {
-    "Θέση": { min: 0, max: 2 },                 // αναφορά + σύντομη εξήγηση
-    "Τεκμηρίωση": { perArgument: 1, cap: null },// 1 βαθμός/μοναδικό επιχείρημα, χωρίς όριο
-    "Συνάφεια": { min: 0, max: 3 },             // λέξεις/ιδέες που ταιριάζουν με τη ρήση
-    "Σαφήνεια": { min: 0, max: 1 },             // δομή: αρχή-μέση-τέλος
-    "Αντίρρηση": { min: 0, max: 2 }             // παραλείπεται στον 1ο γύρο
-  }
+    "Θέση":       { min: 0, max: 2 }, // μόνο στον 1ο γύρο
+    "Τεκμηρίωση": { min: 0, max: 2 },
+    "Συνάφεια":   { min: 0, max: 2 },
+    "Σαφήνεια":   { min: 0, max: 2 },
+    "Αντίρρηση":  { min: 0, max: 2 }  // μόνο από 2ο γύρο και μετά
+  },
+
+  // ✅ Μέγιστο σκορ ανά γύρο
+  maxPerRound: 8
 };
+
   
 /* ---------- Game state ---------- */
 const game = {
@@ -1660,17 +1667,23 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
 
     document.getElementById("socraticComment").textContent = comment;
 
-    // ⚖️ Εμφάνιση κριτηρίων
-    const criteriaList = document.getElementById("criteriaList");
-    criteriaList.innerHTML = "";
-    if (scores.criteria) {
-      for (const [k, v] of Object.entries(scores.criteria)) {
-        if (game.currentRound === 1 && k === "Αντίρρηση") continue;
-        const li = document.createElement("li");
-        li.textContent = `${k}: ${v}/2`;
-        criteriaList.appendChild(li);
-      }
-    }
+   // ⚖️ Εμφάνιση κριτηρίων (ανάλογα με τον γύρο)
+const criteriaList = document.getElementById("criteriaList");
+criteriaList.innerHTML = "";
+
+const activeCriteria = game.currentRound === 1
+  ? ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια"]
+  : ["Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
+
+if (scores.criteria) {
+  for (const key of activeCriteria) {
+    const val = scores.criteria[key];
+    if (typeof val !== "number") continue;
+    const li = document.createElement("li");
+    li.textContent = `${key}: ${val}/2`;
+    criteriaList.appendChild(li);
+  }
+}
 
     // 🧮 Υπολογισμός συνολικής βαθμολογίας
     let totalNum = 0;
