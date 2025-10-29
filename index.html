@@ -1377,10 +1377,6 @@ async function getAIScore(transcript, mission) {
 const activePlayer = game.players[game.activeIndex].name;
 const memory = playerPositions[activePlayer] || {};
 
-// 🧠 Μνήμη παίκτη
-const activePlayer = game.players[game.activeIndex].name;
-const memory = playerPositions[activePlayer] || {};
-
 // 🚀 Κλήση API /api/score
 const response = await fetch("/api/score", {
   method: "POST",
