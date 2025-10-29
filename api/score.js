@@ -10,12 +10,14 @@ const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
+// -------------------------------
 // Κύρια συνάρτηση handler
+// -------------------------------
 export default async function handler(req, res) {
   try {
+    // 📦 Ανάγνωση σώματος αιτήματος
     let body;
     try {
-      // Αν το req.body υπάρχει ήδη (π.χ. σε Vercel), το χρησιμοποιούμε
       body =
         typeof req.body === "object" && req.body !== null
           ? req.body
@@ -25,184 +27,160 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
     }
 
-   const isWarmup = req.query?.warmup === "1" || body?.warmup === true;
+    // ⚙️ Προθέρμανση (warmup)
+    const isWarmup = req.query?.warmup === "1" || body?.warmup === true;
+    if (isWarmup) {
+      try {
+        await client.chat.completions.create({
+          model: "gpt-4-turbo",
+          messages: [
+            { role: "system", content: "Return only valid JSON: {\"ok\":true}" },
+            { role: "user", content: "Ping" }
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0,
+          max_tokens: 5
+        });
+        return res.status(200).json({ ok: true, warmed: true });
+      } catch {
+        return res.status(200).json({ ok: false, warmed: false });
+      }
+    }
 
-if (isWarmup) {
-  try {
-    const warm = await client.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages: [
-        { role: "system", content: "Return only valid JSON: {\"ok\":true}" },
-        { role: "user", content: "Ping" }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0,
-      max_tokens: 5
-    });
-    return res.status(200).json({ ok: true, warmed: true });
-  } catch (e) {
-    // ακόμη κι αν αποτύχει, μην μπλοκάρεις το app
-    return res.status(200).json({ ok: false, warmed: false });
-  }
-}
-
-    const { transcript, mission, philosopher, initial_thesis } = body;
+    const { transcript, mission, philosopher, initial_thesis, round } = body;
 
     console.log("📥 Λήψη δεδομένων για αξιολόγηση:");
-console.log("   transcript:", transcript);
-console.log("   mission:", mission?.title || "—");
-console.log("   philosopher:", philosopher || "(κανένας)");
-console.log("   initial_thesis:", initial_thesis || "(καμία)");
-
+    console.log("   transcript:", transcript);
+    console.log("   mission:", mission?.title || "—");
+    console.log("   philosopher:", philosopher || "(κανένας)");
+    console.log("   round:", round || 1);
 
     if (!transcript || transcript.trim() === "") {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
 
-    // 🧠 Δημιουργία prompt
-    const prompt = `
-Είσαι ο φιλόσοφος Σωκράτης.
-Αξιολογείς μια απάντηση μαθητή σε μια φιλοσοφική αποστολή, 
-με βάση τα κριτήρια:
-Θέση (0-2), Τεκμηρίωση (0-2), Συνάφεια (0-2), Σαφήνεια (0-2), Αντίρρηση (0-2).
-Επιστρέφεις JSON αυτής της μορφής:
-{"criteria":{"Θέση":X,"Τεκμηρίωση":X,"Συνάφεια":X,"Σαφήνεια":X,"Αντίρρηση":X},"total":X,"feedback":"Κείμενο ανατροφοδότησης"}
-
-Αποστολή: ${mission?.title || "—"}
-Ερώτημα: ${mission?.question || "—"}
-Απάντηση: ${transcript}
-`;
-
     const start = Date.now();
 
-    // ✅ Κλήση προς OpenAI
-    const completion = await client.chat.completions.create({
-      model: "gpt-4-turbo",
-      messages: [
-        {
-          role: "system",
-          content: `
+    // ----------------------------------------
+    // 🧠 Κλήση προς OpenAI
+    // ----------------------------------------
+    const completion = await client.chat.completions.create(
+      {
+        model: "gpt-4-turbo",
+        messages: [
+          {
+            role: "system",
+            content: `
 Είσαι ο φιλόσοφος Σωκράτης και λειτουργείς ως εκπαιδευτικός κριτής.
-Αξιολογείς την απάντηση ενός μαθητή με βάση τα εξής κριτήρια (0–2 βαθμοί το καθένα):
-- Θέση
-- Τεκμηρίωση
-- Συνάφεια
-- Σαφήνεια
-- Αντίρρηση
+ΔΙΝΕΙΣ ΜΟΝΟ ΑΡΙΘΜΟΥΣ 0–2 για κάθε κριτήριο και ένα σύντομο feedback.
+ΜΗΝ υπολογίζεις συνολικό σκορ (total). Θα το υπολογίσει ο server.
 
-Αν γνωρίζεις ποιον φιλόσοφο εκπροσωπεί ο μαθητής, αξιολόγησε με βάση τις ιδέες του.
-Αν γνωρίζεις την αρχική του θέση (όπως διατυπώθηκε στον πρώτο γύρο), 
-χρησιμοποίησέ την ως σημείο αναφοράς για να εκτιμήσεις τη συνέπεια και τη συνάφεια των επιχειρημάτων του.
+Επιστρέφεις ΑΥΣΤΗΡΑ JSON:
+{
+ "criteria":{"Θέση":0-2,"Τεκμηρίωση":0-2,"Συνάφεια":0-2,"Σαφήνεια":0-2,"Αντίρρηση":0-2},
+ "feedback":"κείμενο"
+}
 
-Αν η απάντηση είναι πλήρης, σαφής, τεκμηριωμένη και με αναφορά στον φιλόσοφο,
-δώσε συνολική βαθμολογία κοντά στο 10.
-Αν λείπουν σαφή επιχειρήματα ή η σύνδεση με τη ρήση, μείωσε αναλόγως τους επιμέρους βαθμούς.
-
-Πρέπει να επιστρέφεις ΜΟΝΟ ένα έγκυρο JSON της μορφής:
-{"criteria":{"Θέση":0-2,"Τεκμηρίωση":0-2,"Συνάφεια":0-2,"Σαφήνεια":0-2,"Αντίρρηση":0-2},"total":0-10,"feedback":"Σύντομο σχόλιο του Σωκράτη"}
-`
-        },
-        {
-          role: "user",
-          content: `
+Ορισμοί:
+- "Θέση": καθαρή διατύπωση στάσης.
+- "Τεκμηρίωση": ύπαρξη αιτιολόγησης ή παραδείγματος.
+- "Συνάφεια": σύνδεση με το ερώτημα/ρήση.
+- "Σαφήνεια": δομή και ροή.
+- "Αντίρρηση": απάντηση σε αντίθετη θέση (ενεργό από 2ο γύρο).
+            `
+          },
+          {
+            role: "user",
+            content: `
+Γύρος: ${Number(round) || 1}
 Αποστολή: ${mission?.title || "—"}
 Ερώτημα: ${mission?.question || "—"}
-Απάντηση μαθητή: ${transcript}
-Επιστρέψτε μόνο το JSON, χωρίς markdown, χωρίς περιττό κείμενο.
-`
-        }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0,
-      max_tokens: 250
-    });
+Απάντηση μαθητή:
+${transcript}
+
+ΟΔΗΓΙΑ:
+- Αν Γύρος=1 αγνόησε "Αντίρρηση" (βάλε 0).
+- Αν Γύρος>1 αγνόησε "Θέση" (βάλε 0).
+Επέστρεψε ΜΟΝΟ το JSON που ζητήθηκε, χωρίς markdown.
+            `
+          }
+        ],
+        response_format: { type: "json_object" },
+        temperature: 0,
+        max_tokens: 200
+      },
+      { timeout: 12000 } // ⏱️ προληπτικό όριο 12s
+    );
 
     const aiText = (completion.choices?.[0]?.message?.content || "").trim();
     console.log("📩 AI raw output:", aiText);
 
-    // ✅ Καθαρισμός JSON
-    let cleaned = (aiText || "")
-      .replace(/```json|```/g, "")
-      .trim();
-
-    const firstBrace = cleaned.indexOf("{");
-    const lastBrace = cleaned.lastIndexOf("}");
-    if (firstBrace !== -1 && lastBrace > firstBrace) {
-      cleaned = cleaned.slice(firstBrace, lastBrace + 1);
+    let data;
+    try {
+      data = JSON.parse(aiText);
+    } catch {
+      console.error("❌ Αποτυχία parsing JSON:", aiText);
+      data = { criteria: {}, feedback: "⚠️ Μη έγκυρο JSON από AI." };
     }
 
-    console.log("🧹 Καθαρισμένο JSON:", cleaned);
+    // ----------------------------------------
+    // 📊 Υπολογισμός σκορ στον server
+    // ----------------------------------------
+    const C = {
+      "Θέση": Number(data?.criteria?.["Θέση"]) || 0,
+      "Τεκμηρίωση": Number(data?.criteria?.["Τεκμηρίωση"]) || 0,
+      "Συνάφεια": Number(data?.criteria?.["Συνάφεια"]) || 0,
+      "Σαφήνεια": Number(data?.criteria?.["Σαφήνεια"]) || 0,
+      "Αντίρρηση": Number(data?.criteria?.["Αντίρρηση"]) || 0
+    };
 
-   let data;
-try {
-  data = JSON.parse(cleaned);
-} catch (err) {
-  console.error("❌ Αποτυχία parsing JSON:", cleaned);
-  data = { criteria: {}, total: 0, feedback: cleaned };
-}
+    // Σκληρά όρια
+    for (const k of Object.keys(C)) {
+      if (C[k] < 0) C[k] = 0;
+      if (C[k] > 2) C[k] = 2;
+    }
 
-// ✅ Καθαρισμός feedback
-if (typeof data.feedback === "string") {
-  data.feedback = data.feedback.replace(/```json|```/g, "").trim();
-}
+    const currentRound = Number(round) || 1;
+    let total8 = 0;
 
-// ✅ Νέος έλεγχος: αν το feedback είναι κατά λάθος JSON, αντικατάστησέ το
-if (data.feedback.startsWith("{")) {
-  data.feedback = "⚠️ Το σχόλιο δεν διαβάστηκε σωστά.";
-}
+    if (currentRound === 1) {
+      C["Αντίρρηση"] = 0;
+      total8 = C["Θέση"] + C["Τεκμηρίωση"] + C["Συνάφεια"] + C["Σαφήνεια"];
+    } else {
+      C["Θέση"] = 0;
+      total8 = C["Τεκμηρίωση"] + C["Συνάφεια"] + C["Σαφήνεια"] + C["Αντίρρηση"];
+    }
 
-console.log("💬 Καθαρό feedback:", data.feedback);
-   
+    // Soft boost στην Τεκμηρίωση αν εντοπιστεί αιτιολόγηση
+    const t = String(transcript || "").toLowerCase();
+    const hasBecause = /(γιατί|επειδή|λόγω|άρα|αν\s+.*\s*τότε|παράδειγμα|πχ|π\.χ\.)/.test(t);
+    if (hasBecause && C["Τεκμηρίωση"] === 0) C["Τεκμηρίωση"] = 1;
+
+    if (total8 < 0) total8 = 0;
+    if (total8 > 8) total8 = 8;
+    const scaled10 = Math.round((total8 / 8) * 10);
+
+    data = {
+      criteria: C,
+      total: total8,
+      out_of: 8,
+      scaled: scaled10,
+      feedback:
+        typeof data.feedback === "string" && !data.feedback.trim().startsWith("{")
+          ? data.feedback.trim()
+          : "Ο Σωκράτης σε άκουσε∙ προσπάθησε να εξηγήσεις λίγο περισσότερο το «γιατί»."
+    };
 
     const duration = Date.now() - start;
-    console.log("⏱️ Χρόνος απάντησης OpenAI:", duration, "ms");
+    console.log(`📊 Σκορ (γύρος ${currentRound}): ${data.total}/8 (${data.scaled}/10)`);
+    console.log("⏱️ Χρόνος απάντησης:", duration, "ms");
 
-// ✅ Αν η απάντηση δεν έχει τα σωστά πεδία, βάλε fallback
-if (!data.criteria || typeof data.total === "undefined") {
-  data = {
-    criteria: {},
-    total: 0,
-    feedback: "⚠️ Ο Σωκράτης σιώπησε, η απάντηση δεν αξιολογήθηκε σωστά."
-  };
-}
-
-// === ΕΠΕΞΕΡΓΑΣΙΑ ΚΡΙΤΗΡΙΩΝ ΑΝΑ ΓΥΡΟ (1ος χωρίς Αντίρρηση, επόμενοι χωρίς Θέση) ===
-const round = Number(body?.round) || 1;
-
-// 🧭 Ορισμός επιτρεπόμενων κριτηρίων
-const allowed = round === 1
-  ? ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια"]
-  : ["Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
-
-// 🧹 Καθαρισμός & φίλτρο βαθμολογίας
-const sanitized = {};
-for (const k of allowed) {
-  const v = Number(data?.criteria?.[k]) || 0;
-  sanitized[k] = Math.max(0, Math.min(2, Math.round(v)));
-}
-data.criteria = sanitized;
-
-// 🔢 Υπολογισμός συνολικού σκορ μόνο από τα επιτρεπόμενα
-const totalScore = allowed.reduce((sum, k) => sum + (sanitized[k] || 0), 0);
-const maxScore = 8;
-data.total = totalScore;
-data.out_of = maxScore;
-data.scaled = Math.round((totalScore / maxScore) * 10);
-
-console.log(`📊 Σκορ (γύρος ${round}): ${data.total}/${data.out_of} (${data.scaled}/10)`);
-
-    
     return res.status(200).json(data);
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     return res.status(err.status || 500).json({
-  error: err.message || "Αποτυχία σύνδεσης με τον AI Κριτή.",
-  code: err.code || "unknown"
-});
-
+      error: err.message || "Αποτυχία σύνδεσης με τον AI Κριτή.",
+      code: err.code || "unknown"
+    });
   }
 }
-
-
-
-
