@@ -2022,17 +2022,20 @@ window.addEventListener('load', () => {
        bottom: 6px;
        right: 10px;
        color: #fff;
-       font-size: 12px;
+       font-size: 13px;
        opacity: 0.9;
        font-family: monospace;
-       z-index: 9999;
+       background: rgba(0,0,0,0.6);
+       padding: 3px 8px;
+       border-radius: 6px;
+       z-index: 999999;
      ">
 </div>
 
 <script>
   const currentVersion = "v1.3-stable";
   document.getElementById("versionTag").textContent = currentVersion;
+  console.log("✅ Έκδοση εμφανίστηκε:", currentVersion);
 </script>
-
 </body>
 </html>
