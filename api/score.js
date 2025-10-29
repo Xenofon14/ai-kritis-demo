@@ -179,6 +179,25 @@ try {
 } catch (err) {
   console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
 }
+
+// === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
+try {
+  const criteria = data.criteria || {};
+  const totalScore = Object.values(criteria).reduce(
+    (a, b) => a + (Number(b) || 0),
+    0
+  );
+  const maxScore = 8; // βάση 8
+  const scaled = Math.round((totalScore / maxScore) * 10);
+
+  data.total = totalScore;
+  data.out_of = maxScore;
+  data.scaled = scaled;
+
+  console.log("📊 Υπολογισμός σκορ:", data.total, "/", data.out_of, "(", data.scaled, "/10 )");
+} catch (err) {
+  console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
+}
     
     return res.status(200).json(data);
   } catch (err) {
@@ -186,6 +205,7 @@ try {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
