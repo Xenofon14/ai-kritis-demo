@@ -1373,22 +1373,23 @@ async function getAIScore(transcript, mission) {
     console.log("🧾 transcript:", transcript);
     console.log("📘 mission:", mission);
 
-    // 🧠 Μνήμη παίκτη
-    const activePlayer = game.players[game.activeIndex].name;
-    const memory = playerPositions[activePlayer] || {};
+  // 🧠 Μνήμη παίκτη
+const activePlayer = game.players[game.activeIndex].name;
+const memory = playerPositions[activePlayer] || {};
 
-    // 🚀 Κλήση API /api/score
-    const response = await fetch("/api/score", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-     body: JSON.stringify({
-  transcript,
-  mission,
-  philosopher: memory.philosopher || null,
-  initial_thesis: memory.thesis || null
-  round: game.currentRound   // ✅ ΣΤΕΛΝΟΥΜΕ ΤΟΝ ΓΥΡΟ
-})
-    });
+// 🚀 Κλήση API /api/score
+const response = await fetch("/api/score", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    transcript,
+    mission,
+    philosopher: memory.philosopher || null,
+    initial_thesis: memory.thesis || null,   // ✅ ΠΡΟΣΘΕΣΑ ΚΟΜΜΑ ΕΔΩ
+    round: game.currentRound                 // ✅ Τώρα είναι σωστά μέσα στο αντικείμενο
+  })
+});
+
 
     if (!response.ok) {
       console.error("❌ API HTTP error:", response.status);
