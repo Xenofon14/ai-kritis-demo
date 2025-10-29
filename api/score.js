@@ -55,19 +55,31 @@ export default async function handler(req, res) {
     });
 
     // --- Ανάγνωση απάντησης ---
-    const raw = completion.choices?.[0]?.message?.content || "{}";
-    let parsed = {};
+   const raw = completion.choices?.[0]?.message?.content || "{}";
+let parsed = {};
 
-    try {
-      // Δοκιμή 1: κανονικό JSON
-      parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+try {
+  // Κανονική προσπάθεια
+  parsed = JSON.parse(raw);
+} catch (err) {
+  console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
 
-      // Δοκιμή 2: διπλο-ενθυλακωμένο JSON (stringified μέσα σε string)
-      if (typeof parsed === "string") parsed = JSON.parse(parsed);
-    } catch (err) {
-      console.error("⚠️ JSON parse error:", err, raw);
-      parsed = { criteria: {}, feedback: "⚠️ JSON error" };
-    }
+  // 💊 Επιδιόρθωση κοινών σφαλμάτων JSON από το μοντέλο
+  let fixed = raw.trim()
+    .replace(/[\u0000-\u001F]+/g, "")        // αφαιρεί αόρατους χαρακτήρες
+    .replace(/“|”/g, '"')                    // αντικαθιστά ελληνικά εισαγωγικά
+    .replace(/(\w)"(\w)/g, '$1"$2')          // διορθώνει “κολλητά” εισαγωγικά
+    .replace(/,$/, "")                       // αφαιρεί κόμμα στο τέλος
+    .replace(/"feedback":"([^"]*)$/, '"feedback":"$1"}'); // κλείνει feedback
+
+  try {
+    parsed = JSON.parse(fixed);
+  } catch {
+    console.error("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
+    parsed = { criteria: {}, feedback: "⚠️ JSON error" };
+  }
+}
+
 
     // --- Εσωτερική βαθμολόγηση ---
     const c = parsed.criteria || {};
