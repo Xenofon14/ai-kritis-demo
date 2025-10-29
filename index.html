@@ -2021,22 +2021,18 @@ window.addEventListener('load', () => {
        position: fixed;
        bottom: 6px;
        right: 10px;
-       color: #aaa;
+       color: #fff;
        font-size: 12px;
-       opacity: 0.8;
+       opacity: 0.9;
        font-family: monospace;
+       z-index: 9999;
      ">
-  v1.3-stable
 </div>
 
-<!-- === ΕΝΔΕΙΞΗ ΕΚΔΟΣΗΣ (JS) === -->
 <script>
   const currentVersion = "v1.3-stable";
-  document.addEventListener("DOMContentLoaded", () => {
-    const tag = document.getElementById("versionTag");
-    if (tag) tag.textContent = currentVersion;
-  });
+  document.getElementById("versionTag").textContent = currentVersion;
 </script>
-    
+
 </body>
 </html>
