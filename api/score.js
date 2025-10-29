@@ -4,10 +4,19 @@ const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 export default async function handler(req, res) {
   try {
-    const body =
-      typeof req.body === "object" && req.body !== null
-        ? req.body
-        : JSON.parse(await req.text());
+    let body = {};
+try {
+  if (req.body) {
+    body = req.body;
+  } else {
+    let raw = "";
+    for await (const chunk of req) raw += chunk;
+    body = JSON.parse(raw || "{}");
+  }
+} catch (err) {
+  console.error("❌ Αποτυχία ανάγνωσης body:", err);
+  return res.status(400).json({ error: "Μη έγκυρη μορφή αιτήματος." });
+}
 
     const { transcript, mission, round } = body;
     if (!transcript) return res.status(400).json({ error: "Καμία απάντηση." });
