@@ -643,7 +643,7 @@ if (count < 6) {
 <!-- 🌟 Συνολικό Σκορ -->
 <div id="scorePanel">
   <div class="score-label">Συνολική Βαθμολογία</div>
-  <div class="score-value" id="totalScore">—/10</div>
+  <div class="score-value" id="totalScore">—/8</div>
 </div>
 
 <script>
@@ -981,7 +981,7 @@ function advanceTurn() {
   document.getElementById("transcript").value = "";
   document.getElementById("socraticComment").textContent = "—";
   document.getElementById("criteriaList").innerHTML = "";
-  document.getElementById("totalScore").textContent = "—/10";
+  document.getElementById("totalScore").textContent = "—/8";
   document.getElementById("timer").textContent = "1:30";
   remainingTime = game.baseTimeSec;
   clearInterval(timerInterval);
@@ -1711,7 +1711,7 @@ document.getElementById("totalScore").textContent = `${total}/${out_of}`;
     if (!game.completedRounds[currentPlayer]) game.completedRounds[currentPlayer] = [];
     game.completedRounds[currentPlayer].push(game.currentRound);
 
-    console.log(`✅ Βαθμολογία ${currentPlayer}: ${totalNum}/10`);
+   console.log(`✅ Βαθμολογία ${currentPlayer}: ${totalNum}/8`);
 
   } catch (err) {
     console.error("❌ Σφάλμα στη βαθμολόγηση:", err);
