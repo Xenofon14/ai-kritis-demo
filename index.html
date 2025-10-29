@@ -1377,6 +1377,10 @@ async function getAIScore(transcript, mission) {
 const activePlayer = game.players[game.activeIndex].name;
 const memory = playerPositions[activePlayer] || {};
 
+// 🧠 Μνήμη παίκτη
+const activePlayer = game.players[game.activeIndex].name;
+const memory = playerPositions[activePlayer] || {};
+
 // 🚀 Κλήση API /api/score
 const response = await fetch("/api/score", {
   method: "POST",
@@ -1385,38 +1389,38 @@ const response = await fetch("/api/score", {
     transcript,
     mission,
     philosopher: memory.philosopher || null,
-    initial_thesis: memory.thesis || null,   // ✅ ΠΡΟΣΘΕΣΑ ΚΟΜΜΑ ΕΔΩ
-    round: game.currentRound                 // ✅ Τώρα είναι σωστά μέσα στο αντικείμενο
-  })
-});
+    initial_thesis: memory.thesis || null,
+    round: game.currentRound
+  }) // ✅ εδώ κλείνει σωστά η JSON.stringify()
+}); // ✅ κι εδώ κλείνει η fetch()
 
+// Από εδώ και κάτω, ξεκινά η συνέχεια του κώδικα:
+if (!response.ok) {
+  console.error("❌ API HTTP error:", response.status);
+  throw new Error("HTTP " + response.status);
+}
 
-    if (!response.ok) {
-      console.error("❌ API HTTP error:", response.status);
-      throw new Error("HTTP " + response.status);
-    }
+const result = await response.json();
+console.log("📨 AI Response:", result);
 
-    const result = await response.json();
-    console.log("📨 AI Response:", result);
+// Έλεγχος εγκυρότητας
+if (!result || typeof result.total === "undefined") {
+  throw new Error("Μη έγκυρη απάντηση από τον Σωκράτη (API)");
+}
 
-    // Έλεγχος εγκυρότητας
-    if (!result || typeof result.total === "undefined") {
-      throw new Error("Μη έγκυρη απάντηση από τον Σωκράτη (API)");
-    }
+return {
+  criteria: result.criteria || {},
+  total: result.total,
+  feedback: result.feedback || "Ο Σωκράτης σιώπησε, αλλά σκέφτηκε κάτι βαθύ…"
+};
 
-    return {
-      criteria: result.criteria || {},
-      total: result.total,
-      feedback: result.feedback || "Ο Σωκράτης σιώπησε, αλλά σκέφτηκε κάτι βαθύ…"
-    };
   } catch (err) {
     console.error("❌ Σφάλμα στη βαθμολόγηση:", err);
     // Fallback στον offline κριτή
     return await getOfflineScore(transcript, mission);
   }
 }
-
-  
+ 
   
 /* ---------- Επιλογή τρόπου Κριτή ---------- */
 // ai = API, offline = Τοπικός (rubric), manual = Ανθρώπινος Κριτής
