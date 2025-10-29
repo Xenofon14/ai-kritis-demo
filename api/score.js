@@ -169,8 +169,13 @@ if (!data.criteria || typeof data.total === "undefined") {
     return res.status(200).json(data);
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-    return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+    return res.status(err.status || 500).json({
+  error: err.message || "Αποτυχία σύνδεσης με τον AI Κριτή.",
+  code: err.code || "unknown"
+});
+
   }
 }
+
 
 
