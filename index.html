@@ -1678,7 +1678,7 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
       const match = String(scores.total).match(/\d+(\,\d+|\.\d+)?/);
       if (match) totalNum = parseFloat(match[0].replace(",", "."));
     }
-    document.getElementById("totalScore").textContent = `${totalNum}/10`;
+    document.getElementById("totalScore").textContent = `${scores.total}/${scores.out_of} (${scores.scaled}/10)`;
 
     // 💾 Αποθήκευση αποτελεσμάτων
     if (!game.scores[currentPlayer]) game.scores[currentPlayer] = [];
