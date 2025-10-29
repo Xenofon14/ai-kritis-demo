@@ -9,10 +9,10 @@ export const config = {
 
 import OpenAI from "openai";
 
-// Δημιουργία client του OpenAI
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
+
 
 // Κύρια συνάρτηση handler
 export default async function handler(req, res) {
@@ -192,4 +192,5 @@ try {
 
 // ✅ Στείλε με ασφάλεια την απάντηση
 return res.status(200).json(data);
+
 
