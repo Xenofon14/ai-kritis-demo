@@ -167,24 +167,36 @@ if (!data.criteria || typeof data.total === "undefined") {
 }
 
 // === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
-if (data.criteria && Object.keys(data.criteria).length > 0) {
-  try {
-    const criteria = data.criteria;
+try {
+  if (data && typeof data === "object") {
+    const criteria = (data.criteria && typeof data.criteria === "object") ? data.criteria : {};
     const totalScore = Object.values(criteria).reduce(
       (a, b) => a + (Number(b) || 0),
       0
     );
-    const maxScore = 8; // βάση 8
+
+    // ✅ Εδώ ορίζουμε σταθερά τον παρονομαστή
+    const maxScore = 8; 
     const scaled = Math.round((totalScore / maxScore) * 10);
 
     data.total = totalScore;
     data.out_of = maxScore;
     data.scaled = scaled;
 
-    console.log("📊 Υπολογισμός σκορ:", data.total, "/", data.out_of, "(", data.scaled, "/10 )");
-  } catch (err) {
-    console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
+    console.log(`📊 Υπολογισμός σκορ: ${data.total}/${data.out_of} (${data.scaled}/10)`);
+  } else {
+    console.warn("⚠️ Άκυρα δεδομένα για υπολογισμό:", data);
+    data = { total: 0, out_of: 8, scaled: 0, feedback: "⚠️ Δεν ελήφθη έγκυρο JSON από AI." };
   }
+} catch (err) {
+  console.error("❌ Σφάλμα στον υπολογισμό σκορ:", err);
+  data = { total: 0, out_of: 8, scaled: 0, feedback: "⚠️ Αποτυχία υπολογισμού." };
 }
 
-return res.status(200).json(data);
+// ✅ Στείλε την απάντηση με σιγουριά
+try {
+  return res.status(200).json(data);
+} catch (e) {
+  console.error("❌ Σφάλμα αποστολής απάντησης:", e);
+  return res.status(500).json({ error: "Αποτυχία αποστολής JSON." });
+}
