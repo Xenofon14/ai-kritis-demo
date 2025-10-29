@@ -39,7 +39,8 @@ if (isWarmup) {
         { role: "system", content: "Return only valid JSON: {\"ok\":true}" },
         { role: "user", content: "Ping" }
       ],
-      response_format: { type: "json_object" },
+      response_format: undefined,
+
       temperature: 0,
       max_tokens: 5
     });
@@ -199,3 +200,4 @@ return res.status(200).json(data);
   }
 } // <-- Κλείνει το εσωτερικό try/catch
 } // <-- Κλείνει τη συνάρτηση handler 
+
