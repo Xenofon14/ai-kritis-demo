@@ -169,20 +169,6 @@ if (!data.criteria || typeof data.total === "undefined") {
 // === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
 try {
   const criteria = data.criteria || {};
-  const totalScore = Object.values(criteria).reduce((a, b) => a + (Number(b) || 0), 0);
-  const maxScore = 8; // 4 κατηγορίες Χ/2 ή 5 Χ/2 με διαφορετικό rubric
-  const scaled = Math.round((totalScore / maxScore) * 10);
-
-  data.total = totalScore;
-  data.out_of = maxScore;
-  data.scaled = scaled;
-} catch (err) {
-  console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
-}
-
-// === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
-try {
-  const criteria = data.criteria || {};
   const totalScore = Object.values(criteria).reduce(
     (a, b) => a + (Number(b) || 0),
     0
@@ -205,6 +191,7 @@ try {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
