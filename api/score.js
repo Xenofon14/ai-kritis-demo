@@ -167,33 +167,24 @@ if (!data.criteria || typeof data.total === "undefined") {
 }
 
 // === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
-try {
-  const criteria = data.criteria || {};
-  const totalScore = Object.values(criteria).reduce(
-    (a, b) => a + (Number(b) || 0),
-    0
-  );
-  const maxScore = 8; // βάση 8
-  const scaled = Math.round((totalScore / maxScore) * 10);
+if (data.criteria && Object.keys(data.criteria).length > 0) {
+  try {
+    const criteria = data.criteria;
+    const totalScore = Object.values(criteria).reduce(
+      (a, b) => a + (Number(b) || 0),
+      0
+    );
+    const maxScore = 8; // βάση 8
+    const scaled = Math.round((totalScore / maxScore) * 10);
 
-  data.total = totalScore;
-  data.out_of = maxScore;
-  data.scaled = scaled;
+    data.total = totalScore;
+    data.out_of = maxScore;
+    data.scaled = scaled;
 
-  console.log("📊 Υπολογισμός σκορ:", data.total, "/", data.out_of, "(", data.scaled, "/10 )");
-} catch (err) {
-  console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
-}
-    
-    return res.status(200).json(data);
+    console.log("📊 Υπολογισμός σκορ:", data.total, "/", data.out_of, "(", data.scaled, "/10 )");
   } catch (err) {
-    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
-    return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+    console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
   }
 }
 
-
-
-
-
-
+return res.status(200).json(data);
