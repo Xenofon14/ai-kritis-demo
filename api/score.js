@@ -193,4 +193,8 @@ try {
 // ✅ Στείλε με ασφάλεια την απάντηση
 return res.status(200).json(data);
 
-
+  } catch (err) {
+    console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
+    return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
+  }
+}
