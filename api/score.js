@@ -198,7 +198,8 @@ return res.status(200).json(data);
     console.error("❌ Σφάλμα AI Κριτή:", err.response?.data || err.message || err);
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
-} // <-- Κλείνει το εσωτερικό try/catch
+
 } // <-- Κλείνει τη συνάρτηση handler 
+
 
 
