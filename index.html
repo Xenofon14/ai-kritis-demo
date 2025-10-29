@@ -2015,7 +2015,28 @@ window.addEventListener('load', () => {
     </div>
   </div>
 </div>
+<!-- === Version Tag === -->
+<div id="versionTag"
+     style="
+       position: fixed;
+       bottom: 6px;
+       right: 10px;
+       color: #aaa;
+       font-size: 12px;
+       opacity: 0.8;
+       font-family: monospace;
+     ">
+  v1.3-stable
+</div>
 
+<!-- === ΕΝΔΕΙΞΗ ΕΚΔΟΣΗΣ (JS) === -->
+<script>
+  const currentVersion = "v1.3-stable";
+  document.addEventListener("DOMContentLoaded", () => {
+    const tag = document.getElementById("versionTag");
+    if (tag) tag.textContent = currentVersion;
+  });
+</script>
     
 </body>
 </html>
