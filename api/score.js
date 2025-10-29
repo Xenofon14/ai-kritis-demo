@@ -39,8 +39,7 @@ if (isWarmup) {
         { role: "system", content: "Return only valid JSON: {\"ok\":true}" },
         { role: "user", content: "Ping" }
       ],
-      response_format: undefined,
-
+    
       temperature: 0,
       max_tokens: 5
     });
@@ -200,6 +199,7 @@ return res.status(200).json(data);
   }
 
 } // <-- Κλείνει τη συνάρτηση handler 
+
 
 
 
