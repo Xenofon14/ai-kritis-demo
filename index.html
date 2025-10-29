@@ -1386,6 +1386,7 @@ async function getAIScore(transcript, mission) {
   mission,
   philosopher: memory.philosopher || null,
   initial_thesis: memory.thesis || null
+  round: game.currentRound   // ✅ ΣΤΕΛΝΟΥΜΕ ΤΟΝ ΓΥΡΟ
 })
     });
 
