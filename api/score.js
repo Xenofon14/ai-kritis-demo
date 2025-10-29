@@ -3,6 +3,10 @@
 // Αξιολόγηση AI Κριτή "Σωκράτης"
 // ===============================
 
+export const config = {
+  runtime: "nodejs"
+};
+
 import OpenAI from "openai";
 
 // Δημιουργία client του OpenAI
@@ -188,3 +192,4 @@ try {
 
 // ✅ Στείλε με ασφάλεια την απάντηση
 return res.status(200).json(data);
+
