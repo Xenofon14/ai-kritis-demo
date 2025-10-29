@@ -66,7 +66,7 @@ console.log("   initial_thesis:", initial_thesis || "(καμία)");
 με βάση τα κριτήρια:
 Θέση (0-2), Τεκμηρίωση (0-2), Συνάφεια (0-2), Σαφήνεια (0-2), Αντίρρηση (0-2).
 Επιστρέφεις JSON αυτής της μορφής:
-{"criteria":{"Θέση":X,"Τεκμηρίωση":X,"Συνάφεια":X,"Σαφήνεια":X,"Αντίρρηση":X},"total":X,"feedback":"Κείμενο ανατροφοδότησης"}
+{"criteria":{"Θέση":X,"Τεκμηρίωση":X,"Συνάφεια":X,"Σαφήνεια":X,"Αντίρρηση":X},"total":0-8,"feedback":"Κείμενο ανατροφοδότησης"}
 
 Αποστολή: ${mission?.title || "—"}
 Ερώτημα: ${mission?.question || "—"}
@@ -99,7 +99,7 @@ console.log("   initial_thesis:", initial_thesis || "(καμία)");
 Αν λείπουν σαφή επιχειρήματα ή η σύνδεση με τη ρήση, μείωσε αναλόγως τους επιμέρους βαθμούς.
 
 Πρέπει να επιστρέφεις ΜΟΝΟ ένα έγκυρο JSON της μορφής:
-{"criteria":{"Θέση":0-2,"Τεκμηρίωση":0-2,"Συνάφεια":0-2,"Σαφήνεια":0-2,"Αντίρρηση":0-2},"total":0-10,"feedback":"Σύντομο σχόλιο του Σωκράτη"}
+{"criteria":{"Θέση":0-2,"Τεκμηρίωση":0-2,"Συνάφεια":0-2,"Σαφήνεια":0-2,"Αντίρρηση":0-2},"total":0-8,"feedback":"Σύντομο σχόλιο του Σωκράτη"}
 `
         },
         {
@@ -165,6 +165,20 @@ if (!data.criteria || typeof data.total === "undefined") {
     feedback: "⚠️ Ο Σωκράτης σιώπησε, η απάντηση δεν αξιολογήθηκε σωστά."
   };
 }
+
+// === ΚΛΙΜΑΚΩΣΗ ΚΑΙ ΕΝΣΩΜΑΤΩΣΗ ΣΤΑΘΕΡΗΣ ΒΑΣΗΣ ===
+try {
+  const criteria = data.criteria || {};
+  const totalScore = Object.values(criteria).reduce((a, b) => a + (Number(b) || 0), 0);
+  const maxScore = 8; // 4 κατηγορίες Χ/2 ή 5 Χ/2 με διαφορετικό rubric
+  const scaled = Math.round((totalScore / maxScore) * 10);
+
+  data.total = totalScore;
+  data.out_of = maxScore;
+  data.scaled = scaled;
+} catch (err) {
+  console.warn("⚠️ Πρόβλημα κατά τον υπολογισμό του συνολικού σκορ:", err);
+}
     
     return res.status(200).json(data);
   } catch (err) {
@@ -172,6 +186,7 @@ if (!data.criteria || typeof data.total === "undefined") {
     return res.status(500).json({ error: "Αποτυχία σύνδεσης με τον AI Κριτή." });
   }
 }
+
 
 
 
