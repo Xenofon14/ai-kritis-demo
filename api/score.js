@@ -165,6 +165,32 @@ if (!data.criteria || typeof data.total === "undefined") {
     feedback: "⚠️ Ο Σωκράτης σιώπησε, η απάντηση δεν αξιολογήθηκε σωστά."
   };
 }
+
+// === ΕΠΕΞΕΡΓΑΣΙΑ ΚΡΙΤΗΡΙΩΝ ΑΝΑ ΓΥΡΟ (1ος χωρίς Αντίρρηση, επόμενοι χωρίς Θέση) ===
+const round = Number(body?.round) || 1;
+
+// 🧭 Ορισμός επιτρεπόμενων κριτηρίων
+const allowed = round === 1
+  ? ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια"]
+  : ["Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
+
+// 🧹 Καθαρισμός & φίλτρο βαθμολογίας
+const sanitized = {};
+for (const k of allowed) {
+  const v = Number(data?.criteria?.[k]) || 0;
+  sanitized[k] = Math.max(0, Math.min(2, Math.round(v)));
+}
+data.criteria = sanitized;
+
+// 🔢 Υπολογισμός συνολικού σκορ μόνο από τα επιτρεπόμενα
+const totalScore = allowed.reduce((sum, k) => sum + (sanitized[k] || 0), 0);
+const maxScore = 8;
+data.total = totalScore;
+data.out_of = maxScore;
+data.scaled = Math.round((totalScore / maxScore) * 10);
+
+console.log(`📊 Σκορ (γύρος ${round}): ${data.total}/${data.out_of} (${data.scaled}/10)`);
+
     
     return res.status(200).json(data);
   } catch (err) {
@@ -176,6 +202,7 @@ if (!data.criteria || typeof data.total === "undefined") {
 
   }
 }
+
 
 
 
