@@ -117,7 +117,7 @@ console.log("   initial_thesis:", initial_thesis || "(καμία)");
 `
         }
       ],
-      response_format: { type: "json_object" },
+    
       temperature: 0,
       max_tokens: 250
     });
@@ -200,4 +200,5 @@ return res.status(200).json(data);
   }
 } // <-- Κλείνει το εσωτερικό try/catch
 } // <-- Κλείνει τη συνάρτηση handler 
+
 
