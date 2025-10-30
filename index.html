@@ -1812,8 +1812,9 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   const useBonusEl = document.getElementById("useBonus");
   const useBonus = useBonusEl ? useBonusEl.checked : false; // ✅ ασφαλής έλεγχος
   
-    // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
-  judgeMode = document.getElementById("judgeMode").value;
+      // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
+  const judgeSelect = document.getElementById("judgeMode");
+  judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ αν λείπει, default = "ai"
   useAI = (judgeMode === "ai");
   console.log("⚖️ Τρόπος Κριτή:", judgeMode);
   updateAIModeIndicator();
