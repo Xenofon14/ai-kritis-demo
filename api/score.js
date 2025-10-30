@@ -3,10 +3,12 @@
 // AI Κριτής "Σωκράτης" (σταθερή JSON απόκριση)
 // ===============================
 
-import OpenAI from "openai";
-import { config } from "dotenv";
+// ✅ Αντί για import, χρησιμοποίησε dynamic import (συμβατό με Vercel Node 18)
+const OpenAI = (await import("openai")).default;
 
-config(); // ✅ φορτώνει το κλειδί τοπικά αν χρειαστεί
+// Δεν χρειάζεται dotenv στη Vercel, αλλά το κρατάμε για τοπικό περιβάλλον
+import { config } from "dotenv";
+config();
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
