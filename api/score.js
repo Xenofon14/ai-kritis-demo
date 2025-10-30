@@ -4,10 +4,18 @@
 // ===============================
 
 import OpenAI from "openai";
+import { config } from "dotenv";
 
-const client = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+config(); // ✅ φορτώνει το κλειδί τοπικά αν χρειαστεί
+
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
+});
 
 export default async function handler(req, res) {
+
+console.log("⚙️ AI Κριτής ενεργός, API key μήκος:", process.env.OPENAI_API_KEY?.length || 0);
+
   try {
     // --- Ανάγνωση body (ασφαλής για Edge functions) ---
     let body = {};
