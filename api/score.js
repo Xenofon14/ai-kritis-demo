@@ -109,43 +109,42 @@ try {
   const cleaned = raw
     .replace(/```json/g, "")
     .replace(/```/g, "")
-    .replace(/^[^{]*({[\s\S]*})[^}]*$/, "$1")  // κρατά μόνο το JSON block
+    .replace(/^[^{]*({[\s\S]*})[^}]*$/, "$1")
     .trim();
 
   parsed = JSON.parse(cleaned);
-} catch (err) {
- 
-console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
 
-  // 💊 Επιδιόρθωση κοινών σφαλμάτων JSON από το μοντέλο
+} catch (err) {
+  console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
+
   let fixed = raw.trim()
-    .replace(/[\u0000-\u001F]+/g, "")        // αφαιρεί αόρατους χαρακτήρες
-    .replace(/“|”/g, '"')                    // αντικαθιστά ελληνικά εισαγωγικά
-    .replace(/(\w)"(\w)/g, '$1"$2')          // διορθώνει “κολλητά” εισαγωγικά
-    .replace(/,$/, "")                       // αφαιρεί κόμμα στο τέλος
-    // ✅ Αν λείπει το τέλος του feedback, το συμπληρώνουμε σωστά
+    .replace(/[\u0000-\u001F]+/g, "")
+    .replace(/“|”/g, '"')
+    .replace(/(\w)"(\w)/g, '$1"$2')
+    .replace(/,$/, "")
     .replace(/"feedback":"([^}]*)$/, (_, p1) => `"feedback":"${p1.replace(/"$/, "")}"} }`);
 
- try {
-  parsed = JSON.parse(fixed);
-} catch {
-  console.warn("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
+  try {
+    parsed = JSON.parse(fixed);
 
-  // 🩹 Αν το JSON τελειώνει χωρίς κλείσιμο, προσθέτουμε ασφάλεια
-  if (!fixed.trim().endsWith("}")) {
-    fixed = fixed.trim().replace(/"?\s*$/, "\"} }");
-    try {
-      parsed = JSON.parse(fixed);
-      console.log("✅ Επανόρθωση JSON πέτυχε μετά το auto-fix");
-    } catch (err2) {
-      console.error("❌ Αποτυχία και στο auto-fix:", err2.message);
-      parsed = { criteria: {}, feedback: "⚠️ JSON error (incomplete output)" };
-    }
+  } catch (err2) {
+    console.warn("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
+
+    if (!fixed.trim().endsWith("}")) {
+      fixed = fixed.trim().replace(/"?\s*$/, "\"} }");
+      try {
+        parsed = JSON.parse(fixed);
+        console.log("✅ Επανόρθωση JSON πέτυχε μετά το auto-fix");
+      } catch (err3) {
+        console.error("❌ Αποτυχία και στο auto-fix:", err3.message);
+        parsed = { criteria: {}, feedback: "⚠️ JSON error (incomplete output)" };
+      }
     } else {
-    parsed = { criteria: {}, feedback: "⚠️ JSON error" };
+      parsed = { criteria: {}, feedback: "⚠️ JSON error" };
+    }
   }
-}  // ✅ κλείνει το εξωτερικό try/catch
-}    // ✅ κλείνει το εξωτερικό catch (err)
+}
+
 
     
 // --- Εσωτερική βαθμολόγηση ---
