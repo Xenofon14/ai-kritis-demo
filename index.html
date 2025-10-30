@@ -353,6 +353,19 @@ button.recording {
 
   <h1 style="margin-bottom:20px;">🎮 Ρυθμίσεις Παιχνιδιού</h1>
 
+<!-- ✨ Ένδειξη Επιλεγμένης Έκδοσης -->
+<div id="selectedModeDisplay" style="
+  background: rgba(255,255,255,0.15);
+  border-radius: 12px;
+  padding: 10px 14px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #6ee0ff;
+">
+  ✨ Επιλεγμένη Έκδοση: —
+</div>
+  
   <label>Αριθμός Παικτών:
     <select id="playerCount" style="margin-left:10px;">
       <option value="2" selected>2</option>
@@ -1813,10 +1826,31 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
 });
 
 /* ---------- Welcome → Setup ---------- */
-document.getElementById("goToSetup").addEventListener("click", () => {
+/* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
+function startGame(mode) {
+  // Αποθήκευση της επιλογής
+  game.mode = mode;
+
+  // Απόκρυψη αρχικής και εμφάνιση setup screen
   document.getElementById("welcomeScreen").style.display = "none";
   document.getElementById("setupScreen").style.display = "flex";
-});
+
+  // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
+  const display = document.getElementById("selectedModeDisplay");
+  if (display) {
+    if (mode === "simple") {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Απλή";
+      display.style.color = "#7af77a";
+    } else {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Προχωρημένη";
+      display.style.color = "#ff7a7a";
+    }
+  }
+}
+
+// ✅ Συνδέουμε τα κουμπιά της αρχικής
+document.getElementById("startSimpleBtn").addEventListener("click", () => startGame("simple"));
+document.getElementById("startAdvancedBtn").addEventListener("click", () => startGame("advanced"));
 
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
