@@ -1,20 +1,11 @@
 {
   "version": 2,
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "builds": [
-    { "src": "api/**/*.js", "use": "@vercel/node" },
+    { "src": "api/*.js", "use": "@vercel/node" },
     { "src": "public/**/*", "use": "@vercel/static" }
   ],
   "routes": [
-    { "src": "^/api/(.*)$", "dest": "/api/$1" },
-    { "src": "^/data/(.*)$", "dest": "/public/data/$1" },
-    { "src": "^/images/(.*)$", "dest": "/public/images/$1" },
-    { "src": "^/sounds/(.*)$", "dest": "/public/sounds/$1" },
-    { "src": "^/(.*)$", "dest": "/public/index.html" }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/(.*)", "dest": "/public/$1" }
   ]
 }
-
