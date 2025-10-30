@@ -2,9 +2,6 @@
   "name": "ai-kritis-demo",
   "version": "1.0.0",
   "type": "module",
-  "scripts": {
-    "vercel-build": "echo 'Vercel build completed'"
-  },
   "dependencies": {
     "openai": "^4.0.0"
   }
