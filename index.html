@@ -2092,6 +2092,30 @@ window.addEventListener('load', () => {
   const currentVersion = "v1.3-stable";
   document.getElementById("versionTag").textContent = currentVersion;
   console.log("✅ Έκδοση εμφανίστηκε:", currentVersion);
+
+
+  // === Οθόνη Έναρξης Παιχνιδιού (Welcome Screen) ===
+function startGame(mode) {
+  // Κρύβει την αρχική οθόνη
+  document.getElementById("welcomeScreen").style.display = "none";
+
+  // Εμφανίζει τη δεύτερη οθόνη (setup)
+  document.getElementById("setupScreen").style.display = "flex";
+
+  // Ενημερώνει το modeInfo
+  const info = document.getElementById("modeInfo");
+  if (info) {
+    if (mode === "simple") {
+      info.innerHTML = "🟢 Επιλέχθηκε: <b>Απλή Έκδοση</b><br><span style='opacity:0.8;'>Θέση + Επιχειρήματα</span>";
+    } else {
+      info.innerHTML = "🔴 Επιλέχθηκε: <b>Προχωρημένη Έκδοση</b><br><span style='opacity:0.8;'>Μεταφορές, Παραδείγματα, Αντιρρήσεις</span>";
+    }
+  }
+
+  // Κρατάει global επιλογή (αν τη χρειαστούμε)
+  window.selectedGameMode = mode;
+}
+
 </script>
 </body>
 </html>
