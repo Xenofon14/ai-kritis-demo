@@ -1415,15 +1415,16 @@ const memory = playerPositions[activePlayer] || {};
 const response = await fetch("/api/score", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
+   body: JSON.stringify({
     transcript,
     mission,
     philosopher: memory.philosopher || null,
     initial_thesis: memory.thesis || null,
-    round: game.currentRound
-    mode: game.mode || "simple"   // ✅ ΣΤΕΛΝΟΥΜΕ την έκδοση (Απλή/Προχωρημένη)
-  }) // ✅ εδώ κλείνει σωστά η JSON.stringify()
-}); // ✅ κι εδώ κλείνει η fetch()
+    round: game.currentRound,     // ✅ πρόσθεσε κόμμα εδώ
+    mode: game.mode || "simple"   // ✅ τώρα συντακτικά σωστό
+  })
+});
+
 
 // Από εδώ και κάτω, ξεκινά η συνέχεια του κώδικα:
 if (!response.ok) {
