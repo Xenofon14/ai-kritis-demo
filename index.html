@@ -1421,6 +1421,7 @@ const response = await fetch("/api/score", {
     philosopher: memory.philosopher || null,
     initial_thesis: memory.thesis || null,
     round: game.currentRound
+    mode: game.mode || "simple"   // ✅ ΣΤΕΛΝΟΥΜΕ την έκδοση (Απλή/Προχωρημένη)
   }) // ✅ εδώ κλείνει σωστά η JSON.stringify()
 }); // ✅ κι εδώ κλείνει η fetch()
 
