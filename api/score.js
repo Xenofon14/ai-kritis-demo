@@ -126,13 +126,22 @@ console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
     // ✅ Αν λείπει το τέλος του feedback, το συμπληρώνουμε σωστά
     .replace(/"feedback":"([^}]*)$/, (_, p1) => `"feedback":"${p1.replace(/"$/, "")}"} }`);
 
-  try {
-    parsed = JSON.parse(fixed);
+ try {
+  parsed = JSON.parse(fixed);
+} catch {
+  console.warn("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
 
-  try {
-    parsed = JSON.parse(fixed);
-  } catch {
-    console.error("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
+  // 🩹 Αν το JSON τελειώνει χωρίς κλείσιμο, προσθέτουμε ασφάλεια
+  if (!fixed.trim().endsWith("}")) {
+    fixed = fixed.trim().replace(/"?\s*$/, "\"} }");
+    try {
+      parsed = JSON.parse(fixed);
+      console.log("✅ Επανόρθωση JSON πέτυχε μετά το auto-fix");
+    } catch (err2) {
+      console.error("❌ Αποτυχία και στο auto-fix:", err2.message);
+      parsed = { criteria: {}, feedback: "⚠️ JSON error (incomplete output)" };
+    }
+  } else {
     parsed = { criteria: {}, feedback: "⚠️ JSON error" };
   }
 }
