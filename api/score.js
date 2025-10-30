@@ -189,7 +189,14 @@ const scaled = Math.round((total / 8) * 10);
 
     console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/8 (${scaled}/10)`);
 
-    return res.status(200).json(result);
+   try {
+  const safeResult = JSON.parse(JSON.stringify(result)); // καθαρισμός για αποστολή
+  return res.status(200).json(safeResult);
+} catch (e) {
+  console.error("❌ Σφάλμα κατά την αποστολή JSON:", e);
+  return res.status(500).json({ error: "Σφάλμα στην αποστολή δεδομένων." });
+}
+
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err);
     return res
