@@ -256,6 +256,28 @@ button.recording {
   transform: scale(1.08);
 }
 
+.character img:hover {
+  transform: scale(1.08);
+}
+
+/* 🎨 Στυλ για τα νέα κουμπιά επιλογής έκδοσης στην αρχική σελίδα */
+#startSimpleBtn, #startAdvancedBtn {
+  background: white;
+  color: #0e2a66;
+  font-weight: 600;
+  transition: transform 0.2s;
+}
+#startSimpleBtn:hover { transform: scale(1.05); background:#d6ffe0; }
+#startAdvancedBtn:hover { transform: scale(1.05); background:#ffd6d6; }
+
+/* === Εφέ εμφάνισης popup Σωκράτη === */
+#socratesPopup {
+  transition: opacity 1s, transform 1s;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+    
 /* === Εφέ εμφάνισης popup Σωκράτη === */
 #socratesPopup {
   transition: opacity 1s, transform 1s;
