@@ -53,55 +53,34 @@ export default async function handler(req, res) {
 - Αντίρρηση: 0–4 (μόνο από 2ο γύρο και μετά)
 (Δεν υπάρχει κριτήριο "Παράδειγμα"· θεώρησέ το 0)`;
 
-
-    
     // --- Prompt προς το μοντέλο ---
-    const completion = await client.chat.completions.create({
-      model: "gpt-4-turbo",
-      temperature: 0,
-      max_tokens: 250,
-      messages: [
+    const completion = await client.responses.create({
+      model: "gpt-4o-mini",
+      input: [
         {
           role: "system",
           content: `
 Είσαι ο φιλόσοφος Σωκράτης.
-Απάντησε *μόνο* με έγκυρο JSON, στη ΜΟΡΦΗ:
-{
-  "criteria": {
-    "Θέση": 0-4,
-    "Επιχειρηματολογία": 0-6,
-    "Εικόνα/Μεταφορά": 0-4,
-    "Παράδειγμα": 0-3,
-    "Αντίρρηση": 0-4
-  },
-  "feedback": "κείμενο"
-}
-
-Κανόνες:
-- "${isAdvanced ? "Προχωρημένη" : "Απλή"}" έκδοση.
-- ΜΟΝΟ στον 1ο γύρο βαθμολογείται η "Θέση". Σε επόμενους γύρους βάλε "Θέση": 0.
-- Η "Αντίρρηση" βαθμολογείται ΜΟΝΟ από τον 2ο γύρο και μετά. Στον 1ο γύρο βάλε "Αντίρρηση": 0.
-- Στην Απλή Έκδοση το "Παράδειγμα" θεωρείται 0 (μη διαθέσιμο).
+Απάντησε ΜΟΝΟ με έγκυρο JSON, στη ΜΟΡΦΗ:
+{"criteria":{"Θέση":0-4,"Επιχειρηματολογία":0-6,"Εικόνα/Μεταφορά":0-4,"Παράδειγμα":0-3,"Αντίρρηση":0-4},"feedback":"κείμενο"}
+(Χωρίς markdown, χωρίς σχόλια, χωρίς ```json)
+- Έκδοση: ${isAdvanced ? "Προχωρημένη" : "Απλή"}
 - ${rubricText}
-
-Μην προσθέτεις τίποτα άλλο εκτός από το JSON.
 `
         },
         {
           role: "user",
           content: `
 Γύρος: ${roundNum}
-Έκδοση: ${isAdvanced ? "Προχωρημένη" : "Απλή"}
 Ερώτημα: ${mission?.question || "—"}
 Απάντηση: ${transcript}`
         }
       ]
-
-   
     });
 
-// --- Ανάγνωση απάντησης ---
-const raw = completion.choices?.[0]?.message?.content || "{}";
+    const raw = completion.output_text || "{}";
+
+    
 let parsed = {};
 
 try {
