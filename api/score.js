@@ -145,9 +145,10 @@ console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
     parsed = { criteria: {}, feedback: "⚠️ JSON error" };
   }
 }  // ✅ κλείνει το εξωτερικό try/catch
+}    // ✅ κλείνει το εξωτερικό catch (err)
 
+    
 // --- Εσωτερική βαθμολόγηση ---
-
 const c = parsed.criteria || {};
 
 // ✅ Ενοποίηση ονομάτων από παλιό & νέο rubric
@@ -165,8 +166,6 @@ const C = {
   Σαφήνεια:   Number(mapped["Σαφήνεια"])   || 0,
   Αντίρρηση:  Number(mapped["Αντίρρηση"])  || 0
 };
-
-
 
 // ✅ Περιορισμοί ανά γύρο ΜΕΤΑ τον ορισμό του C
 if (roundNum === 1) C["Αντίρρηση"] = 0;
