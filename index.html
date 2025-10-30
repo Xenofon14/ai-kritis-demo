@@ -307,32 +307,66 @@ button.recording {
 </head>
 <body>
 
-<!-- === ΑΡΧΙΚΗ ΟΘΟΝΗ (Welcome Screen) === -->
+<!-- === ΟΘΟΝΗ 1: WELCOME SCREEN === -->
 <div id="welcomeScreen" style="
   position:fixed;
   inset:0;
-  background:linear-gradient(180deg,#102a6d,#173b88);
+  background:radial-gradient(circle at center, #1a1a2e 40%, #0d0d1a 100%);
   color:white;
   display:flex;
   flex-direction:column;
+  justify-content:center;
   align-items:center;
-  justify-content:flex-start;
-  padding:40px 20px 20px 20px;
   text-align:center;
-  z-index:2000;
+  font-family:'Poppins', sans-serif;
 ">
-  <img src="images/Socrates.png" alt="Σωκράτης" style="width:160px;height:160px;border-radius:50%;margin-bottom:20px;object-fit:cover;">
 
-  <h1 style="font-size:24px;margin-bottom:10px;">AI Κριτής - Σωκράτης</h1>
-  <p style="font-size:15px;opacity:0.85;margin-bottom:25px;">
-    Ένα φιλοσοφικό παιχνίδι επιχειρηματολογίας για παιδιά και μεγάλους.
+  <h1 style="font-size:38px; margin-bottom:10px;">🎓 Ο Κριτής Σωκράτης</h1>
+  <p style="font-size:18px; opacity:0.8; max-width:420px;">
+    Επίλεξε πώς θέλεις να παίξεις τον ρητορικό αγώνα σου.
   </p>
 
-  <!-- === ΚΟΥΜΠΙΑ ΑΡΧΙΚΗΣ ΟΘΟΝΗΣ (Main Buttons) === -->
-  <div class="button-container">
-    <button id="goToSetup">🎮 Νέο Παιχνίδι</button>
-    <button id="infoButton">ℹ️ Πληροφορίες</button>
+  <div style="display:flex; gap:20px; margin-top:40px; flex-wrap:wrap; justify-content:center;">
+    <!-- Απλή Έκδοση -->
+    <button onclick="startGame('simple')" style="
+      background:#4CAF50;
+      color:white;
+      padding:18px 24px;
+      font-size:18px;
+      border:none;
+      border-radius:15px;
+      width:220px;
+      box-shadow:0 0 15px rgba(76,175,80,0.4);
+      cursor:pointer;
+      transition:transform 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(76,175,80,0.7)';"
+      onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(76,175,80,0.4)';">
+      🟢 Απλή Έκδοση<br>
+      <span style="font-size:14px; opacity:0.9;">Για αρχάριους<br>Θέση + Επιχειρήματα</span>
+    </button>
+
+    <!-- Προχωρημένη Έκδοση -->
+    <button onclick="startGame('advanced')" style="
+      background:#E74C3C;
+      color:white;
+      padding:18px 24px;
+      font-size:18px;
+      border:none;
+      border-radius:15px;
+      width:220px;
+      box-shadow:0 0 15px rgba(231,76,60,0.4);
+      cursor:pointer;
+      transition:transform 0.2s, box-shadow 0.2s;
+    " onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 20px rgba(231,76,60,0.7)';"
+      onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 15px rgba(231,76,60,0.4)';">
+      🔴 Προχωρημένη Έκδοση<br>
+      <span style="font-size:14px; opacity:0.9;">Για γνώστες<br>Μεταφορές, Παραδείγματα, Αντιρρήσεις</span>
+    </button>
   </div>
+
+  <p style="margin-top:40px; font-size:14px; opacity:0.7;">
+    ή πάτησε <b>Esc</b> για Έξοδο
+  </p>
 </div>
 
 <!-- === ΡΥΘΜΙΣΕΙΣ ΠΑΙΧΝΙΔΙΟΥ (Setup Screen) === -->
