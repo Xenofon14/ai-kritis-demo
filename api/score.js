@@ -100,12 +100,12 @@ export default async function handler(req, res) {
    
     });
 
-  // --- Ανάγνωση απάντησης ---
+// --- Ανάγνωση απάντησης ---
 const raw = completion.choices?.[0]?.message?.content || "{}";
 let parsed = {};
 
 try {
-  // ✅ Καθαρισμός από τυχόν markdown ή σχόλια του μοντέλου
+  // 🔹 Αφαίρεση markdown και περίσσιων χαρακτήρων
   const cleaned = raw
     .replace(/```json/g, "")
     .replace(/```/g, "")
@@ -113,40 +113,40 @@ try {
     .trim();
 
   parsed = JSON.parse(cleaned);
-
 } catch (err) {
   console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
-
-  let fixed = raw.trim()
+  let fixed = raw
+    .replace(/```json|```/g, "")
     .replace(/[\u0000-\u001F]+/g, "")
     .replace(/“|”/g, '"')
-    .replace(/(\w)"(\w)/g, '$1"$2')
-    .replace(/,$/, "")
-    .replace(/"feedback":"([^}]*)$/, (_, p1) => `"feedback":"${p1.replace(/"$/, "")}"} }`);
+    .replace(/([a-zA-ZΑ-Ωα-ω])"([a-zA-ZΑ-Ωα-ω])/g, '$1"$2')
+    .replace(/\n/g, " ")
+    .trim();
+
+  // 🔹 Εξασφαλίζουμε ότι υπάρχει κλείσιμο JSON
+  if (!fixed.endsWith("}")) {
+    const lastBrace = fixed.lastIndexOf("}");
+    fixed = lastBrace === -1 ? fixed + "}" : fixed.slice(0, lastBrace + 1);
+  }
 
   try {
     parsed = JSON.parse(fixed);
-
   } catch (err2) {
-    console.warn("⚠️ Αποτυχία και μετά τη διόρθωση:", fixed);
-
-    if (!fixed.trim().endsWith("}")) {
-      fixed = fixed.trim().replace(/"?\s*$/, "\"} }");
-      try {
-        parsed = JSON.parse(fixed);
-        console.log("✅ Επανόρθωση JSON πέτυχε μετά το auto-fix");
-      } catch (err3) {
-        console.error("❌ Αποτυχία και στο auto-fix:", err3.message);
-        parsed = { criteria: {}, feedback: "⚠️ JSON error (incomplete output)" };
-      }
-    } else {
-      parsed = { criteria: {}, feedback: "⚠️ JSON error" };
-    }
+    console.error("❌ Αποτυχία JSON parsing:", err2.message);
+    console.log("🧩 Απάντηση AI (truncated):", raw.slice(0, 200));
+    parsed = {
+      criteria: {
+        "Θέση": 0,
+        "Επιχειρηματολογία": 0,
+        "Εικόνα/Μεταφορά": 0,
+        "Παράδειγμα": 0,
+        "Αντίρρηση": 0
+      },
+      feedback: "⚠️ JSON error (incomplete output)"
+    };
   }
 }
 
-
-    
 // --- Εσωτερική βαθμολόγηση ---
 const c = parsed.criteria || {};
 
