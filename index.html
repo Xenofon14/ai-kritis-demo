@@ -1809,7 +1809,9 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   document.getElementById("welcomeScreen").style.display = "none";
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
-  const useBonus = document.getElementById("useBonus").checked;
+  const useBonusEl = document.getElementById("useBonus");
+  const useBonus = useBonusEl ? useBonusEl.checked : false; // ✅ ασφαλής έλεγχος
+  
     // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
   judgeMode = document.getElementById("judgeMode").value;
   useAI = (judgeMode === "ai");
