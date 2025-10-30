@@ -141,12 +141,13 @@ console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
       console.error("❌ Αποτυχία και στο auto-fix:", err2.message);
       parsed = { criteria: {}, feedback: "⚠️ JSON error (incomplete output)" };
     }
-  } else {
+    } else {
     parsed = { criteria: {}, feedback: "⚠️ JSON error" };
   }
-}
+}  // ✅ κλείνει το εξωτερικό try/catch
 
 // --- Εσωτερική βαθμολόγηση ---
+
 const c = parsed.criteria || {};
 
 // ✅ Ενοποίηση ονομάτων από παλιό & νέο rubric
