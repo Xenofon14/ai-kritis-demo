@@ -97,19 +97,25 @@ export default async function handler(req, res) {
         }
       ]
 
-
-      
+   
     });
 
-    // --- Ανάγνωση απάντησης ---
-   const raw = completion.choices?.[0]?.message?.content || "{}";
+  // --- Ανάγνωση απάντησης ---
+const raw = completion.choices?.[0]?.message?.content || "{}";
 let parsed = {};
 
 try {
-  // Κανονική προσπάθεια
-  parsed = JSON.parse(raw);
+  // ✅ Καθαρισμός από τυχόν markdown ή σχόλια του μοντέλου
+  const cleaned = raw
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .replace(/^[^{]*({[\s\S]*})[^}]*$/, "$1")  // κρατά μόνο το JSON block
+    .trim();
+
+  parsed = JSON.parse(cleaned);
 } catch (err) {
   console.warn("⚠️ JSON parse error, επιχειρώ διόρθωση…");
+
 
   // 💊 Επιδιόρθωση κοινών σφαλμάτων JSON από το μοντέλο
   let fixed = raw.trim()
