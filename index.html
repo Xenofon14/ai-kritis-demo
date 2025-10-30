@@ -382,6 +382,31 @@ button.recording {
     Χρήση καρτών +30″
   </label>
 
+<!-- === Επιλογή Έκδοσης Παιχνιδιού === -->
+<div id="modeSelector" style="text-align:center; margin-top:20px;">
+  <h3>🧩 Επιλέξτε Έκδοση Παιχνιδιού</h3>
+  <button onclick="setMode(false)" style="margin:5px; padding:10px 20px; font-size:16px; border-radius:10px; border:none; background:#4CAF50; color:white;">
+    🟢 Απλή Έκδοση
+  </button>
+  <button onclick="setMode(true)" style="margin:5px; padding:10px 20px; font-size:16px; border-radius:10px; border:none; background:#E74C3C; color:white;">
+    🔴 Προχωρημένη Έκδοση
+  </button>
+  <p id="modeInfo" style="margin-top:10px; font-size:14px; color:#ddd;">Δεν έχει επιλεγεί ακόμη έκδοση</p>
+</div>
+    
+  <button class="btn-secondary" id="speakBtn">🔊 Άκου τον Σωκράτη</button>
+
+    <p id="aiModeIndicator" style="
+  text-align:center;
+  font-size:14px;
+  color:#6ee0ff;
+  margin-top:-5px;
+  margin-bottom:10px;
+  opacity:0.85;
+">
+  🤖 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη
+</p>
+  
 <!-- 💡 Επιλογή Λειτουργίας Κριτή -->
 <div id="useAICheckboxContainer" class="glow">
 <!-- 🧠 Επιλογή Ποιος Κρίνει -->
@@ -598,30 +623,6 @@ if (count < 6) {
   <button class="btn-primary" id="listenBtn">▶️ Ο Σωκράτης ακούει/διαβάζει</button>
   <button class="btn-secondary" id="scoreBtn">⚖️ Βαθμολογία</button>
 
-<!-- === Επιλογή Έκδοσης Παιχνιδιού === -->
-<div id="modeSelector" style="text-align:center; margin-top:20px;">
-  <h3>🧩 Επιλέξτε Έκδοση Παιχνιδιού</h3>
-  <button onclick="setMode(false)" style="margin:5px; padding:10px 20px; font-size:16px; border-radius:10px; border:none; background:#4CAF50; color:white;">
-    🟢 Απλή Έκδοση
-  </button>
-  <button onclick="setMode(true)" style="margin:5px; padding:10px 20px; font-size:16px; border-radius:10px; border:none; background:#E74C3C; color:white;">
-    🔴 Προχωρημένη Έκδοση
-  </button>
-  <p id="modeInfo" style="margin-top:10px; font-size:14px; color:#ddd;">Δεν έχει επιλεγεί ακόμη έκδοση</p>
-</div>
-    
-  <button class="btn-secondary" id="speakBtn">🔊 Άκου τον Σωκράτη</button>
-
-    <p id="aiModeIndicator" style="
-  text-align:center;
-  font-size:14px;
-  color:#6ee0ff;
-  margin-top:-5px;
-  margin-bottom:10px;
-  opacity:0.85;
-">
-  🤖 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη
-</p>
   
 <div class="panel" id="timerPanel">
   ⏳ Χρόνος: <span id="timer">1:30</span>
