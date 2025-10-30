@@ -1557,26 +1557,19 @@ async function getOfflineScore(transcript, mission) {
   return { criteria, total, feedback };
 }
 
-/* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
+  /* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
 async function getManualScore() {
-  // 🔹 Όλα τα πιθανά κριτήρια
-  const allCriteria = ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
+  // 1) Προσδιορισμός ενεργών κριτηρίων με βάση Γύρο & Έκδοση
+  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
 
-  // 🔸 Φιλτράρουμε ανάλογα με τον γύρο
-  const isFirstRound = game.currentRound === 1;
-  const criteria = isFirstRound
-    ? allCriteria.filter(c => c !== "Αντίρρηση")
-    : allCriteria.filter(c => c !== "Θέση");
-
-  const scores = {};
-
-  // Δημιουργία πεδίων στο modal
+  // 2) Φτιάχνουμε δυναμικά τα inputs
   const container = document.getElementById("manualInputs");
   container.innerHTML = "";
 
+  const isFirstRound = game.currentRound === 1;
   const roundLabel = isFirstRound
-    ? "🔹 1ος γύρος (χωρίς αντεπιχειρήματα)"
-    : `🔸 ${game.currentRound}ος γύρος (χωρίς επανάληψη θέσης)`;
+    ? "🔹 1ος γύρος (περιλαμβάνει 'Θέση', χωρίς 'Αντίρρηση')"
+    : `🔸 ${game.currentRound}ος γύρος (χωρίς 'Θέση', με 'Αντίρρηση')`;
 
   const header = document.createElement("p");
   header.textContent = roundLabel;
@@ -1584,58 +1577,101 @@ async function getManualScore() {
   header.style.opacity = "0.9";
   container.appendChild(header);
 
- criteria.forEach(c => {
-  const row = document.createElement("div");
-  
-  // Δημιουργούμε input με περιορισμούς 0–2
-  const label = document.createElement("label");
-  label.textContent = `${c}: `;
-  
-  const input = document.createElement("input");
-  input.id = `crit_${c}`;
-  input.type = "number";
-  input.min = 0;
-  input.max = 2;
-  input.step = 1;
-  input.value = 0;
-  input.style.width = "45px";
-  input.style.textAlign = "center";
-  
-  // 🚫 Δεν επιτρέπει τίποτα έξω από 0–2
-  input.addEventListener("input", () => {
-    if (input.value === "") return;
-    let val = parseInt(input.value);
-    if (isNaN(val) || val < 0) val = 0;
-    if (val > 2) val = 2;
-    input.value = val;
-  });
-  
-  label.appendChild(input);
-  label.insertAdjacentHTML("beforeend", " /2");
-  row.appendChild(label);
-  container.appendChild(row);
-});
+  // Προσθήκη πεδίων ανά κριτήριο
+  active.forEach(c => {
+    const row = document.createElement("div");
+    row.style.margin = "6px 0";
 
-  // Εμφάνιση modal
+    const label = document.createElement("label");
+    label.style.display = "inline-flex";
+    label.style.alignItems = "center";
+    label.style.gap = "6px";
+
+    const span = document.createElement("span");
+    span.textContent = `${c.key}:`;
+
+    const input = document.createElement("input");
+    input.id = `crit_${c.key}`;
+    input.type = "number";
+    input.min = 0;
+    input.max = c.max;
+    input.step = 1;
+    input.value = 0;
+    input.style.width = "60px";
+    input.style.textAlign = "center";
+
+    input.addEventListener("input", () => {
+      if (input.value === "") return;
+      let val = parseInt(input.value);
+      if (isNaN(val) || val < 0) val = 0;
+      if (val > c.max) val = c.max;
+      input.value = val;
+    });
+
+    label.appendChild(span);
+    label.appendChild(input);
+    label.insertAdjacentHTML("beforeend", ` /${c.max}`);
+
+    row.appendChild(label);
+    container.appendChild(row);
+
+    // Αν είναι Εικόνα/Μεταφορά και έχει bonus, βάζουμε checkbox για +1
+    if (c.key === "Εικόνα / Μεταφορά" && c.bonus) {
+      const b = document.createElement("div");
+      b.style.fontSize = "13px";
+      b.style.opacity = "0.9";
+      b.style.marginLeft = "6px";
+      b.innerHTML = `
+        <label style="display:inline-flex; align-items:center; gap:6px; margin-top:4px;">
+          <input type="checkbox" id="bonus_image_meta" />
+          +${c.bonus} μπόνους (χρησιμοποιήθηκαν <b>και</b> Εικόνα <u>και</u> Μεταφορά)
+        </label>`;
+      container.appendChild(b);
+    }
+  });
+
+  // 3) Εμφάνιση modal
   const modal = document.getElementById("manualModal");
   modal.style.display = "flex";
 
+  // 4) Υπολογισμός out_of (περιλαμβάνει +1 στο μέγιστο όταν υπάρχει διαθέσιμο bonus)
+  const baseMax = active.reduce((s, c) => s + c.max, 0);
+  const hasImageMeta = active.some(c => c.key === "Εικόνα / Μεταφορά" && c.bonus);
+  const outOf = baseMax + (hasImageMeta ? 1 : 0);
+
+  // 5) Υποβολή / Ακύρωση
   return new Promise(resolve => {
     document.getElementById("manualSubmit").onclick = () => {
+      const scores = {};
       let total = 0;
-      criteria.forEach(c => {
-        const val = parseInt(document.getElementById(`crit_${c}`).value) || 0;
-        scores[c] = val;
+
+      // Τιμές ανά κριτήριο
+      active.forEach(c => {
+        const val = parseInt(document.getElementById(`crit_${c.key}`).value) || 0;
+        scores[c.key] = val;
         total += val;
       });
 
-      // Περιορισμός στο 10
-      if (total > 10) total = 10;
+      // Bonus για Εικόνα/Μεταφορά (αν υπάρχει checkbox και είναι τσεκαρισμένο)
+      let bonus = 0;
+      if (hasImageMeta) {
+        const bonusEl = document.getElementById("bonus_image_meta");
+        if (bonusEl && bonusEl.checked) {
+          bonus = 1; // μόνο +1
+          scores["Μπόνους Εικόνας/Μεταφοράς"] = 1;
+        } else {
+          scores["Μπόνους Εικόνας/Μεταφοράς"] = 0;
+        }
+      }
+
+      total += bonus;
 
       modal.style.display = "none";
       resolve({
-        criteria: scores,
+        criteria: scores,          // π.χ. { Θέση: 3, Επιχειρηματολογία: 5, ... }
+        criteriaMax: Object.fromEntries(active.map(c => [c.key, c.max])), // π.χ. { Θέση: 4, ... }
         total,
+        out_of: outOf,
         feedback: "📋 Οι βαθμοί καταχωρήθηκαν από τον Κριτή."
       });
     };
@@ -1644,12 +1680,15 @@ async function getManualScore() {
       modal.style.display = "none";
       resolve({
         criteria: {},
+        criteriaMax: {},
         total: 0,
+        out_of: outOf,
         feedback: "⏸️ Η αξιολόγηση ακυρώθηκε."
       });
     };
   });
 }
+
 
 /* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=> {
