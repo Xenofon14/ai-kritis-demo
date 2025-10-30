@@ -127,56 +127,26 @@ try {
   }
 }
 
+// --- Εσωτερική βαθμολόγηση ---
+const roundNum = Number(round) || 1;
+const c = parsed.criteria || {};
 
-       // --- Εσωτερική βαθμολόγηση (ΝΕΟ rubric) ---
-    const c = parsed.criteria || {};
+// ✅ ΟΡΙΖΟΥΜΕ ΠΑΝΤΑ ΤΟ C ΠΡΙΝ ΤΗ ΧΡΗΣΗ ΤΟΥ
+const C = {
+  Θέση:       Number(c["Θέση"])       || 0,
+  Τεκμηρίωση: Number(c["Τεκμηρίωση"]) || 0,
+  Συνάφεια:   Number(c["Συνάφεια"])   || 0,
+  Σαφήνεια:   Number(c["Σαφήνεια"])   || 0,
+  Αντίρρηση:  Number(c["Αντίρρηση"])  || 0
+};
 
-    // Τιμές από το μοντέλο (με προστασία NaN)
-    let scores = {
-      "Θέση": Number(c["Θέση"]) || 0,
-      "Επιχειρηματολογία": Number(c["Επιχειρηματολογία"]) || 0,
-      "Εικόνα/Μεταφορά": Number(c["Εικόνα/Μεταφορά"]) || 0,
-      "Παράδειγμα": Number(c["Παράδειγμα"]) || 0,
-      "Αντίρρηση": Number(c["Αντίρρηση"]) || 0
-    };
+// ✅ Περιορισμοί ανά γύρο ΜΕΤΑ τον ορισμό του C
+if (roundNum === 1) C["Αντίρρηση"] = 0;
+if (roundNum > 1)  C["Θέση"] = 0;
 
-    // Weights
-    const WEIGHTS = {
-      "Θέση": 4,
-      "Επιχειρηματολογία": 6,
-      "Εικόνα/Μεταφορά": 4,
-      "Παράδειγμα": (isAdvanced ? 3 : 0),
-      "Αντίρρηση": 4
-    };
-
-    // Ενεργοποίηση/Απενεργοποίηση ανά γύρο
-    if (isFirstRound) {
-      // 1ος γύρος: δεν μετρά η Αντίρρηση
-      scores["Αντίρρηση"] = 0;
-    } else {
-      // 2ος+ γύρος: δεν μετρά η Θέση
-      scores["Θέση"] = 0;
-    }
-
-    // Στην Απλή: Παράδειγμα = 0
-    if (!isAdvanced) {
-      scores["Παράδειγμα"] = 0;
-    }
-
-    // Κλάμπινγκ ανά weight
-    const clamped = Object.fromEntries(
-      Object.entries(scores).map(([k, v]) => [k, Math.max(0, Math.min(v, WEIGHTS[k]))])
-    );
-
-    // Σύνολο & out_of
-    const out_of = (isAdvanced ? 17 : 14); // Advanced: 6+4+3+(4 ή 4) + Θέση/Αντίρρηση ανά γύρο => 17 max ανά γύρο
-    let total = Object.entries(clamped).reduce((sum, [k, v]) => sum + v, 0);
-
-    // Επιπλέον ασφαλιστική δικλείδα: μη ξεπερνάς το θεωρητικό μέγιστο ανά γύρο
-    if (total > out_of) total = out_of;
-
-    const scaled = Math.round((total / out_of) * 10);
-
+let total = Object.values(C).reduce((a, b) => a + b, 0);
+if (total > 8) total = 8;
+const scaled = Math.round((total / 8) * 10);
 
     // --- Τελικό αποτέλεσμα ---
     const result = {
