@@ -3,9 +3,7 @@
 // AI Κριτής "Σωκράτης" (σταθερή JSON απόκριση)
 // ===============================
 
-import OpenAI from "openai"; // ✅ Κανονικό import (όχι await import)
-
-// ❌ Δεν χρειάζεται dotenv – η Vercel χειρίζεται το API key αυτόματα
+import OpenAI from "openai";
 
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
@@ -17,6 +15,7 @@ export default async function handler(req, res) {
   try {
     // --- Ανάγνωση body (ασφαλής για Edge functions) ---
     let body = {};
+
     try {
       if (req.body) {
         body = req.body;
