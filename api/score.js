@@ -128,7 +128,6 @@ try {
 }
 
 // --- Εσωτερική βαθμολόγηση ---
-const roundNum = Number(round) || 1;
 const c = parsed.criteria || {};
 
 // ✅ ΟΡΙΖΟΥΜΕ ΠΑΝΤΑ ΤΟ C ΠΡΙΝ ΤΗ ΧΡΗΣΗ ΤΟΥ
