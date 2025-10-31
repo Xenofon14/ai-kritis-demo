@@ -2323,6 +2323,85 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ Τα κουμπιά της αρχικής σελίδας ενεργοποιήθηκαν.");
 });
+
+/* ==========================================================
+   🎲 ΚΟΥΜΠΙ ΠΑΡΑΔΕΙΓΜΑ + ΑΥΤΟΜΑΤΗ ΑΞΙΟΛΟΓΗΣΗ ΣΩΚΡΑΤΗ
+   ========================================================== */
+
+/* ---------- Ενεργοποίηση Κάρτας Παραδείγματος + Αυτόματη Αξιολόγηση ---------- */
+async function showExample() {
+  try {
+    const missionId = currentMissionId || "M-101";
+    const words = await loadExampleWords(missionId);
+
+    if (words.length === 0) {
+      alert("Δεν υπάρχουν διαθέσιμες κάρτες παραδειγμάτων για αυτή την αποστολή.");
+      return;
+    }
+
+    // 🎲 Τυχαία επιλογή μιας 3άδας λέξεων
+    const trio = words[Math.floor(Math.random() * words.length)];
+    const exampleText = `🎲 Οι λέξεις σου είναι: ${trio.join(" – ")}`;
+    console.log(exampleText);
+    alert(exampleText);
+
+    // 🎙️ Ενεργοποίηση φωνητικής αναγνώρισης
+    if (typeof startSpeechRecognition === "function") {
+      console.log("🎤 Ενεργοποιείται η φωνητική αναγνώριση για το Παράδειγμα...");
+      startSpeechRecognition(async (spokenText) => {
+
+        console.log("🗣️ Παράδειγμα που ειπώθηκε:", spokenText);
+
+        // ✨ Στέλνουμε μόνο το Παράδειγμα για αξιολόγηση στον Σωκράτη
+        const feedback = await getExampleFeedback(spokenText, trio);
+
+        alert(`💬 Σωκράτης: ${feedback}`);
+      });
+    } else {
+      console.warn("⚠️ Δεν βρέθηκε η συνάρτηση startSpeechRecognition().");
+    }
+
+  } catch (err) {
+    console.error("⚠️ Σφάλμα κατά την εμφάνιση κάρτας παραδείγματος:", err);
+  }
+}
+
+
+/* ---------- Σωκρατική Αξιολόγηση Παραδείγματος ---------- */
+async function getExampleFeedback(spokenText, trioWords) {
+  try {
+    const prompt = `
+Είσαι ο φιλόσοφος Σωκράτης.
+Ο μαθητής μόλις έδωσε ένα παράδειγμα χρησιμοποιώντας τις λέξεις: ${trioWords.join(", ")}.
+Αξιολόγησέ το σύντομα (1 πρόταση) αν το παράδειγμα σχετίζεται ουσιαστικά με αυτές τις έννοιες.
+Να απαντήσεις ως "Σωκράτης" με θετικό ή διορθωτικό τόνο, χωρίς αριθμούς.
+Παράδειγμα μαθητή: "${spokenText}"`;
+
+    const response = await fetch("/api/score", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        transcript: spokenText,
+        mission: { question: "Αξιολόγησε μόνο τη χρήση του παραδείγματος" },
+        mode: "example"
+      })
+    });
+
+    if (!response.ok) {
+      console.error("❌ API error για Παράδειγμα:", response.status);
+      return "Δεν κατάλαβα πλήρως το παράδειγμά σου — για προσπάθησε ξανά!";
+    }
+
+    const data = await response.json();
+    console.log("📨 Απάντηση Σωκράτη (Παράδειγμα):", data);
+    return data.feedback || "Καλή αρχή, αλλά χρειάζεται πιο σαφής σύνδεση.";
+  } catch (err) {
+    console.error("⚠️ Σφάλμα αξιολόγησης παραδείγματος:", err);
+    return "Ο Σωκράτης συλλογίζεται ακόμη το παράδειγμα...";
+  }
+}
+
+      
 </script>
 
 </body>
