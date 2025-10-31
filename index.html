@@ -1606,63 +1606,6 @@ async function getOfflineScore(transcript, mission) {
   };
 }
 
-  // 🧠 Ανίχνευση patterns
-  const found = checkPatterns(text, argumentPatterns);
-  console.log("🧩 Εντοπισμένα μοτίβα:", found);
-
-  // 🎯 Προσδιορισμός γύρου
-  const isFirstRound = game.currentRound === 1;
-
-  // 🔹 Αρχικοποίηση βαθμών
-  let Θέση = 0, Τεκμηρίωση = 0, Συνάφεια = 0, Σαφήνεια = 0, Αντίρρηση = 0;
-
-  // ---------- Κριτήριο "Θέση" ----------
-  if (isFirstRound) {
-    if (found.position_indicators || text.includes("είπε") || text.includes("πιστεύω")) {
-      Θέση = text.length > 50 ? 2 : 1;
-    }
-  }
-
-  // ---------- Κριτήριο "Τεκμηρίωση" ----------
-  const hasBecause = /(γιατί|επειδή|λόγω|άρα|αν|τότε|παράδειγμα|παραδείγματος)/.test(text);
-  if (hasBecause) Τεκμηρίωση = text.split(" ").length > 25 ? 2 : 1;
-
-  // ---------- Κριτήριο "Συνάφεια" ----------
-  const related = found.relevance_indicators || (mission && text.includes(mission.title.toLowerCase()));
-  if (related) Συνάφεια = 2;
-  else if (text.length > 20) Συνάφεια = 1;
-
-  // ---------- Κριτήριο "Σαφήνεια" ----------
-  const clarityWords = /(στην αρχή|μετά|επίσης|τελικά|οπότε|άρα)/.test(text);
-  if (clarityWords) Σαφήνεια = 1;
-
-  // ---------- Κριτήριο "Αντίρρηση" ----------
-  if (!isFirstRound) {
-    const opposition = /(όμως|αλλά|δεν συμφωνώ|αντίθετα|παρόλα αυτά)/.test(text);
-    if (opposition) Αντίρρηση = found.opposition_indicators ? 2 : 1;
-  }
-
-  // ---------- Υπολογισμός συνολικής βαθμολογίας ----------
-  let total = Τεκμηρίωση + Συνάφεια + Σαφήνεια;
-  if (isFirstRound) total += Θέση;
-  else total += Αντίρρηση;
-
-  if (total > 10) total = 10;
-
-  // ---------- Ανατροφοδότηση ----------
-  let feedback = "";
-  if (total === 10) feedback = "Η σκέψη σου είναι καθαρή και βαθιά∙ μίλησες σαν φιλόσοφος.";
-  else if (Σαφήνεια < 1) feedback = "Η ιδέα σου έχει ουσία∙ προσπάθησε να την εκφράσεις πιο καθαρά.";
-  else if (Τεκμηρίωση < 2) feedback = "Πολύ καλή αρχή∙ δώσε λίγο περισσότερη εξήγηση στο γιατί.";
-  else if (Συνάφεια < 2) feedback = "Σκέψου πώς συνδέεται αυτό με τη ρήση του φιλοσόφου.";
-  else feedback = "Ο Σωκράτης σε άκουσε προσεκτικά και χαμογέλασε με τη σκέψη σου.";
-
- 
-  // ✅ Επιστροφή αναλυτικού αντικειμένου
-  const criteria = { Θέση, Τεκμηρίωση, Συνάφεια, Σαφήνεια, Αντίρρηση };
-  return { criteria, total, feedback };
-}
-
   /* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
 async function getManualScore() {
   // 1) Προσδιορισμός ενεργών κριτηρίων με βάση Γύρο & Έκδοση
