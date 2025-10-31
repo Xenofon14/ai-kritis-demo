@@ -432,12 +432,9 @@ button.recording {
   </select>
 </div>
   
-  <label style="font-size:17px; display:flex; align-items:center; gap:8px;">
-    <input type="checkbox" id="useAICheckbox" checked style="transform:scale(1.3);">
-    💡 Ενεργοποίηση Σωκράτη με Τεχνητή Νοημοσύνη
-  </label>
-  <p style="font-size:14px; opacity:0.8; margin-left:30px; margin-top:6px;">
-    Απαιτεί σύνδεση στο διαδίκτυο.
+   <!-- ✅ Νέο ενημερωτικό μήνυμα -->
+  <p id="aiNotice" style="font-size:14px; opacity:0.85; margin-top:8px; display:none;">
+    💡 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη. Απαιτεί σύνδεση στο διαδίκτυο.
   </p>
 </div>
   
@@ -2004,9 +2001,17 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   updateJudgeModeIndicator(judgeMode);
 
   // 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
-document.getElementById("judgeMode").addEventListener("change", (e) => {
+const judgeSelect = document.getElementById("judgeMode");
+const aiNotice = document.getElementById("aiNotice");
+
+judgeSelect.addEventListener("change", (e) => {
   judgeMode = e.target.value;
   updateJudgeModeIndicator(judgeMode);
+
+  // ✅ Εμφάνιση ή απόκρυψη ενημερωτικού μηνύματος
+  if (aiNotice) {
+    aiNotice.style.display = judgeMode === "ai" ? "block" : "none";
+  }
 });
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
