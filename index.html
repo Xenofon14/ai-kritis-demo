@@ -1993,6 +1993,12 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   console.log("⚖️ Τρόπος Κριτή:", judgeMode);
   updateJudgeModeIndicator(judgeMode);
 
+  // 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
+document.getElementById("judgeMode").addEventListener("change", (e) => {
+  judgeMode = e.target.value;
+  updateJudgeModeIndicator(judgeMode);
+});
+
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
     alert("Παρακαλώ επίλεξε όσους χαρακτήρες όσοι είναι οι παίκτες!");
