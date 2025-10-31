@@ -1042,11 +1042,19 @@ function advanceTurn() {
   }
 
   // 🧹 Καθαρισμός πεδίων πριν ξεκινήσει ο επόμενος παίκτης
-  document.getElementById("transcript").value = "";
+   document.getElementById("transcript").value = "";
   document.getElementById("socraticComment").textContent = "—";
   document.getElementById("criteriaList").innerHTML = "";
-  document.getElementById("totalScore").textContent = "—/8";
+
+  // ✅ Υπολογισμός σωστού παρονομαστή πριν εμφανιστεί
+  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+  const baseMax = active.reduce((s, c) => s + c.max, 0);
+  const hasImageMeta = active.some(c => c.key === "Εικόνα / Μεταφορά" && c.bonus);
+  const outOf = baseMax + (hasImageMeta ? 1 : 0);
+  document.getElementById("totalScore").textContent = `—/${outOf}`;
+
   document.getElementById("timer").textContent = "1:30";
+
   remainingTime = game.baseTimeSec;
   clearInterval(timerInterval);
   isTimerRunning = false;
