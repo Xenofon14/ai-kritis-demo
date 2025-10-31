@@ -1041,8 +1041,17 @@ function advanceTurn() {
     console.log(`🔁 Νέος γύρος: ${game.currentRound}/${game.totalRounds}`);
   }
 
+  // ✅ Κλήση προετοιμασίας επόμενου παίκτη
+  prepareNextPlayer();
+} // <— ΕΔΩ ΕΚΛΕΙΝΕΙ ΤΩΡΑ Η advanceTurn()
+
+
+/* ---------- Προετοιμασία επόμενου παίκτη ---------- */
+function prepareNextPlayer() {
+  console.log("%c⚙️ Εκτελείται prepareNextPlayer()", "color: #6ee0ff; font-weight: bold;");
+
   // 🧹 Καθαρισμός πεδίων πριν ξεκινήσει ο επόμενος παίκτης
-   document.getElementById("transcript").value = "";
+  document.getElementById("transcript").value = "";
   document.getElementById("socraticComment").textContent = "—";
   document.getElementById("criteriaList").innerHTML = "";
 
@@ -1061,9 +1070,10 @@ function advanceTurn() {
   isPaused = false;
 
   renderActivePlayer();
-    updateTimeBar(game.baseTimeSec); // ✅ Επαναφορά μπάρας χρόνου
+  updateTimeBar(game.baseTimeSec); // ✅ Επαναφορά μπάρας χρόνου
 }
 
+  
 /* ---------- Αναλυτική Βαθμολογία (με αναλυτικά κριτήρια) ---------- */
 function buildDetailsHTML() {
   let html = `<table id="detailsTable" style="width:100%;border-collapse:collapse;text-align:center;font-size:15px;">
