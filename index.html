@@ -432,10 +432,17 @@ button.recording {
   </select>
 </div>
   
-   <!-- ✅ Νέο ενημερωτικό μήνυμα -->
-  <p id="aiNotice" style="font-size:14px; opacity:0.85; margin-top:8px; display:none;">
-    💡 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη. Απαιτεί σύνδεση στο διαδίκτυο.
-  </p>
+  <!-- ✅ Νέο ενημερωτικό μήνυμα με ομαλή εμφάνιση -->
+<p id="aiNotice" style="
+  font-size:14px;
+  opacity:0;
+  margin-top:8px;
+  transition: opacity 0.6s ease, height 0.6s ease;
+  height:0;
+  overflow:hidden;
+">
+  💡 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη. Απαιτεί σύνδεση στο διαδίκτυο.
+</p>
 </div>
   
   <button id="startGameBtn" style="
@@ -1994,24 +2001,45 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   const useBonus = useBonusEl ? useBonusEl.checked : false; // ✅ ασφαλής έλεγχος
   
       // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
-  const judgeSelect = document.getElementById("judgeMode");
-  judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ αν λείπει, default = "ai"
+   judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ αν λείπει, default = "ai"
   useAI = (judgeMode === "ai");
   console.log("⚖️ Τρόπος Κριτή:", judgeMode);
   updateJudgeModeIndicator(judgeMode);
 
   // 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
-const judgeSelect = document.getElementById("judgeMode");
 const aiNotice = document.getElementById("aiNotice");
+if (judgeSelect && !judgeSelect.dataset.bound) {
+  judgeSelect.addEventListener("change", (e) => {
+    judgeMode = e.target.value;
+    updateJudgeModeIndicator(judgeMode);
+
+    if (aiNotice) {
+      if (judgeMode === "ai") {
+        aiNotice.style.opacity = "1";
+        aiNotice.style.height = "auto";
+      } else {
+        aiNotice.style.opacity = "0";
+        aiNotice.style.height = "0";
+      }
+    }
+  });
+  judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
+}
 
 judgeSelect.addEventListener("change", (e) => {
   judgeMode = e.target.value;
   updateJudgeModeIndicator(judgeMode);
 
-  // ✅ Εμφάνιση ή απόκρυψη ενημερωτικού μηνύματος
-  if (aiNotice) {
-    aiNotice.style.display = judgeMode === "ai" ? "block" : "none";
+ // ✅ Ομαλή εμφάνιση ή απόκρυψη ενημερωτικού μηνύματος
+if (aiNotice) {
+  if (judgeMode === "ai") {
+    aiNotice.style.opacity = "1";
+    aiNotice.style.height = "auto";
+  } else {
+    aiNotice.style.opacity = "0";
+    aiNotice.style.height = "0";
   }
+}
 });
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
