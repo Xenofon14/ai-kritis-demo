@@ -5,6 +5,18 @@
 
 import OpenAI from "openai";
 
+import fs from "fs";
+import path from "path";
+
+// 🔹 Δυναμική φόρτωση rubricWeights.json
+async function loadRubric() {
+  const filePath = path.join(process.cwd(), "public", "data", "rubricWeights.json");
+  const raw = fs.readFileSync(filePath, "utf8");
+  const json = JSON.parse(raw);
+  console.log("📘 RubricWeights JSON φορτώθηκε από:", filePath);
+  return json;
+}
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -37,19 +49,21 @@ export default async function handler(req, res) {
     const roundNum = Number(round) || 1;
     const isAdvanced = mode === "advanced";
 
-    const rubricText = isAdvanced
-      ? `Κριτήρια (Προχωρημένη Έκδοση):
-- Θέση: 0–4 (μόνο 1ος γύρος)
-- Επιχειρηματολογία: 0–6
-- Εικόνα/Μεταφορά: 0–4
-- Παράδειγμα: 0–3
-- Αντίρρηση: 0–4 (μόνο από 2ο γύρο)`
-      : `Κριτήρια (Απλή Έκδοση):
-- Θέση: 0–4 (μόνο 1ος γύρος)
-- Επιχειρηματολογία: 0–6
-- Εικόνα/Μεταφορά: 0–4
-- Αντίρρηση: 0–4 (μόνο από 2ο γύρο)
-(Δεν υπάρχει "Παράδειγμα")`;
+        // --- Φόρτωση rubric από το αρχείο ---
+    const rubricData = await loadRubric();
+
+    // Φιλτράρισμα ενεργών κριτηρίων βάσει γύρου & έκδοσης
+    const activeCriteria = rubricData.criteria.filter(c =>
+      (c.simple && !isAdvanced) || (c.advanced && isAdvanced)
+    ).filter(c =>
+      (roundNum === 1 && c.rounds.first) || (roundNum > 1 && c.rounds.later)
+    );
+
+    // Δημιουργία περιγραφικού κειμένου rubric για το prompt
+    const rubricText = activeCriteria.map(c => {
+      const bonusText = c.bonus ? " (+1 μπόνους)" : "";
+      return `- ${c.key}: 0–${c.max}${bonusText}`;
+    }).join("\n");
 
     // --- Prompt προς το μοντέλο ---
     const completion = await client.responses.create({
