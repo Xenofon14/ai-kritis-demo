@@ -773,18 +773,31 @@ const RUBRIC = {
 };
 ---------- ΤΕΛΟΣ ΠΑΛΑΙΟΥ RUBRIC ---------- */
 
+/* ---------- Manual Rubric (φορτώνεται από εξωτερικό αρχείο) ---------- */
+let MANUAL_RUBRIC = { criteria: [] };
 
+async function loadRubric() {
+  try {
+    const response = await fetch("data/rubricWeights.json");
+    if (!response.ok) throw new Error("Αποτυχία φόρτωσης rubricWeights.json");
+    const data = await response.json();
+    MANUAL_RUBRIC = data;
+    console.log("📘 Rubric φορτώθηκε επιτυχώς:", MANUAL_RUBRIC);
+  } catch (err) {
+    console.error("⚠️ Σφάλμα στη φόρτωση rubricWeights.json:", err);
+  }
+}
 
-/* ---------- Manual Rubric v2 (5 κριτήρια με βάρη & κανόνες) ---------- */
-const MANUAL_RUBRIC = {
-  criteria: [
-    { key: "Θέση", max: 4, rounds: { first: true, later: false }, simple: true,  advanced: true },
-    { key: "Επιχειρηματολογία", max: 6, rounds: { first: true, later: true }, simple: true,  advanced: true },
-    { key: "Εικόνα / Μεταφορά", max: 4, rounds: { first: true, later: true }, simple: true,  advanced: true, bonus: 1 },
-    { key: "Παράδειγμα", max: 3, rounds: { first: true, later: true },       simple: false, advanced: true },
-    { key: "Αντίρρηση", max: 4, rounds: { first: false, later: true },        simple: true,  advanced: true }
-  ]
-};
+function getActiveManualCriteria(gameMode, currentRound) {
+  const isFirstRound = currentRound === 1;
+  const isSimple = (gameMode || "simple") === "simple";
+  return MANUAL_RUBRIC.criteria.filter(c => {
+    const roundOK = isFirstRound ? c.rounds.first : c.rounds.later;
+    const modeOK  = isSimple ? c.simple : c.advanced;
+    return roundOK && modeOK;
+  });
+}
+
 
 function getActiveManualCriteria(gameMode, currentRound) {
   const isFirstRound = currentRound === 1;
