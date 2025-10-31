@@ -1657,8 +1657,7 @@ async function getOfflineScore(transcript, mission) {
   else if (Συνάφεια < 2) feedback = "Σκέψου πώς συνδέεται αυτό με τη ρήση του φιλοσόφου.";
   else feedback = "Ο Σωκράτης σε άκουσε προσεκτικά και χαμογέλασε με τη σκέψη σου.";
 
-  await new Promise(r => setTimeout(r, 400));
-
+ 
   // ✅ Επιστροφή αναλυτικού αντικειμένου
   const criteria = { Θέση, Τεκμηρίωση, Συνάφεια, Σαφήνεια, Αντίρρηση };
   return { criteria, total, feedback };
