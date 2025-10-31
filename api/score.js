@@ -130,15 +130,26 @@ export default async function handler(req, res) {
     if (roundNum === 1) C["Αντίρρηση"] = 0;
     if (roundNum > 1) C["Θέση"] = 0;
 
+       // --- Υπολογισμός συνολικής βαθμολογίας ---
     let total = Object.values(C).reduce((a, b) => a + b, 0);
-    if (total > 8) total = 8;
+
+    // --- Υπολογισμός "out_of" από το ενεργό rubric ---
+    const maxSum = activeCriteria.reduce((sum, c) => sum + (c.max || 0), 0);
+    const hasBonus = activeCriteria.some(c => c.bonus);
+    const outOf = maxSum + (hasBonus ? 1 : 0);
+
+    if (total > outOf) total = outOf;
 
     const result = {
       criteria: C,
       total,
-      out_of: 8,
+      out_of: outOf,
       feedback: parsed.feedback || "Ο Σωκράτης σιώπησε."
     };
+
+    console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/${outOf}`);
+    return res.status(200).json(result);
+
 
     console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/8`);
     return res.status(200).json(result);
