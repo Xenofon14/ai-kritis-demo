@@ -2011,6 +2011,12 @@ async function startGame(mode) {
       display.style.color = "#ff7a7a";
     }
   }
+
+  // ✅ Υπολογισμός αρχικού παρονομαστή για τον πρώτο γύρο
+  if (typeof prepareNextPlayer === "function") {
+    prepareNextPlayer();
+    console.log("🧮 Προετοιμάστηκε ο πρώτος παίκτης με σωστό παρονομαστή.");
+  }
 }
 
 // ✅ Συνδέουμε τα κουμπιά της αρχικής
