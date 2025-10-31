@@ -1534,13 +1534,77 @@ function setJudgeMode(mode) {
   }
 }
 
-/* ---------- Offline Rubric (Αξιολόγηση χωρίς API) ---------- */
+/* ---------- Τοπικός Κριτής (Offline / Local) ---------- */
 async function getOfflineScore(transcript, mission) {
-  const text = (transcript || "").trim().toLowerCase();
+  // ✅ Ανάκτηση ενεργών κριτηρίων από το rubricWeights.json
+  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
 
-  if (!text) {
-    return { criteria: {}, total: 0, feedback: "Δεν άκουσα κάτι για να βαθμολογήσω." };
+  // Αν δεν υπάρχουν, επιστρέφει μηδενικά
+  if (!active.length) {
+    return {
+      criteria: {},
+      total: 0,
+      comment: "Δεν εντοπίστηκαν ενεργά κριτήρια για αυτόν τον γύρο."
+    };
   }
+
+  // ✅ Βαθμολόγηση βάσει εμφάνισης λέξεων-δεικτών
+  let totalScore = 0;
+  const results = {};
+
+  for (const c of active) {
+    let score = 0;
+    const lower = transcript.toLowerCase();
+
+    if (c.key.includes("Θέση")) {
+      if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
+      if (lower.includes("ο φιλόσοφος") || lower.includes("λέει")) score = c.max;
+    }
+
+    else if (c.key.includes("Επιχειρηματολογία")) {
+      if (lower.includes("γιατί") || lower.includes("επειδή")) score = c.max * 0.5;
+      if (lower.includes("άρα") || lower.includes("συνεπώς")) score = c.max;
+    }
+
+    else if (c.key.includes("Εικόνα")) {
+      if (lower.includes("όπως")) score = c.max * 0.5;
+      if (lower.includes("σαν") || lower.includes("μοιάζει")) score = c.max;
+    }
+
+    else if (c.key.includes("Παράδειγμα")) {
+      if (lower.includes("παράδειγμα") || lower.includes("όπως")) score = c.max;
+    }
+
+    else if (c.key.includes("Αντίρρηση")) {
+      if (lower.includes("δεν συμφωνώ") || lower.includes("όμως")) score = c.max * 0.5;
+      if (lower.includes("αντίθετα") || lower.includes("αντίρρηση")) score = c.max;
+    }
+
+    results[c.key] = Math.round(score);
+    totalScore += score;
+  }
+
+  // ✅ Δημιουργία σχολίου
+  let comment = "Καλή προσπάθεια! ";
+  if (totalScore >= active.reduce((s, c) => s + c.max, 0) * 0.8)
+    comment = "Εξαιρετική απάντηση! Ο Σωκράτης θα ήταν περήφανος.";
+  else if (totalScore < active.reduce((s, c) => s + c.max, 0) * 0.4)
+    comment = "Χρειάζεται περισσότερη τεκμηρίωση και παραδείγματα.";
+
+  // 🧮 Καταγραφή αποτελεσμάτων για debugging
+  console.log("🧮 Offline Κριτής:", {
+    results,
+    total: Math.round(totalScore),
+    round: game.currentRound,
+    mode: game.mode
+  });
+  
+  return {
+    criteria: results,
+    total: Math.round(totalScore),
+    comment
+  };
+}
 
   // 🧠 Ανίχνευση patterns
   const found = checkPatterns(text, argumentPatterns);
