@@ -1,1 +1,41 @@
+{
+  "criteria": [
+    {
+      "key": "Θέση",
+      "max": 4,
+      "rounds": { "first": true, "later": false },
+      "simple": true,
+      "advanced": true
+    },
+    {
+      "key": "Επιχειρηματολογία",
+      "max": 6,
+      "rounds": { "first": true, "later": true },
+      "simple": true,
+      "advanced": true
+    },
+    {
+      "key": "Εικόνα / Μεταφορά",
+      "max": 4,
+      "bonus": 1,
+      "rounds": { "first": true, "later": true },
+      "simple": true,
+      "advanced": true
+    },
+    {
+      "key": "Παράδειγμα",
+      "max": 3,
+      "rounds": { "first": true, "later": true },
+      "simple": false,
+      "advanced": true
+    },
+    {
+      "key": "Αντίρρηση",
+      "max": 4,
+      "rounds": { "first": false, "later": true },
+      "simple": true,
+      "advanced": true
+    }
+  ]
+}
 
