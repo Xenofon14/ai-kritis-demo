@@ -1874,14 +1874,7 @@ if (scores.criteria && Object.keys(scores.criteria).length > 0) {
   criteriaList.appendChild(li);
 }
     
-} else {
-  // ❌ Αν δεν υπάρχουν λεπτομέρειες, εμφάνισε placeholder
-  const li = document.createElement("li");
-  li.textContent = "Δεν υπάρχουν αναλυτικά στοιχεία για αυτόν τον γύρο.";
-  criteriaList.appendChild(li);
-}
-
-    
+   
     // 🧮 Υπολογισμός συνολικής βαθμολογίας
     let totalNum = 0;
     if (scores.total) {
