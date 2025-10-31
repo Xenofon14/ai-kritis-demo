@@ -1862,7 +1862,7 @@ if (scores.criteria && Object.keys(scores.criteria).length > 0) {
     const li = document.createElement("li");
 
     // 🔹 Αντιστοίχιση στο rubricWeights.json για το σωστό max
-    const rubricCriterion = rubric.criteria.find(c => c.key === key);
+    const rubricCriterion = MANUAL_RUBRIC.criteria.find(c => c.key === key);
     const max = rubricCriterion ? rubricCriterion.max : 2; // fallback = 2
 
     li.textContent = `${key}: ${val}/${max}`;
