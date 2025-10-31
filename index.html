@@ -1994,6 +1994,8 @@ renderActivePlayer();
 
 /* ---------- Start Game (setup → app) ---------- */
 document.getElementById("startGameBtn").addEventListener("click", () => {
+const judgeSelect = document.getElementById("judgeMode");
+const aiNotice = document.getElementById("aiNotice");
   document.getElementById("welcomeScreen").style.display = "none";
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
@@ -2040,27 +2042,9 @@ if (judgeSelect && !judgeSelect.dataset.bound) {
   });
   judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
 }
-
-
   
   judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
 }
-
-judgeSelect.addEventListener("change", (e) => {
-  judgeMode = e.target.value;
-  updateJudgeModeIndicator(judgeMode);
-
- // ✅ Ομαλή εμφάνιση ή απόκρυψη ενημερωτικού μηνύματος
-if (aiNotice) {
-  if (judgeMode === "ai") {
-    aiNotice.style.opacity = "1";
-    aiNotice.style.height = "auto";
-  } else {
-    aiNotice.style.opacity = "0";
-    aiNotice.style.height = "0";
-  }
-}
-});
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
