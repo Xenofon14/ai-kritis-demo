@@ -1519,13 +1519,13 @@ return {
   feedback: result.feedback || "Ο Σωκράτης σιώπησε, αλλά σκέφτηκε κάτι βαθύ…"
 };
 
-  } catch (err) {
-    console.error("❌ Σφάλμα στη βαθμολόγηση:", err);
-    // Fallback στον offline κριτή
-    return await getOfflineScore(transcript, mission);
-  }
+} catch (err) {
+  console.error("❌ Σφάλμα στη βαθμολόγηση:", err);
+  // Fallback στον offline κριτή
+  return await getOfflineScore(transcript, mission);
 }
- 
+}
+
   
 /* ---------- Επιλογή τρόπου Κριτή ---------- */
 // ai = API, offline = Τοπικός (rubric), manual = Ανθρώπινος Κριτής
