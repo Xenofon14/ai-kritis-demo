@@ -1853,10 +1853,6 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
 const criteriaList = document.getElementById("criteriaList");
 criteriaList.innerHTML = "";
 
-// ⚖️ Εμφάνιση αναλυτικών κριτηρίων για κάθε τύπο Κριτή
-const criteriaList = document.getElementById("criteriaList");
-criteriaList.innerHTML = "";
-
 if (scores.criteria && Object.keys(scores.criteria).length > 0) {
   // ✅ Προβάλλουμε όσα επέστρεψε ο Κριτής (AI, Offline ή Manual)
   for (const [key, val] of Object.entries(scores.criteria)) {
