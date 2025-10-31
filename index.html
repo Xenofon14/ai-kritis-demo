@@ -1449,17 +1449,42 @@ async function getAIScore(transcript, mission) {
 const activePlayer = game.players[game.activeIndex].name;
 const memory = playerPositions[activePlayer] || {};
 
+// ✅ Δημιουργία δυναμικού prompt βάσει rubricWeights.json
+const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+const rubricText = active.map(c =>
+  `- ${c.key} (max ${c.max}${c.bonus ? " +1 μπόνους" : ""})`
+).join("\n");
+
+const prompt = `
+Είσαι ο φιλόσοφος Σωκράτης.
+Αξιολογείς την απάντηση ενός μαθητή σε μια φιλοσοφική αποστολή.
+
+Χρησιμοποίησε τα εξής κριτήρια βαθμολόγησης:
+${rubricText}
+
+Βαθμολόγησε σε μορφή JSON όπως:
+{
+  "criteria": { "Θέση": 3, "Επιχειρηματολογία": 5, "Εικόνα / Μεταφορά": 4, "Αντίρρηση": 2 },
+  "total": 14,
+  "comment": "Εξαιρετική ανάλυση, σαφής θέση και πειστικά επιχειρήματα."
+}
+
+Απάντηση μαθητή:
+${transcript}
+`;
+
 // 🚀 Κλήση API /api/score
 const response = await fetch("/api/score", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-   body: JSON.stringify({
+  body: JSON.stringify({
+    prompt,                // ✅ τώρα στέλνουμε το δυναμικό prompt
     transcript,
     mission,
     philosopher: memory.philosopher || null,
     initial_thesis: memory.thesis || null,
-    round: game.currentRound,     // ✅ πρόσθεσε κόμμα εδώ
-    mode: game.mode || "simple"   // ✅ τώρα συντακτικά σωστό
+    round: game.currentRound,
+    mode: game.mode || "simple"
   })
 });
 
