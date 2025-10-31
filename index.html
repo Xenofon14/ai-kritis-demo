@@ -1554,64 +1554,83 @@ async function getOfflineScore(transcript, mission) {
     return {
       criteria: {},
       total: 0,
+      out_of: 0,
       comment: "Δεν εντοπίστηκαν ενεργά κριτήρια για αυτόν τον γύρο."
     };
+  }
+
+  // ✅ Ανάκτηση πραγματικών μέγιστων τιμών rubric (για έλεγχο και ομοιομορφία)
+  let rubricMax = {};
+  try {
+    const res = await fetch("data/rubricWeights.json");
+    const json = await res.json();
+    json.criteria.forEach(c => {
+      rubricMax[c.key] = c.max;
+    });
+  } catch (err) {
+    console.warn("⚠️ Δεν βρέθηκε rubricWeights.json — χρήση default τιμών.");
+    active.forEach(c => rubricMax[c.key] = c.max);
   }
 
   // ✅ Βαθμολόγηση βάσει εμφάνισης λέξεων-δεικτών
   let totalScore = 0;
   const results = {};
+  const lower = transcript.toLowerCase();
 
   for (const c of active) {
     let score = 0;
-    const lower = transcript.toLowerCase();
 
     if (c.key.includes("Θέση")) {
-      if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
-      if (lower.includes("ο φιλόσοφος") || lower.includes("λέει")) score = c.max;
+      if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = rubricMax[c.key] * 0.5;
+      if (lower.includes("ο φιλόσοφος") || lower.includes("λέει")) score = rubricMax[c.key];
     }
 
     else if (c.key.includes("Επιχειρηματολογία")) {
-      if (lower.includes("γιατί") || lower.includes("επειδή")) score = c.max * 0.5;
-      if (lower.includes("άρα") || lower.includes("συνεπώς")) score = c.max;
+      if (lower.includes("γιατί") || lower.includes("επειδή")) score = rubricMax[c.key] * 0.5;
+      if (lower.includes("άρα") || lower.includes("συνεπώς")) score = rubricMax[c.key];
     }
 
     else if (c.key.includes("Εικόνα")) {
-      if (lower.includes("όπως")) score = c.max * 0.5;
-      if (lower.includes("σαν") || lower.includes("μοιάζει")) score = c.max;
+      if (lower.includes("όπως")) score = rubricMax[c.key] * 0.5;
+      if (lower.includes("σαν") || lower.includes("μοιάζει")) score = rubricMax[c.key];
     }
 
     else if (c.key.includes("Παράδειγμα")) {
-      if (lower.includes("παράδειγμα") || lower.includes("όπως")) score = c.max;
+      if (lower.includes("παράδειγμα") || lower.includes("όπως")) score = rubricMax[c.key];
     }
 
     else if (c.key.includes("Αντίρρηση")) {
-      if (lower.includes("δεν συμφωνώ") || lower.includes("όμως")) score = c.max * 0.5;
-      if (lower.includes("αντίθετα") || lower.includes("αντίρρηση")) score = c.max;
+      if (lower.includes("δεν συμφωνώ") || lower.includes("όμως")) score = rubricMax[c.key] * 0.5;
+      if (lower.includes("αντίθετα") || lower.includes("αντίρρηση")) score = rubricMax[c.key];
     }
 
     results[c.key] = Math.round(score);
     totalScore += score;
   }
 
+  // ✅ Υπολογισμός συνολικού παρονομαστή
+  const outOf = active.reduce((sum, c) => sum + (rubricMax[c.key] || c.max), 0);
+
   // ✅ Δημιουργία σχολίου
-  let comment = "Καλή προσπάθεια! ";
-  if (totalScore >= active.reduce((s, c) => s + c.max, 0) * 0.8)
+  let comment = "Καλή προσπάθεια!";
+  if (totalScore >= outOf * 0.8)
     comment = "Εξαιρετική απάντηση! Ο Σωκράτης θα ήταν περήφανος.";
-  else if (totalScore < active.reduce((s, c) => s + c.max, 0) * 0.4)
+  else if (totalScore < outOf * 0.4)
     comment = "Χρειάζεται περισσότερη τεκμηρίωση και παραδείγματα.";
 
   // 🧮 Καταγραφή αποτελεσμάτων για debugging
   console.log("🧮 Offline Κριτής:", {
     results,
     total: Math.round(totalScore),
+    out_of: outOf,
     round: game.currentRound,
     mode: game.mode
   });
-  
+
   return {
     criteria: results,
     total: Math.round(totalScore),
+    out_of: outOf,
     comment
   };
 }
