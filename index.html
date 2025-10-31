@@ -1505,6 +1505,9 @@ if (!response.ok) {
 const result = await response.json();
 console.log("📨 AI Response:", result);
 
+// ✅ Αποθήκευση του μέγιστου (out_of) για σωστή απεικόνιση στο UI
+scores.out_of = result.out_of;
+    
 // Έλεγχος εγκυρότητας
 if (!result || typeof result.total === "undefined") {
   throw new Error("Μη έγκυρη απάντηση από τον Σωκράτη (API)");
