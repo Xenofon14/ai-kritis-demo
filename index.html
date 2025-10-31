@@ -1495,7 +1495,6 @@ const response = await fetch("/api/score", {
   })
 });
 
-
 // Από εδώ και κάτω, ξεκινά η συνέχεια του κώδικα:
 if (!response.ok) {
   console.error("❌ API HTTP error:", response.status);
@@ -1505,8 +1504,9 @@ if (!response.ok) {
 const result = await response.json();
 console.log("📨 AI Response:", result);
 
-// ✅ Αποθήκευση του μέγιστου (out_of) για σωστή απεικόνιση στο UI
-scores.out_of = result.out_of;
+// ✅ Ενημέρωση του συνολικού out_of στο global αντικείμενο
+window.scores = window.scores || {};
+window.scores.out_of = result.out_of;
     
 // Έλεγχος εγκυρότητας
 if (!result || typeof result.total === "undefined") {
