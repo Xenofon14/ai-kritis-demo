@@ -783,7 +783,7 @@ async function loadRubric() {
     const data = await response.json();
     MANUAL_RUBRIC = data;
     console.log("📘 Rubric φορτώθηκε επιτυχώς:", MANUAL_RUBRIC);
-  catch (err) {
+  } catch (err) {
     console.error("⚠️ Σφάλμα στη φόρτωση rubricWeights.json:", err);
   }
 }
