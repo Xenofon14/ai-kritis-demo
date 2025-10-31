@@ -2001,13 +2001,28 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   const useBonus = useBonusEl ? useBonusEl.checked : false; // ✅ ασφαλής έλεγχος
   
       // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
+  const judgeSelect = document.getElementById("judgeMode");
    judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ αν λείπει, default = "ai"
   useAI = (judgeMode === "ai");
-  console.log("⚖️ Τρόπος Κριτή:", judgeMode);
+    console.log("⚖️ Τρόπος Κριτή:", judgeMode);
   updateJudgeModeIndicator(judgeMode);
+
+  // ✅ Αρχική ενημέρωση εμφάνισης μηνύματος
+  const aiNotice = document.getElementById("aiNotice");
+  if (aiNotice) {
+    if (judgeMode === "ai") {
+      aiNotice.style.opacity = "1";
+      aiNotice.style.height = "auto";
+    } else {
+      aiNotice.style.opacity = "0";
+      aiNotice.style.height = "0";
+    }
+  }
 
   // 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
 const aiNotice = document.getElementById("aiNotice");
+if (judgeSelect && !judgeSelect.dataset.bound) {
+// 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
 if (judgeSelect && !judgeSelect.dataset.bound) {
   judgeSelect.addEventListener("change", (e) => {
     judgeMode = e.target.value;
@@ -2023,6 +2038,11 @@ if (judgeSelect && !judgeSelect.dataset.bound) {
       }
     }
   });
+  judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
+}
+
+
+  
   judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
 }
 
