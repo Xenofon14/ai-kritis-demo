@@ -2026,6 +2026,17 @@ document.getElementById("judgeMode").addEventListener("change", (e) => {
   game.totalRounds = roundCount;
   game.activeIndex = 0;
 
+  // 🎲 Εμφάνιση κουμπιού Παραδείγματος μόνο στην Προχωρημένη Έκδοση
+const exampleBtn = document.getElementById("exampleBtn");
+if (exampleBtn) {
+  if (mode === "advanced") {
+    exampleBtn.style.display = "block";
+  } else {
+    exampleBtn.style.display = "none";
+  }
+}
+
+
   document.getElementById("setupScreen").style.display = "none";
   renderActivePlayer();
 });
