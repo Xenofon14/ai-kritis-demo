@@ -1618,7 +1618,7 @@ async function getOfflineScore(transcript, mission) {
   else if (totalScore < outOf * 0.4)
     comment = "Χρειάζεται περισσότερη τεκμηρίωση και παραδείγματα.";
 
-  // 🧮 Καταγραφή αποτελεσμάτων για debugging
+    // 🧮 Καταγραφή αποτελεσμάτων για debugging
   console.log("🧮 Offline Κριτής:", {
     results,
     total: Math.round(totalScore),
@@ -1627,8 +1627,17 @@ async function getOfflineScore(transcript, mission) {
     mode: game.mode
   });
 
+  // ✅ Επιστρέφει πάντα όλα τα κριτήρια, ακόμα κι αν κάποια είναι μηδενικά
+  const fullCriteria = {
+    "Θέση": results["Θέση"] || 0,
+    "Επιχειρηματολογία": results["Επιχειρηματολογία"] || 0,
+    "Εικόνα / Μεταφορά": results["Εικόνα / Μεταφορά"] || 0,
+    "Παράδειγμα": results["Παράδειγμα"] || 0,
+    "Αντίρρηση": results["Αντίρρηση"] || 0
+  };
+
   return {
-    criteria: results,
+    criteria: fullCriteria,
     total: Math.round(totalScore),
     out_of: outOf,
     comment
