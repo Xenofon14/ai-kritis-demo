@@ -1857,18 +1857,23 @@ const criteriaList = document.getElementById("criteriaList");
 criteriaList.innerHTML = "";
 
 if (scores.criteria && Object.keys(scores.criteria).length > 0) {
-  // ✅ Προβάλλουμε όσα επέστρεψε ο Κριτής (AI, Offline ή Manual)
+  // ✅ Προβολή αναλυτικών κριτηρίων
   for (const [key, val] of Object.entries(scores.criteria)) {
     const li = document.createElement("li");
-    let max = 2; // default
-    if (scores.criteriaMax && scores.criteriaMax[key]) {
-      max = scores.criteriaMax[key];
-    } else if (key === "Μπόνους Εικόνας/Μεταφοράς") {
-      max = 1;
-    }
+
+    // 🔹 Αντιστοίχιση στο rubricWeights.json για το σωστό max
+    const rubricCriterion = rubric.criteria.find(c => c.key === key);
+    const max = rubricCriterion ? rubricCriterion.max : 2; // fallback = 2
+
     li.textContent = `${key}: ${val}/${max}`;
     criteriaList.appendChild(li);
   }
+} else {
+  const li = document.createElement("li");
+  li.textContent = "Δεν υπάρχουν αναλυτικά στοιχεία για αυτόν τον γύρο.";
+  criteriaList.appendChild(li);
+}
+    
 } else {
   // ❌ Αν δεν υπάρχουν λεπτομέρειες, εμφάνισε placeholder
   const li = document.createElement("li");
