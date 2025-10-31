@@ -2012,12 +2012,77 @@ async function startGame(mode) {
     }
   }
 
+/* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
+async function startGame(mode) {
+
+  // Αποθήκευση της επιλογής
+  game.mode = mode;
+  
+  // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
+  if (typeof loadRubric === "function") {
+    try {
+      await loadRubric();
+      console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
+    } catch (err) {
+      console.warn("⚠️ Δεν φορτώθηκε το rubric στην έναρξη:", err);
+    }
+  }
+
+  // Απόκρυψη αρχικής και εμφάνιση setup screen
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("setupScreen").style.display = "flex";
+
+  // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
+  const display = document.getElementById("selectedModeDisplay");
+  if (display) {
+    if (mode === "simple") {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Απλή";
+      display.style.color = "#7af77a";
+    } else {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Προχωρημένη";
+      display.style.color = "#ff7a7a";
+    }
+  }
+
+ /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
+async function startGame(mode) {
+
+  // Αποθήκευση της επιλογής
+  game.mode = mode;
+  
+  // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
+  if (typeof loadRubric === "function") {
+    try {
+      await loadRubric();
+      console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
+    } catch (err) {
+      console.warn("⚠️ Δεν φορτώθηκε το rubric στην έναρξη:", err);
+    }
+  }
+
+  // Απόκρυψη αρχικής και εμφάνιση setup screen
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("setupScreen").style.display = "flex";
+
+  // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
+  const display = document.getElementById("selectedModeDisplay");
+  if (display) {
+    if (mode === "simple") {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Απλή";
+      display.style.color = "#7af77a";
+    } else {
+      display.textContent = "✨ Επιλεγμένη Έκδοση: Προχωρημένη";
+      display.style.color = "#ff7a7a";
+    }
+  }
+
   // ✅ Υπολογισμός αρχικού παρονομαστή για τον πρώτο γύρο
   if (typeof prepareNextPlayer === "function") {
     prepareNextPlayer();
-    console.log("🧮 Προετοιμάστηκε ο πρώτος παίκτης με σωστό παρονομαστή.");
+    console.log("%c🧮 Προετοιμάστηκε ο πρώτος παίκτης με σωστό παρονομαστή.", "color: #7af77a; font-weight: bold;");
   }
 }
+
 
 // ✅ Συνδέουμε τα κουμπιά της αρχικής
 document.getElementById("startSimpleBtn").addEventListener("click", () => startGame("simple"));
