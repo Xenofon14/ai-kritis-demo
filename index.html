@@ -1949,11 +1949,21 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   renderActivePlayer();
 });
 
-/* ---------- Welcome → Setup ---------- */
 /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
-function startGame(mode) {
+async function startGame(mode) {
+
   // Αποθήκευση της επιλογής
   game.mode = mode;
+  
+  // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
+  if (typeof loadRubric === "function") {
+    try {
+      await loadRubric();
+      console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
+    } catch (err) {
+      console.warn("⚠️ Δεν φορτώθηκε το rubric στην έναρξη:", err);
+    }
+  }
 
   // Απόκρυψη αρχικής και εμφάνιση setup screen
   document.getElementById("welcomeScreen").style.display = "none";
