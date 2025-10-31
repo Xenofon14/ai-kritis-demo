@@ -1994,23 +1994,26 @@ renderActivePlayer();
 
 /* ---------- Start Game (setup → app) ---------- */
 document.getElementById("startGameBtn").addEventListener("click", () => {
-const judgeSelect = document.getElementById("judgeMode");
-const aiNotice = document.getElementById("aiNotice");
+  // 🔹 Επιλογές κριτή και μηνύματος
+  const judgeSelect = document.getElementById("judgeMode");
+  const aiNotice = document.getElementById("aiNotice");
+
+  // Απόκρυψη αρχικών οθονών
   document.getElementById("welcomeScreen").style.display = "none";
+
+  // Ρυθμίσεις παιχνιδιού
   const playerCount = parseInt(document.getElementById("playerCount").value);
   const roundCount = parseInt(document.getElementById("roundCount").value);
   const useBonusEl = document.getElementById("useBonus");
   const useBonus = useBonusEl ? useBonusEl.checked : false; // ✅ ασφαλής έλεγχος
-  
-      // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
-  const judgeSelect = document.getElementById("judgeMode");
-   judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ αν λείπει, default = "ai"
+
+  // ⚙️ Ρύθμιση τρόπου Κριτή (AI / Offline / Manual)
+  judgeMode = judgeSelect ? judgeSelect.value : "ai"; // ✅ default = "ai"
   useAI = (judgeMode === "ai");
-    console.log("⚖️ Τρόπος Κριτή:", judgeMode);
+  console.log("⚖️ Τρόπος Κριτή:", judgeMode);
   updateJudgeModeIndicator(judgeMode);
 
   // ✅ Αρχική ενημέρωση εμφάνισης μηνύματος
-  const aiNotice = document.getElementById("aiNotice");
   if (aiNotice) {
     if (judgeMode === "ai") {
       aiNotice.style.opacity = "1";
@@ -2022,29 +2025,23 @@ const aiNotice = document.getElementById("aiNotice");
   }
 
   // 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
-const aiNotice = document.getElementById("aiNotice");
-if (judgeSelect && !judgeSelect.dataset.bound) {
-// 🌀 Ενημέρωση ενδείξεων σε πραγματικό χρόνο όταν αλλάζει η επιλογή "Ποιος κρίνει;"
-if (judgeSelect && !judgeSelect.dataset.bound) {
-  judgeSelect.addEventListener("change", (e) => {
-    judgeMode = e.target.value;
-    updateJudgeModeIndicator(judgeMode);
+  if (judgeSelect && !judgeSelect.dataset.bound) {
+    judgeSelect.addEventListener("change", (e) => {
+      judgeMode = e.target.value;
+      updateJudgeModeIndicator(judgeMode);
 
-    if (aiNotice) {
-      if (judgeMode === "ai") {
-        aiNotice.style.opacity = "1";
-        aiNotice.style.height = "auto";
-      } else {
-        aiNotice.style.opacity = "0";
-        aiNotice.style.height = "0";
+      if (aiNotice) {
+        if (judgeMode === "ai") {
+          aiNotice.style.opacity = "1";
+          aiNotice.style.height = "auto";
+        } else {
+          aiNotice.style.opacity = "0";
+          aiNotice.style.height = "0";
+        }
       }
-    }
-  });
-  judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
-}
-  
-  judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
-}
+    });
+    judgeSelect.dataset.bound = "true"; // ✅ σημαία για να μην ξαναδεθεί
+  }
 
   const selected = Array.from(document.querySelectorAll(".character.selected"));
   if (selected.length < playerCount) {
@@ -2064,19 +2061,16 @@ if (judgeSelect && !judgeSelect.dataset.bound) {
   game.activeIndex = 0;
 
   // 🎲 Εμφάνιση κουμπιού Παραδείγματος μόνο στην Προχωρημένη Έκδοση
-const exampleBtn = document.getElementById("exampleBtn");
-if (exampleBtn) {
-  if (game.mode === "advanced") {
-    exampleBtn.style.display = "block";
-  } else {
-    exampleBtn.style.display = "none";
+  const exampleBtn = document.getElementById("exampleBtn");
+  if (exampleBtn) {
+    exampleBtn.style.display = game.mode === "advanced" ? "block" : "none";
   }
-}
 
   document.getElementById("setupScreen").style.display = "none";
   renderActivePlayer();
 });
 
+  
 /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
 async function startGame(mode) {
   // Αποθήκευση της επιλογής
