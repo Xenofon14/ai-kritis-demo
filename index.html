@@ -1619,15 +1619,6 @@ async function getOfflineScore(transcript, mission) {
     comment = "Χρειάζεται περισσότερη τεκμηρίωση και παραδείγματα.";
 
     // 🧮 Καταγραφή αποτελεσμάτων για debugging
-  console.log("🧮 Offline Κριτής:", {
-    results,
-    total: Math.round(totalScore),
-    out_of: outOf,
-    round: game.currentRound,
-    mode: game.mode
-  });
-
-  // ✅ Επιστρέφει πάντα όλα τα κριτήρια, ακόμα κι αν κάποια είναι μηδενικά
   const fullCriteria = {
     "Θέση": results["Θέση"] || 0,
     "Επιχειρηματολογία": results["Επιχειρηματολογία"] || 0,
@@ -1636,6 +1627,13 @@ async function getOfflineScore(transcript, mission) {
     "Αντίρρηση": results["Αντίρρηση"] || 0
   };
 
+  console.log("🧮 Offline Κριτής (τελικό αντικείμενο):", {
+    criteria: fullCriteria,
+    total: Math.round(totalScore),
+    out_of: outOf,
+    comment
+  });
+
   return {
     criteria: fullCriteria,
     total: Math.round(totalScore),
@@ -1643,6 +1641,7 @@ async function getOfflineScore(transcript, mission) {
     comment
   };
 }
+
 
   /* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
 async function getManualScore() {
