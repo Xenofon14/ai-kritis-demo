@@ -1853,37 +1853,28 @@ document.getElementById("scoreBtn").addEventListener("click", async ()=> {
 const criteriaList = document.getElementById("criteriaList");
 criteriaList.innerHTML = "";
 
-if (judgeMode === "manual" && scores.criteria && scores.criteriaMax) {
-  // Προβολή με σωστά μέγιστα ανά κριτήριο
+// ⚖️ Εμφάνιση αναλυτικών κριτηρίων για κάθε τύπο Κριτή
+const criteriaList = document.getElementById("criteriaList");
+criteriaList.innerHTML = "";
+
+if (scores.criteria && Object.keys(scores.criteria).length > 0) {
+  // ✅ Προβάλλουμε όσα επέστρεψε ο Κριτής (AI, Offline ή Manual)
   for (const [key, val] of Object.entries(scores.criteria)) {
-    // Αν είναι το bonus, δείξ’ το διακριτά
-    if (key === "Μπόνους Εικόνας/Μεταφοράς") {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${val > 0 ? "+1" : "0"}`;
-      criteriaList.appendChild(li);
-      continue;
-    }
-    const max = scores.criteriaMax[key] ?? 2;
-    if (typeof val !== "number") continue;
     const li = document.createElement("li");
+    let max = 2; // default
+    if (scores.criteriaMax && scores.criteriaMax[key]) {
+      max = scores.criteriaMax[key];
+    } else if (key === "Μπόνους Εικόνας/Μεταφοράς") {
+      max = 1;
+    }
     li.textContent = `${key}: ${val}/${max}`;
     criteriaList.appendChild(li);
   }
 } else {
-  // Fallback: προηγούμενη λογική (για AI/Offline)
-  const activeCriteria = game.currentRound === 1
-    ? ["Θέση", "Τεκμηρίωση", "Συνάφεια", "Σαφήνεια"]
-    : ["Τεκμηρίωση", "Συνάφεια", "Σαφήνεια", "Αντίρρηση"];
-
-  if (scores.criteria) {
-    for (const key of activeCriteria) {
-      const val = scores.criteria[key];
-      if (typeof val !== "number") continue;
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${val}/2`;
-      criteriaList.appendChild(li);
-    }
-  }
+  // ❌ Αν δεν υπάρχουν λεπτομέρειες, εμφάνισε placeholder
+  const li = document.createElement("li");
+  li.textContent = "Δεν υπάρχουν αναλυτικά στοιχεία για αυτόν τον γύρο.";
+  criteriaList.appendChild(li);
 }
 
     
