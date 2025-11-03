@@ -52,6 +52,43 @@ export default async function handler(req, res) {
     const { transcript, mission, round, mode } = body;
         // 🔹 Φόρτωση λεξικού καρτών
     const cardsCatalog = await loadCardsCatalog();
+    // 🔹 Ανάκτηση καρτών & φιλοσοφικού πλαισίου από το body
+    const { cards = {}, philosopherContext = {} } = body;
+
+    // Συνάρτηση που βρίσκει τις κάρτες του παίκτη μέσα στο λεξικό
+    function findCards(list, section) {
+      const all = cardsCatalog[section] || [];
+      return (list || []).map(id => all.find(c => c.id === id)).filter(Boolean);
+    }
+
+    // Δημιουργία λιστών
+    const imageCards = findCards(cards.images, "images");
+    const metaphorCards = findCards(cards.metaphors, "metaphors");
+
+    // Αν έχει ενεργοποιήσει συγκεκριμένες κάρτες (προαιρετικά από UI)
+    const activatedIds = new Set(cards.activated || []);
+    const activatedTitles = [
+      ...imageCards.filter(c => activatedIds.has(c.id)).map(c => c.title),
+      ...metaphorCards.filter(c => activatedIds.has(c.id)).map(c => c.title)
+    ];
+
+    // Δημιουργία περιγραφικού κειμένου για το prompt
+    const cardsTextLines = [];
+
+    if (imageCards.length) {
+      cardsTextLines.push(`Εικόνες διαθέσιμες: ${imageCards.map(c => `"${c.title}"`).join(", ")}`);
+      cardsTextLines.push(`Λέξεις-κλειδιά (εικόνες): ${imageCards.flatMap(c => c.keywords).join(", ")}`);
+    }
+    if (metaphorCards.length) {
+      cardsTextLines.push(`Μεταφορές διαθέσιμες: ${metaphorCards.map(c => `"${c.title}"`).join(", ")}`);
+      cardsTextLines.push(`Λέξεις-κλειδιά (μεταφορές): ${metaphorCards.flatMap(c => c.keywords).join(", ")}`);
+    }
+    if (activatedTitles.length) {
+      cardsTextLines.push(`Ενεργοποιήθηκαν ρητά: ${activatedTitles.join(", ")}`);
+    }
+
+    const cardsText = cardsTextLines.join("\n");
+   
     
     if (!transcript) {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
