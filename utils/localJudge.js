@@ -2,6 +2,23 @@
 import fs from "fs";
 import path from "path";
 
+// ✅ Βοηθητικά για ελληνικά: αφαίρεση τόνων + ασφαλές includes με οριοθέτηση λέξης
+function normalizeGreek(str = "") {
+  return str
+    .toLowerCase()
+    .normalize("NFD")                 // διαχωρίζει γράμμα/τόνο
+    .replace(/[\u0300-\u036f]/g, ""); // αφαιρεί τόνους
+}
+
+function hasWord(text, ...patterns) {
+  return patterns.some((p) => {
+    const pat = normalizeGreek(p).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    // οριοθέτηση λέξης (δέχεται ελληνικούς χαρακτήρες)
+    const re = new RegExp(`(^|[^\\p{L}])${pat}([^\\p{L}]|$)`, "u");
+    return re.test(text);
+  });
+}
+
 export async function localJudge({ transcript, mission, rubric, round = 1, philosopherContext = {}, cards = {} }) {
 
   if (!transcript || !rubric?.criteria) {
@@ -13,7 +30,7 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
     };
   }
 
-  const lower = transcript.toLowerCase();
+  const lower = normalizeGreek(transcript);
   const active = rubric.criteria;
 
     // ✅ Φόρτωση καρτών (λεξικό εικόνων/μεταφορών)
@@ -63,14 +80,21 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
   else if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
 }
 
-   else if (c.key.includes("Επιχειρηματολογία")) {
-      if (lower.includes("γιατί") || lower.includes("επειδή")) score = c.max * 0.5;
-      if (lower.includes("άρα") || lower.includes("συνεπώς")) score = c.max;
-    }
+  else if (c.key.includes("Επιχειρηματολογία")) {
+  if (hasWord(lower, "γιατί", "γιατι", "επειδή", "επειδη")) score = c.max * 0.5;
+  if (hasWord(lower, "άρα", "αρα", "συνεπώς", "συνεπως")) score = c.max;
+}
 
-    else if (c.key.includes("Εικόνα")) {
-  const usedImages = imageKeywords.some(k => lower.includes(k));
-  const usedMetaphors = metaphorKeywords.some(k => lower.includes(k));
+  else if (c.key.includes("Εικόνα")) {
+  if (hasWord(lower, "όπως", "οπως")) score = c.max * 0.5;
+  if (hasWord(lower, "σαν", "μοιάζει", "μοιαζει")) score = c.max;
+
+  // ✅ Bonus αν το rubric ορίζει bonus για Εικόνα/Μεταφορά και χρησιμοποιήθηκαν ΚΑΙ τα δύο
+  if (c.bonus && hasWord(lower, "όπως", "οπως") && hasWord(lower, "μοιάζει", "μοιαζει")) {
+    results["Μπόνους Εικόνας/Μεταφοράς"] = 1;
+    total += 1;
+  }
+}
 
   if (usedImages && usedMetaphors) score = c.max;
   else if (usedImages || usedMetaphors) score = c.max * 0.6;
@@ -78,18 +102,19 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
 }
 
 
-    else if (c.key.includes("Παράδειγμα")) {
-      if (lower.includes("παράδειγμα")) score = c.max;
-    }
+   else if (c.key.includes("Παράδειγμα")) {
+  if (hasWord(lower, "παράδειγμα", "παραδειγμα", "π.χ.", "πχ", "όπως", "οπως")) score = c.max;
+}
 
-    else if (c.key.includes("Αντίρρηση")) {
-      if (lower.includes("όμως") || lower.includes("δεν συμφωνώ")) score = c.max * 0.5;
-      if (lower.includes("αντίθετα") || lower.includes("αντίρρηση")) score = c.max;
-    }
+   else if (c.key.includes("Αντίρρηση")) {
+  if (hasWord(lower, "όμως", "ομως", "δεν συμφωνώ", "δεν συμφωνω")) score = c.max * 0.5;
+  if (hasWord(lower, "αντίθετα", "αντιθετα", "αντίρρηση", "αντιρρηση")) score = c.max;
+}
 
-    results[c.key] = Math.round(score);
-    total += score;
-  }
+    const safe = Math.max(0, Math.min(c.max, Number(score.toFixed(1))));
+results[c.key] = safe;
+total += safe;
+
 
   const out_of = active
     .filter(c => (round === 1 && c.rounds.first) || (round > 1 && c.rounds.later))
@@ -108,7 +133,7 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
   
   return {
     criteria: results,
-    total: Math.round(total),
+    total: Number(total.toFixed(1)),
     out_of,
     comment
   };
