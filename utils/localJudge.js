@@ -1,6 +1,5 @@
 // utils/localJudge.js
-
-export async function localJudge({ transcript, mission, rubric }) {
+export async function localJudge({ transcript, mission, rubric, round = 1 }) {
   if (!transcript || !rubric?.criteria) {
     return {
       criteria: {},
@@ -19,6 +18,19 @@ export async function localJudge({ transcript, mission, rubric }) {
   for (const c of active) {
     let score = 0;
 
+    // ✅ Ελέγχουμε αν το κριτήριο είναι ενεργό στον γύρο
+    const isFirstRound = round === 1;
+    const isLaterRound = round > 1;
+    const validThisRound =
+      (isFirstRound && c.rounds?.first) ||
+      (isLaterRound && c.rounds?.later);
+
+    if (!validThisRound) {
+      results[c.key] = 0;
+      continue;
+    }
+
+    // --- Απλοί κανόνες εντοπισμού ---
     if (c.key.includes("Θέση")) {
       if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
       if (lower.includes("ο φιλόσοφος") || lower.includes("είπε")) score = c.max;
@@ -47,9 +59,11 @@ export async function localJudge({ transcript, mission, rubric }) {
     total += score;
   }
 
-  const out_of = active.reduce((sum, c) => sum + c.max, 0);
-  let comment = "Καλή προσπάθεια!";
+  const out_of = active
+    .filter(c => (round === 1 && c.rounds.first) || (round > 1 && c.rounds.later))
+    .reduce((sum, c) => sum + c.max, 0);
 
+  let comment = "Καλή προσπάθεια!";
   if (total >= out_of * 0.8)
     comment = "Εξαιρετική απάντηση! Ο Σωκράτης θα ήταν περήφανος.";
   else if (total < out_of * 0.4)
