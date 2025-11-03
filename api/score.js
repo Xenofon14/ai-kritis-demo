@@ -216,10 +216,6 @@ for (const key of Object.keys(C)) {
     console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/${outOf}`);
     return res.status(200).json(result);
 
-
-    console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/8`);
-    return res.status(200).json(result);
-
   } catch (err) {
     console.error("❌ Σφάλμα AI Κριτή:", err);
     return res.status(500).json({ error: err.message || "Σφάλμα στον διακομιστή." });
