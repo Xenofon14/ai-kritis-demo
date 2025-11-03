@@ -85,21 +85,21 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
   if (hasWord(lower, "άρα", "αρα", "συνεπώς", "συνεπως")) score = c.max;
 }
 
-  else if (c.key.includes("Εικόνα")) {
-  if (hasWord(lower, "όπως", "οπως")) score = c.max * 0.5;
-  if (hasWord(lower, "σαν", "μοιάζει", "μοιαζει")) score = c.max;
+ else if (c.key.includes("Εικόνα")) {
+  const usedImages = imageKeywords.some(k => hasWord(lower, k));
+  const usedMetaphors = metaphorKeywords.some(k => hasWord(lower, k));
 
-  // ✅ Bonus αν το rubric ορίζει bonus για Εικόνα/Μεταφορά και χρησιμοποιήθηκαν ΚΑΙ τα δύο
-  if (c.bonus && hasWord(lower, "όπως", "οπως") && hasWord(lower, "μοιάζει", "μοιαζει")) {
+  if (usedImages && usedMetaphors) score = c.max;
+  else if (usedImages || usedMetaphors) score = c.max * 0.6;
+  else if (hasWord(lower, "όπως", "οπως")) score = c.max * 0.5;
+  else if (hasWord(lower, "σαν", "μοιάζει", "μοιαζει")) score = c.max;
+
+  if (c.bonus && usedImages && usedMetaphors) {
     results["Μπόνους Εικόνας/Μεταφοράς"] = 1;
     total += 1;
   }
 }
 
-  if (usedImages && usedMetaphors) score = c.max;
-  else if (usedImages || usedMetaphors) score = c.max * 0.6;
-  else if (lower.includes("όπως") || lower.includes("σαν")) score = c.max * 0.3;
-}
 
 
    else if (c.key.includes("Παράδειγμα")) {
