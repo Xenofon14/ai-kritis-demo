@@ -1,5 +1,9 @@
 // utils/localJudge.js
-export async function localJudge({ transcript, mission, rubric, round = 1 }) {
+import fs from "fs";
+import path from "path";
+
+export async function localJudge({ transcript, mission, rubric, round = 1, philosopherContext = {}, cards = {} }) {
+
   if (!transcript || !rubric?.criteria) {
     return {
       criteria: {},
@@ -12,7 +16,28 @@ export async function localJudge({ transcript, mission, rubric, round = 1 }) {
   const lower = transcript.toLowerCase();
   const active = rubric.criteria;
 
-  let total = 0;
+    // ✅ Φόρτωση καρτών (λεξικό εικόνων/μεταφορών)
+  let cardsCatalog = {};
+  try {
+    const filePath = path.join(process.cwd(), "public", "data", "cardsImagesMetaphors.json");
+    const raw = fs.readFileSync(filePath, "utf8");
+    cardsCatalog = JSON.parse(raw);
+  } catch (err) {
+    console.warn("⚠️ Δεν βρέθηκε cardsImagesMetaphors.json:", err.message);
+  }
+
+  function findCards(list, section) {
+    const all = cardsCatalog[section] || [];
+    return (list || []).map(id => all.find(c => c.id === id)).filter(Boolean);
+  }
+
+  const imageCards = findCards(cards.images, "images");
+  const metaphorCards = findCards(cards.metaphors, "metaphors");
+
+  const imageKeywords = imageCards.flatMap(c => c.keywords || []);
+  const metaphorKeywords = metaphorCards.flatMap(c => c.keywords || []);
+
+    let total = 0;
   const results = {};
 
   for (const c of active) {
