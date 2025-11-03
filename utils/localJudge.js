@@ -56,20 +56,27 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
     }
 
     // --- Απλοί κανόνες εντοπισμού ---
-    if (c.key.includes("Θέση")) {
-      if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
-      if (lower.includes("ο φιλόσοφος") || lower.includes("είπε")) score = c.max;
-    }
+   if (c.key.includes("Θέση")) {
+  if (lower.includes("ο φιλόσοφος") ||
+      lower.includes("είπε") ||
+      lower.includes(philosopherContext.philosopher?.toLowerCase() || "")) score = c.max;
+  else if (lower.includes("πιστεύω") || lower.includes("θεωρώ")) score = c.max * 0.5;
+}
 
-    else if (c.key.includes("Επιχειρηματολογία")) {
+   else if (c.key.includes("Επιχειρηματολογία")) {
       if (lower.includes("γιατί") || lower.includes("επειδή")) score = c.max * 0.5;
       if (lower.includes("άρα") || lower.includes("συνεπώς")) score = c.max;
     }
 
     else if (c.key.includes("Εικόνα")) {
-      if (lower.includes("όπως")) score = c.max * 0.5;
-      if (lower.includes("σαν") || lower.includes("μοιάζει")) score = c.max;
-    }
+  const usedImages = imageKeywords.some(k => lower.includes(k));
+  const usedMetaphors = metaphorKeywords.some(k => lower.includes(k));
+
+  if (usedImages && usedMetaphors) score = c.max;
+  else if (usedImages || usedMetaphors) score = c.max * 0.6;
+  else if (lower.includes("όπως") || lower.includes("σαν")) score = c.max * 0.3;
+}
+
 
     else if (c.key.includes("Παράδειγμα")) {
       if (lower.includes("παράδειγμα")) score = c.max;
@@ -94,6 +101,11 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
   else if (total < out_of * 0.4)
     comment = "Χρειάζεται περισσότερη τεκμηρίωση και παραδείγματα.";
 
+  // ✅ Αν γνωρίζουμε ποιον φιλόσοφο εκπροσωπεί ο παίκτης, προσαρμόζουμε το σχόλιο
+  if (comment.includes("Εξαιρετική")) {
+    comment = `Εξαιρετική απάντηση! Ο ${philosopherContext.philosopher || "Σωκράτης"} θα ήταν περήφανος.`;
+  }
+  
   return {
     criteria: results,
     total: Math.round(total),
