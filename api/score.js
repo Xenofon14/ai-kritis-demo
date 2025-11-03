@@ -206,12 +206,18 @@ for (const key of Object.keys(C)) {
 
     if (total > outOf) total = outOf;
 
-    const result = {
-      criteria: C,
-      total,
-      out_of: outOf,
-      feedback: parsed.feedback || "Ο Σωκράτης σιώπησε."
-    };
+   // ✅ Επιστρέφουμε μόνο τα ενεργά κριτήρια (τα υπόλοιπα κρύβονται εντελώς)
+const filteredCriteria = {};
+for (const key of activeKeys) {
+  filteredCriteria[key] = C[key];
+}
+
+const result = {
+  criteria: filteredCriteria,
+  total,
+  out_of: outOf,
+  feedback: parsed.feedback || "Ο Σωκράτης σιώπησε."
+};
 
     console.log(`📊 Σκορ γύρος ${roundNum}: ${total}/${outOf}`);
     return res.status(200).json(result);
