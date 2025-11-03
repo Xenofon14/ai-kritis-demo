@@ -17,6 +17,15 @@ async function loadRubric() {
   return json;
 }
 
+// 🔹 Δυναμική φόρτωση cardsImagesMetaphors.json
+async function loadCardsCatalog() {
+  const filePath = path.join(process.cwd(), "public", "data", "cardsImagesMetaphors.json");
+  const raw = fs.readFileSync(filePath, "utf8");
+  const json = JSON.parse(raw);
+  console.log("🗂️ Cards catalog φορτώθηκε από:", filePath);
+  return json;
+}
+
 const client = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -41,6 +50,9 @@ export default async function handler(req, res) {
     }
 
     const { transcript, mission, round, mode } = body;
+        // 🔹 Φόρτωση λεξικού καρτών
+    const cardsCatalog = await loadCardsCatalog();
+    
     if (!transcript) {
       return res.status(400).json({ error: "Καμία απάντηση για αξιολόγηση." });
     }
