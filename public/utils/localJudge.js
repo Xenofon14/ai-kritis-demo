@@ -117,7 +117,7 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
     const safe = Math.max(0, Math.min(c.max, Number(score.toFixed(1))));
 results[c.key] = safe;
 total += safe;
-
+  }
 
   const out_of = active
     .filter(c => (round === 1 && c.rounds.first) || (round > 1 && c.rounds.later))
