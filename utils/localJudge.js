@@ -1,6 +1,6 @@
 // utils/localJudge.js
-import fs from "fs";
-import path from "path";
+// (browser build) — δεν χρησιμοποιούμε fs/path
+
 
 // ✅ Βοηθητικά για ελληνικά: αφαίρεση τόνων + ασφαλές includes με οριοθέτηση λέξης
 function normalizeGreek(str = "") {
@@ -33,14 +33,17 @@ export async function localJudge({ transcript, mission, rubric, round = 1, philo
   const lower = normalizeGreek(transcript);
   const active = rubric.criteria;
 
-    // ✅ Φόρτωση καρτών (λεξικό εικόνων/μεταφορών)
+  // ✅ Φόρτωση καρτών (λεξικό εικόνων/μεταφορών) — browser fetch από /data/...
   let cardsCatalog = {};
   try {
-    const filePath = path.join(process.cwd(), "public", "data", "cardsImagesMetaphors.json");
-    const raw = fs.readFileSync(filePath, "utf8");
-    cardsCatalog = JSON.parse(raw);
+    const res = await fetch("/data/cardsImagesMetaphors.json", { cache: "no-store" });
+    if (res.ok) {
+      cardsCatalog = await res.json();
+    } else {
+      console.warn("⚠️ Δεν φορτώθηκε cardsImagesMetaphors.json:", res.status);
+    }
   } catch (err) {
-    console.warn("⚠️ Δεν βρέθηκε cardsImagesMetaphors.json:", err.message);
+    console.warn("⚠️ Σφάλμα φόρτωσης cardsImagesMetaphors.json:", err?.message || err);
   }
 
   function findCards(list, section) {
