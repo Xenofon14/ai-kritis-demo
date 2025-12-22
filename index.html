@@ -1275,6 +1275,10 @@ function handleTimeUp() {
   document.getElementById("timer").textContent = "⏰ Τέλος!";
   updateTimeBar(1);
 
+    // 🚫 Κλείδωμα bonus όταν λήξει ο χρόνος (όχι +30″ μετά)
+  const bonusBtn = document.getElementById("bonusBtn");
+  if (bonusBtn) bonusBtn.disabled = true;
+
   // Ήχος
   try {
     const audio = new Audio("sounds/philosophical_chime.mp3");
