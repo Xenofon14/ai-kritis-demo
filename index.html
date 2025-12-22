@@ -1335,20 +1335,7 @@ if (bar) {
 }
 
     if (remainingTime < 0) {
-      clearInterval(timerInterval);
-      isTimerRunning = false;
-      document.getElementById("timer").textContent = "⏰ Τέλος!";
-
-      try {
-        const audio = new Audio("sounds/philosophical_chime.mp3");
-        audio.volume = 0.6;
-        audio.currentTime = 0;
-        audio.play().catch(()=>{});
-      } catch {}
-
-      showSocratesPopup();
-      try { if (recognition && recognizing) recognition.stop(); } catch {}
-      advanceTurn();
+      handleTimeUp();   // ✅ καμπανάκι + auto-score, χωρίς auto next
       return;
     }
 
