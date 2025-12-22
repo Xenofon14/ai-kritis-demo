@@ -1922,14 +1922,22 @@ document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
 
 document.getElementById('bonusBtn').addEventListener('click', ()=>{
 
-    // ✅ Bonus επιτρέπεται ΜΟΝΟ πριν λήξει ο χρόνος
+  const p = game.players[game.activeIndex];
+
+  // ⛔ Αν δεν έχει άλλο bonus
+  if (p.bonusLeft <= 0) {
+    alert("⛔ Δεν έχεις άλλο +30″ διαθέσιμο.");
+    return;
+  }
+
+  // ✅ Bonus επιτρέπεται ΜΟΝΟ πριν λήξει ο χρόνος
   if (!isTimerRunning || remainingTime <= 0) {
     alert("⛔ Το +30″ μπορεί να χρησιμοποιηθεί μόνο πριν τελειώσει ο χρόνος.");
     return;
   }
 
-  const p = game.players[game.activeIndex];
-  if(p.bonusLeft > 0){
+  if (p.bonusLeft > 0) {
+  
     p.bonusLeft--;
     const timerEl = document.getElementById("timer").textContent;
   if(/^\d+:\d+$/.test(timerEl)){
