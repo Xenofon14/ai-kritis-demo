@@ -1918,6 +1918,13 @@ document.getElementById('nextPlayerBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('bonusBtn').addEventListener('click', ()=>{
+
+    // ✅ Bonus επιτρέπεται ΜΟΝΟ πριν λήξει ο χρόνος
+  if (!isTimerRunning || remainingTime <= 0) {
+    alert("⛔ Το +30″ μπορεί να χρησιμοποιηθεί μόνο πριν τελειώσει ο χρόνος.");
+    return;
+  }
+
   const p = game.players[game.activeIndex];
   if(p.bonusLeft > 0){
     p.bonusLeft--;
