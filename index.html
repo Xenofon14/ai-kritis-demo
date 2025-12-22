@@ -1262,6 +1262,44 @@ function zeroTimer() {
   updateTimeBar(1);
 }
 
+// ✅ Όταν τελειώνει ο χρόνος: καμπανάκι + αυτόματη βαθμολόγηση (ΧΩΡΙΣ αυτόματο next)
+function handleTimeUp() {
+  // Σταμάτα οτιδήποτε τρέχει
+  try { if (recognition && recognizing) recognition.stop(); } catch {}
+  clearInterval(timerInterval);
+  isTimerRunning = false;
+  isPaused = false;
+  remainingTime = 0;
+
+  // UI
+  document.getElementById("timer").textContent = "⏰ Τέλος!";
+  updateTimeBar(1);
+
+  // Ήχος
+  try {
+    const audio = new Audio("sounds/philosophical_chime.mp3");
+    audio.volume = 0.6;
+    audio.currentTime = 0;
+    audio.play().catch(()=>{});
+  } catch {}
+
+  // Popup
+  showSocratesPopup();
+
+  // ✅ Αυτόματη βαθμολόγηση (αν υπάρχει κείμενο)
+  const transcript = document.getElementById("transcript").value.trim();
+  if (!transcript) {
+    alert("⏰ Τέλος χρόνου! Γράψε/πες μια απάντηση και πάτα «Βαθμολογία».");
+    return;
+  }
+
+  const scoreBtn = document.getElementById("scoreBtn");
+  if (scoreBtn && !scoreBtn.disabled) {
+    // μικρή καθυστέρηση για να “κλείσει” καθαρά το speech recognition
+    setTimeout(() => scoreBtn.click(), 80);
+  }
+}
+  
 /* === ΝΕΑ startTimer === */
 function startTimer(durationSec = 90) {
   if (isTimerRunning && !isPaused) return; // Αν ήδη τρέχει, μην ξαναξεκινά
