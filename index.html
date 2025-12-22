@@ -1091,7 +1091,10 @@ function prepareNextPlayer() {
   updateTimeBar(game.baseTimeSec); // ✅ Επαναφορά μπάρας χρόνου
 }
 
-  
+  // ✅ Επανενεργοποίηση bonus για τον νέο παίκτη (αν δικαιούται)
+  const bonusBtn = document.getElementById("bonusBtn");
+  if (bonusBtn) bonusBtn.disabled = (game.players[game.activeIndex].bonusLeft <= 0);
+
 /* ---------- Αναλυτική Βαθμολογία (με αναλυτικά κριτήρια) ---------- */
 function buildDetailsHTML() {
   let html = `<table id="detailsTable" style="width:100%;border-collapse:collapse;text-align:center;font-size:15px;">
