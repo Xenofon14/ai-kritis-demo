@@ -2071,10 +2071,32 @@ async function startGame(mode) {
   }
 }
 
+// ✅ Welcome: Α’ Φάση (προσωρινά ίδια ροή με simple — θα το κάνουμε ξεχωριστό μετά)
+document.getElementById("phaseATrialsBtn").addEventListener("click", () => {
+  // εδώ αργότερα θα ανοίξουμε “Trials Screen”
+  startGame("simple");
+});
 
-// ✅ Συνδέουμε τα κουμπιά της αρχικής
-document.getElementById("startSimpleBtn").addEventListener("click", () => startGame("simple"));
-document.getElementById("startAdvancedBtn").addEventListener("click", () => startGame("advanced"));
+// ✅ Welcome: άνοιγμα modal επιλογής έκδοσης ντιμπέητ
+document.getElementById("debateBtn").addEventListener("click", () => {
+  document.getElementById("debateModal").style.display = "flex";
+});
+
+// ✅ Επιλογές μέσα στο modal
+document.getElementById("debateSimpleBtn").addEventListener("click", () => {
+  document.getElementById("debateModal").style.display = "none";
+  startGame("simple");
+});
+
+document.getElementById("debateAdvancedBtn").addEventListener("click", () => {
+  document.getElementById("debateModal").style.display = "none";
+  startGame("advanced");
+});
+
+document.getElementById("debateCancelBtn").addEventListener("click", () => {
+  document.getElementById("debateModal").style.display = "none";
+});
+
 
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
@@ -2429,6 +2451,72 @@ async function getExampleFeedback(spokenText, trioWords) {
       
 </script>
 
+<!-- === MODAL ΕΠΙΛΟΓΗΣ ΕΚΔΟΣΗΣ ΝΤΙΜΠΕΪΤ === -->
+<div id="debateModal" style="
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:5000;
+  padding:20px;
+">
+  <div style="
+    background:#142f70;
+    border-radius:18px;
+    padding:22px;
+    width:100%;
+    max-width:420px;
+    box-shadow:0 0 30px rgba(0,0,0,0.4);
+    text-align:center;
+    color:white;
+    font-family:system-ui, Arial;
+  ">
+    <h2 style="margin:0 0 10px 0;">🔵 Ντιμπέητ</h2>
+    <p style="margin:0 0 18px 0; opacity:0.9;">Διάλεξε έκδοση</p>
+
+    <button id="debateSimpleBtn" style="
+      width:100%;
+      padding:14px;
+      border-radius:16px;
+      border:0;
+      font-size:18px;
+      margin:10px 0;
+      cursor:pointer;
+      background:white;
+      color:#0e2a66;
+      font-weight:700;
+    ">🟢 Απλή</button>
+
+    <button id="debateAdvancedBtn" style="
+      width:100%;
+      padding:14px;
+      border-radius:16px;
+      border:0;
+      font-size:18px;
+      margin:10px 0;
+      cursor:pointer;
+      background:white;
+      color:#0e2a66;
+      font-weight:700;
+    ">🔴 Προχωρημένη</button>
+
+    <button id="debateCancelBtn" style="
+      width:100%;
+      padding:12px;
+      border-radius:14px;
+      border:0;
+      font-size:16px;
+      margin-top:10px;
+      cursor:pointer;
+      background:rgba(255,255,255,0.15);
+      color:white;
+      font-weight:600;
+    ">↩︎ Πίσω</button>
+  </div>
+</div>
+  
 </body>
 </html>
 
