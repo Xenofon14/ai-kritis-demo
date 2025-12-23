@@ -2071,11 +2071,12 @@ async function startGame(mode) {
   }
 }
 
-// ✅ Welcome: Α’ Φάση (προσωρινά ίδια ροή με simple — θα το κάνουμε ξεχωριστό μετά)
 document.getElementById("phaseATrialsBtn").addEventListener("click", () => {
-  // εδώ αργότερα θα ανοίξουμε “Trials Screen”
-  startGame("simple");
+  // ✅ Α’ Φάση: Δοκιμασίες (ΔΕΝ μπαίνουμε σε ντιμπέητ)
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("trialsScreen").style.display = "flex";
 });
+  
 
 // ✅ Welcome: άνοιγμα modal επιλογής έκδοσης ντιμπέητ
 document.getElementById("debateBtn").addEventListener("click", () => {
