@@ -1,3 +1,6 @@
+console.log("✅ trialsEngine.js loaded");
+// (ό,τι είχε ήδη από κάτω)
+
 // js/trials.js
 let TRIALS = [];
 let activeTrial = null;
@@ -138,6 +141,7 @@ async function loadTrials() {
   const res = await fetch("../data/trials.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Δεν φορτώθηκε το data/trials.json");
   const data = await res.json();
+  console.log("✅ trials.json loaded:", (data?.trials?.length || 0), "trials", data);
   TRIALS = data.trials || [];
 }
 
