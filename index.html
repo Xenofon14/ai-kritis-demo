@@ -354,14 +354,73 @@ button.recording {
 <div class="button-container">
   <button id="startTrialsBtn">🟡 Α’ Φάση — Δοκιμασίες</button>
 
-  <button id="startSimpleBtn">🟢 Τελική Φάση — Απλή (Ντιμπέητ)</button>
-  <button id="startAdvancedBtn">🔴 Τελική Φάση — Προχωρημένη (Ντιμπέητ)</button>
+  <button id="startBigDiscussionBtn">🟢 Μεγάλη Συζήτηση</button>
 
   <button id="infoButton">ℹ️ Πληροφορίες</button>
 </div>
 
 </div>
 
+<!-- === Α’ ΦΑΣΗ — ΔΟΚΙΜΑΣΙΕΣ (Trials Screen - placeholder) === -->
+<div id="trialsScreen" style="
+  position:fixed;
+  inset:0;
+  background:rgba(10,20,60,0.95);
+  color:white;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  z-index:1800;
+  text-align:center;
+  padding:40px 20px 20px 20px;
+">
+  <h1 style="margin-bottom:10px;">🟡 Α’ Φάση — Δοκιμασίες</h1>
+  <p style="opacity:0.9; max-width:420px;">
+    Εδώ θα μπουν οι σελίδες των Δοκιμασιών. Προς το παρόν είναι placeholder.
+  </p>
+
+  <div style="width:100%; max-width:420px; margin-top:20px;">
+    <button class="btn-secondary" id="backToWelcomeFromTrialsBtn">⬅️ Επιστροφή</button>
+    <button class="btn-primary" id="trialsComingSoonBtn" disabled style="opacity:0.6;">
+      (Σύντομα) Επιλογή Δοκιμασίας
+    </button>
+  </div>
+</div>
+
+<!-- === ΜΕΓΑΛΗ ΣΥΖΗΤΗΣΗ — ΕΠΙΛΟΓΗ ΕΚΔΟΣΗΣ (Mode Select Screen) === -->
+<div id="modeSelectScreen" style="
+  position:fixed;
+  inset:0;
+  background:rgba(10,20,60,0.95);
+  color:white;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  z-index:1850;
+  text-align:center;
+  padding:40px 20px 20px 20px;
+">
+  <h1 style="margin-bottom:10px;">🟢 Μεγάλη Συζήτηση</h1>
+  <p style="opacity:0.9; max-width:420px;">
+    Διάλεξε έκδοση για να ξεκινήσει το ντιμπέητ.
+  </p>
+
+  <div style="width:100%; max-width:420px; margin-top:20px;">
+    <button class="btn-secondary" id="backToWelcomeFromModeBtn">⬅️ Πίσω</button>
+
+    <button id="modeSimpleBtn" class="btn-primary" style="margin-top:10px;">
+      🟢 Απλή Έκδοση (Ντιμπέητ)
+    </button>
+
+    <button id="modeAdvancedBtn" class="btn-primary" style="margin-top:10px;">
+      🔴 Προχωρημένη Έκδοση (Ντιμπέητ)
+    </button>
+  </div>
+</div>
+
+  
 <!-- === ΡΥΘΜΙΣΕΙΣ ΠΑΙΧΝΙΔΙΟΥ (Setup Screen) === -->
 <div id="setupScreen" style="
   position:fixed;
