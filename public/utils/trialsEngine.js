@@ -170,8 +170,6 @@ if (listEl) {
   if (TRIALS[0]) openTrial(TRIALS[0].id);
 }
 
-}
-
 function bindUI() {
   // κουμπί από welcome → trials
   const startTrialsBtn = $("startTrialsBtn");
