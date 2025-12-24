@@ -135,7 +135,7 @@ function showScreen(screenId) {
 }
 
 async function loadTrials() {
-  const res = await fetch("data/trials.json", { cache: "no-store" });
+  const res = await fetch("../data/trials.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Δεν φορτώθηκε το data/trials.json");
   const data = await res.json();
   TRIALS = data.trials || [];
