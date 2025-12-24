@@ -65,7 +65,7 @@ function renderTrialList() {
       list.appendChild(btn);
     });
   });
-
+}
 function openTrial(trialId) {
   activeTrial = TRIALS.find(t => t.id === trialId);
   if (!activeTrial) return;
