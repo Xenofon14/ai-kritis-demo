@@ -352,51 +352,23 @@ button.recording {
 
   <!-- === ΚΟΥΜΠΙΑ ΑΡΧΙΚΗΣ ΟΘΟΝΗΣ (Main Buttons) === -->
 <div class="button-container">
-  <button id="phaseATrialsBtn">🟡 Α’ Φάση — Δοκιμασίες</button>
-  <button id="debateBtn">🔵 Τελική Φάση — Ντιμπέητ</button>
+  <button id="startTrialsBtn">🟡 Α’ Φάση — Δοκιμασίες</button>
+
+  <button id="startSimpleBtn">🟢 Τελική Φάση — Απλή (Ντιμπέητ)</button>
+  <button id="startAdvancedBtn">🔴 Τελική Φάση — Προχωρημένη (Ντιμπέητ)</button>
+
   <button id="infoButton">ℹ️ Πληροφορίες</button>
 </div>
 
 </div>
 
-<!-- === Α’ ΦΑΣΗ (Trials Screen) — προσωρινό placeholder === -->
-<div id="trialsScreen" style="
-  position:fixed;
-  inset:0;
-  background:rgba(10,20,60,0.95);
-  color:white;
-  display:none;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  z-index:1500;
-  text-align:center;
-  padding:40px 20px;
-">
-  <h1>🟡 Α’ Φάση — Δοκιμασίες</h1>
-  <p style="opacity:0.9; max-width:360px;">
-    (Προσωρινό) Εδώ θα μπουν οι Δοκιμασίες.
-  </p>
-
-  <button id="backToWelcomeFromTrials" style="
-    margin-top:20px;
-    background:rgba(255,255,255,0.15);
-    color:white;
-    border:0;
-    border-radius:16px;
-    padding:12px 18px;
-    font-size:16px;
-    cursor:pointer;
-  ">↩︎ Πίσω</button>
-</div>
-  
 <!-- === ΡΥΘΜΙΣΕΙΣ ΠΑΙΧΝΙΔΙΟΥ (Setup Screen) === -->
 <div id="setupScreen" style="
   position:fixed;
   inset:0;
   background:rgba(10,20,60,0.95);
   color:white;
-  display:none;
+  display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2102,64 +2074,10 @@ async function startGame(mode) {
   }
 }
 
-// ✅ Welcome buttons — bind ONCE (overwrite old handlers)
-window.addEventListener("DOMContentLoaded", () => {
 
-  const phaseABtn = document.getElementById("phaseATrialsBtn");
-  const debateBtn = document.getElementById("debateBtn");
-  const infoBtn   = document.getElementById("infoButton");
-
-  if (phaseABtn) {
-    phaseABtn.onclick = () => {
-      const welcome = document.getElementById("welcomeScreen");
-      const trials  = document.getElementById("trialsScreen");
-
-      if (welcome) welcome.style.display = "none";
-
-      // 🛡️ Αν δεν υπάρχει trialsScreen, το λέμε καθαρά (και δεν “σπάμε”)
-      if (!trials) {
-        alert("⚠️ Δεν υπάρχει ακόμα οθόνη trialsScreen στο HTML. Πρέπει να την προσθέσουμε.");
-        return;
-      }
-
-      trials.style.display = "flex";
-      console.log("➡️ Άνοιξε: Α’ Φάση — Δοκιμασίες");
-    };
-  }
-
-  if (debateBtn) {
-    debateBtn.onclick = () => {
-      const modal = document.getElementById("debateModal");
-      if (modal) modal.style.display = "flex";
-      console.log("➡️ Άνοιξε: Debate modal");
-    };
-  }
-
-  if (infoBtn) {
-    infoBtn.onclick = () => {
-      alert("📜 Οδηγίες Παιχνιδιού:\n\n🟡 Α’ Φάση: Δοκιμασίες\n🔵 Τελική Φάση: Ντιμπέητ\n\nΚαλή διασκέδαση!");
-    };
-  }
-
-});
-
-  
-
-// ✅ Επιλογές μέσα στο modal
-document.getElementById("debateSimpleBtn").addEventListener("click", () => {
-  document.getElementById("debateModal").style.display = "none";
-  startGame("simple");
-});
-
-document.getElementById("debateAdvancedBtn").addEventListener("click", () => {
-  document.getElementById("debateModal").style.display = "none";
-  startGame("advanced");
-});
-
-document.getElementById("debateCancelBtn").addEventListener("click", () => {
-  document.getElementById("debateModal").style.display = "none";
-});
-
+// ✅ Συνδέουμε τα κουμπιά της αρχικής
+document.getElementById("startSimpleBtn").addEventListener("click", () => startGame("simple"));
+document.getElementById("startAdvancedBtn").addEventListener("click", () => startGame("advanced"));
 
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
@@ -2414,7 +2332,6 @@ window.addEventListener('load', () => {
 </script>
 
     <script>
-      /*
 window.addEventListener("DOMContentLoaded", () => {
   const simpleBtn = document.getElementById("startSimpleBtn");
   const advancedBtn = document.getElementById("startAdvancedBtn");
@@ -2434,7 +2351,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ Τα κουμπιά της αρχικής σελίδας ενεργοποιήθηκαν.");
 });
-*/
+
 /* ==========================================================
    🎲 ΚΟΥΜΠΙ ΠΑΡΑΔΕΙΓΜΑ + ΑΥΤΟΜΑΤΗ ΑΞΙΟΛΟΓΗΣΗ ΣΩΚΡΑΤΗ
    ========================================================== */
@@ -2515,72 +2432,7 @@ async function getExampleFeedback(spokenText, trioWords) {
       
 </script>
 
-<!-- === MODAL ΕΠΙΛΟΓΗΣ ΕΚΔΟΣΗΣ ΝΤΙΜΠΕΪΤ === -->
-<div id="debateModal" style="
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.75);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:5000;
-  padding:20px;
-">
-  <div style="
-    background:#142f70;
-    border-radius:18px;
-    padding:22px;
-    width:100%;
-    max-width:420px;
-    box-shadow:0 0 30px rgba(0,0,0,0.4);
-    text-align:center;
-    color:white;
-    font-family:system-ui, Arial;
-  ">
-    <h2 style="margin:0 0 10px 0;">🔵 Ντιμπέητ</h2>
-    <p style="margin:0 0 18px 0; opacity:0.9;">Διάλεξε έκδοση</p>
-
-    <button id="debateSimpleBtn" style="
-      width:100%;
-      padding:14px;
-      border-radius:16px;
-      border:0;
-      font-size:18px;
-      margin:10px 0;
-      cursor:pointer;
-      background:white;
-      color:#0e2a66;
-      font-weight:700;
-    ">🟢 Απλή</button>
-
-    <button id="debateAdvancedBtn" style="
-      width:100%;
-      padding:14px;
-      border-radius:16px;
-      border:0;
-      font-size:18px;
-      margin:10px 0;
-      cursor:pointer;
-      background:white;
-      color:#0e2a66;
-      font-weight:700;
-    ">🔴 Προχωρημένη</button>
-
-    <button id="debateCancelBtn" style="
-      width:100%;
-      padding:12px;
-      border-radius:14px;
-      border:0;
-      font-size:16px;
-      margin-top:10px;
-      cursor:pointer;
-      background:rgba(255,255,255,0.15);
-      color:white;
-      font-weight:600;
-    ">↩︎ Πίσω</button>
-  </div>
-</div>
-  
 </body>
 </html>
+
 
