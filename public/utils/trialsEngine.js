@@ -155,6 +155,14 @@ async function loadTrials() {
   const data = await res.json();
   console.log("✅ trials.json loaded:", (data?.trials?.length || 0), "trials", data);
   TRIALS = data.trials || [];
+
+// ✅ Αν υπάρχει UI στη σελίδα, γέμισέ το αμέσως
+const listEl = document.getElementById("trialsList");
+if (listEl) {
+  renderTrialList();
+  if (TRIALS[0]) openTrial(TRIALS[0].id);
+}
+
 }
 
 function bindUI() {
