@@ -2133,10 +2133,63 @@ async function startGame(mode) {
   }
 }
 
+// ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή)
+const startTrialsBtn = document.getElementById("startTrialsBtn");
+const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 
-// ✅ Συνδέουμε τα κουμπιά της αρχικής
-document.getElementById("startSimpleBtn").addEventListener("click", () => startGame("simple"));
-document.getElementById("startAdvancedBtn").addEventListener("click", () => startGame("advanced"));
+const trialsScreen = document.getElementById("trialsScreen");
+const modeSelectScreen = document.getElementById("modeSelectScreen");
+
+const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
+const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
+
+const modeSimpleBtn = document.getElementById("modeSimpleBtn");
+const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
+
+// 1) 🟡 Α’ Φάση — Δοκιμασίες
+if (startTrialsBtn) {
+  startTrialsBtn.addEventListener("click", () => {
+    document.getElementById("welcomeScreen").style.display = "none";
+    if (trialsScreen) trialsScreen.style.display = "flex";
+  });
+}
+
+if (backToWelcomeFromTrialsBtn) {
+  backToWelcomeFromTrialsBtn.addEventListener("click", () => {
+    if (trialsScreen) trialsScreen.style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
+  });
+}
+
+// 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
+if (startBigDiscussionBtn) {
+  startBigDiscussionBtn.addEventListener("click", () => {
+    document.getElementById("welcomeScreen").style.display = "none";
+    if (modeSelectScreen) modeSelectScreen.style.display = "flex";
+  });
+}
+
+if (backToWelcomeFromModeBtn) {
+  backToWelcomeFromModeBtn.addEventListener("click", () => {
+    if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
+  });
+}
+
+// Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
+if (modeSimpleBtn) {
+  modeSimpleBtn.addEventListener("click", () => {
+    if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    startGame("simple");
+  });
+}
+
+if (modeAdvancedBtn) {
+  modeAdvancedBtn.addEventListener("click", () => {
+    if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    startGame("advanced");
+  });
+}
 
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
