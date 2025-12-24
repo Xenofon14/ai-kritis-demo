@@ -2445,23 +2445,15 @@ window.addEventListener('load', () => {
 
     <script>
 window.addEventListener("DOMContentLoaded", () => {
-  const simpleBtn = document.getElementById("startSimpleBtn");
-  const advancedBtn = document.getElementById("startAdvancedBtn");
   const infoBtn = document.getElementById("infoButton");
 
-  if (simpleBtn) {
-    simpleBtn.addEventListener("click", () => startGame("simple"));
-  }
-  if (advancedBtn) {
-    advancedBtn.addEventListener("click", () => startGame("advanced"));
-  }
   if (infoBtn) {
     infoBtn.addEventListener("click", () => {
       alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
     });
   }
 
-  console.log("✅ Τα κουμπιά της αρχικής σελίδας ενεργοποιήθηκαν.");
+  console.log("✅ Info button ενεργοποιήθηκε.");
 });
 
 /* ==========================================================
