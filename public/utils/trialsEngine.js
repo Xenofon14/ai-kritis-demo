@@ -239,8 +239,6 @@ function bindUI() {
 window.addEventListener("DOMContentLoaded", async () => {
   bindUI();
 
-  // ✅ Αν υπάρχει το trials UI στη σελίδα, γέμισε τη λίστα αμέσως
-  // (ώστε να δουλεύει όταν μπαίνεις στην Α’ Φάση από οποιοδήποτε κουμπί)
   try {
     const listEl = document.getElementById("trialsList");
     if (listEl) {
