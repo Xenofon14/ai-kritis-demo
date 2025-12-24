@@ -2071,17 +2071,48 @@ async function startGame(mode) {
   }
 }
 
-document.getElementById("phaseATrialsBtn").addEventListener("click", () => {
-  // ✅ Α’ Φάση: Δοκιμασίες (ΔΕΝ μπαίνουμε σε ντιμπέητ)
-  document.getElementById("welcomeScreen").style.display = "none";
-  document.getElementById("trialsScreen").style.display = "flex";
-});
-  
+// ✅ Welcome buttons — bind ONCE (overwrite old handlers)
+window.addEventListener("DOMContentLoaded", () => {
 
-// ✅ Welcome: άνοιγμα modal επιλογής έκδοσης ντιμπέητ
-document.getElementById("debateBtn").addEventListener("click", () => {
-  document.getElementById("debateModal").style.display = "flex";
+  const phaseABtn = document.getElementById("phaseATrialsBtn");
+  const debateBtn = document.getElementById("debateBtn");
+  const infoBtn   = document.getElementById("infoButton");
+
+  if (phaseABtn) {
+    phaseABtn.onclick = () => {
+      const welcome = document.getElementById("welcomeScreen");
+      const trials  = document.getElementById("trialsScreen");
+
+      if (welcome) welcome.style.display = "none";
+
+      // 🛡️ Αν δεν υπάρχει trialsScreen, το λέμε καθαρά (και δεν “σπάμε”)
+      if (!trials) {
+        alert("⚠️ Δεν υπάρχει ακόμα οθόνη trialsScreen στο HTML. Πρέπει να την προσθέσουμε.");
+        return;
+      }
+
+      trials.style.display = "flex";
+      console.log("➡️ Άνοιξε: Α’ Φάση — Δοκιμασίες");
+    };
+  }
+
+  if (debateBtn) {
+    debateBtn.onclick = () => {
+      const modal = document.getElementById("debateModal");
+      if (modal) modal.style.display = "flex";
+      console.log("➡️ Άνοιξε: Debate modal");
+    };
+  }
+
+  if (infoBtn) {
+    infoBtn.onclick = () => {
+      alert("📜 Οδηγίες Παιχνιδιού:\n\n🟡 Α’ Φάση: Δοκιμασίες\n🔵 Τελική Φάση: Ντιμπέητ\n\nΚαλή διασκέδαση!");
+    };
+  }
+
 });
+
+  
 
 // ✅ Επιλογές μέσα στο modal
 document.getElementById("debateSimpleBtn").addEventListener("click", () => {
@@ -2352,6 +2383,7 @@ window.addEventListener('load', () => {
 </script>
 
     <script>
+      /*
 window.addEventListener("DOMContentLoaded", () => {
   const simpleBtn = document.getElementById("startSimpleBtn");
   const advancedBtn = document.getElementById("startAdvancedBtn");
@@ -2371,7 +2403,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
   console.log("✅ Τα κουμπιά της αρχικής σελίδας ενεργοποιήθηκαν.");
 });
-
+*/
 /* ==========================================================
    🎲 ΚΟΥΜΠΙ ΠΑΡΑΔΕΙΓΜΑ + ΑΥΤΟΜΑΤΗ ΑΞΙΟΛΟΓΗΣΗ ΣΩΚΡΑΤΗ
    ========================================================== */
