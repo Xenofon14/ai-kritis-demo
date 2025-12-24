@@ -138,7 +138,7 @@ function showScreen(screenId) {
 }
 
 async function loadTrials() {
-  const res = await fetch("../data/trials.json", { cache: "no-store" });
+  const res = await fetch("/data/trials.json", { cache: "no-store" });
   if (!res.ok) throw new Error("Δεν φορτώθηκε το data/trials.json");
   const data = await res.json();
   console.log("✅ trials.json loaded:", (data?.trials?.length || 0), "trials", data);
@@ -211,6 +211,19 @@ function bindUI() {
   }
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   bindUI();
+
+  // ✅ Αν υπάρχει το trials UI στη σελίδα, γέμισε τη λίστα αμέσως
+  // (ώστε να δουλεύει όταν μπαίνεις στην Α’ Φάση από οποιοδήποτε κουμπί)
+  try {
+    const listEl = document.getElementById("trialsList");
+    if (listEl) {
+      await loadTrials();
+      renderTrialList();
+      if (TRIALS[0]) openTrial(TRIALS[0].id);
+    }
+  } catch (e) {
+    console.error(e);
+  }
 });
