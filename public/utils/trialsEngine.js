@@ -151,10 +151,19 @@ function showScreen(screenId) {
 
 async function loadTrials() {
   const res = await fetch("/data/trials.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Δεν φορτώθηκε το data/trials.json");
+  if (!res.ok) throw new Error("Δεν φορτώθηκε το trials.json");
   const data = await res.json();
-  console.log("✅ trials.json loaded:", (data?.trials?.length || 0), "trials", data);
+
   TRIALS = data.trials || [];
+  console.log("✅ trials.json loaded:", TRIALS.length, "trials", data);
+
+  // ✅ Αν υπάρχει UI για trials στη σελίδα, γέμισε τη λίστα άμεσα
+  const listEl = document.getElementById("trialsList");
+  if (listEl) {
+    renderTrialList();
+    if (TRIALS[0]) openTrial(TRIALS[0].id);
+  }
+}
 
 // ✅ Αν υπάρχει UI στη σελίδα, γέμισέ το αμέσως
 const listEl = document.getElementById("trialsList");
