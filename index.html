@@ -420,7 +420,64 @@ button.recording {
   </div>
 </div>
 
-  
+<!-- === ΟΘΟΝΗ ΔΟΚΙΜΑΣΙΩΝ (Trials Screen) === -->
+<div id="trialsScreen" style="
+  position:fixed;
+  inset:0;
+  background:linear-gradient(180deg,#102a6d,#173b88);
+  color:white;
+  display:none;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-start;
+  padding:30px 20px 20px 20px;
+  text-align:center;
+  z-index:1900;
+  overflow-y:auto;
+">
+
+  <div style="width:100%; max-width:520px;">
+    <h1 style="margin:0 0 10px 0;">🟡 Α’ Φάση — Δοκιμασίες</h1>
+    <p style="opacity:0.85; margin:0 0 16px 0;">
+      Διάλεξε δοκιμασία, διάβασε οδηγίες και ξεκίνα χρονόμετρο.
+    </p>
+
+    <button id="trialsBackBtn" class="btn-secondary" style="margin-bottom:12px;">
+      ⟵ Πίσω στην Αρχική
+    </button>
+
+    <div id="trialsList" class="panel" style="text-align:left;"></div>
+
+    <div id="trialDetails" class="panel" style="display:none; text-align:left; margin-top:14px;">
+      <div style="font-weight:800; font-size:18px;" id="trialTitle">—</div>
+      <div style="opacity:0.9; margin-top:6px;" id="trialMeta">—</div>
+
+      <div style="margin-top:10px; opacity:0.9;" id="trialIntro">—</div>
+      <div style="margin-top:10px;" id="trialInstructions">—</div>
+
+      <div id="trialOptions"></div>
+      <div id="trialRules"></div>
+
+      <div style="margin-top:10px;">
+        <div style="font-weight:700;">Συνθήκη επιτυχίας:</div>
+        <div style="opacity:0.9;" id="trialSuccess">—</div>
+      </div>
+
+      <div class="panel" style="margin-top:12px; text-align:center;">
+        ⏳ Χρόνος: <span id="trialTimer">0:00</span>
+        <div class="row" style="margin-top:10px;">
+          <button id="trialStartBtn" class="btn-primary">▶️ Έναρξη</button>
+          <button id="trialStopBtn" class="btn-secondary">⏹️ Reset</button>
+        </div>
+        <div class="row" style="margin-top:10px;">
+          <button id="trialSuccessBtn" class="btn-secondary">✅ Επιτυχία</button>
+          <button id="trialFailBtn" class="btn-secondary">❌ Αποτυχία</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- === ΡΥΘΜΙΣΕΙΣ ΠΑΙΧΝΙΔΙΟΥ (Setup Screen) === -->
 <div id="setupScreen" style="
   position:fixed;
