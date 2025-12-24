@@ -146,7 +146,6 @@ function showScreen(screenId) {
       .catch(console.error);
   }
 }
-}
 
 async function loadTrials() {
   const res = await fetch("/data/trials.json", { cache: "no-store" });
