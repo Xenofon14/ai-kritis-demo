@@ -134,7 +134,19 @@ function showScreen(screenId) {
   const trials = $("trialsScreen");
 
   if (welcome) welcome.style.display = (screenId === "welcome") ? "flex" : "none";
-  if (trials) trials.style.display = (screenId === "trials") ? "flex" : "none";
+ if (trials) {
+  trials.style.display = (screenId === "trials") ? "flex" : "none";
+
+  // ✅ μόλις ανοίξει η Α’ Φάση, φόρτωσε τις δοκιμασίες
+  if (screenId === "trials" && !TRIALS.length) {
+    loadTrials()
+      .then(() => {
+        renderTrialList();
+        if (TRIALS[0]) openTrial(TRIALS[0].id);
+      })
+      .catch(console.error);
+  }
+}
 }
 
 async function loadTrials() {
