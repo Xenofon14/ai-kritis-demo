@@ -1,7 +1,6 @@
+// utils/trialsEngine.js
 console.log("✅ trialsEngine.js loaded");
-// (ό,τι είχε ήδη από κάτω)
 
-// js/trials.js
 let TRIALS = [];
 let activeTrial = null;
 
@@ -17,31 +16,68 @@ function formatTime(sec) {
 }
 
 function stopTimer() {
-  clearInterval(timerInterval);
+  if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
 }
 
 function startTimer(seconds) {
   stopTimer();
-  remaining = seconds;
-  $("trialTimer").textContent = formatTime(remaining);
+  remaining = Number(seconds || 0);
+  const el = $("trialTimer");
+  if (el) el.textContent = formatTime(remaining);
 
   timerInterval = setInterval(() => {
     remaining -= 1;
-    $("trialTimer").textContent = formatTime(Math.max(0, remaining));
+    if (el) el.textContent = formatTime(Math.max(0, remaining));
 
     if (remaining <= 0) {
       stopTimer();
-      $("trialTimer").textContent = "⏰ Τέλος!";
+      if (el) el.textContent = "⏰ Τέλος!";
     }
   }, 1000);
 }
 
+async function loadTrials() {
+  const res = await fetch("/data/trials.json", { cache: "no-store" });
+  if (!res.ok) throw new Error("Δεν φορτώθηκε το /data/trials.json");
+  const data = await res.json();
+  TRIALS = Array.isArray(data?.trials) ? data.trials : [];
+  console.log("✅ trials.json loaded:", TRIALS.length, "trials", data);
+}
+
+/* ----------------- RENDER: είτε dropdown είτε list ----------------- */
+
+function renderTrialsSelect() {
+  const sel = $("trialSelect"); // αν υπάρχει dropdown UI
+  if (!sel) return false;
+
+  sel.innerHTML = "";
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "— Διάλεξε Δοκιμασία —";
+  sel.appendChild(placeholder);
+
+  TRIALS.forEach(t => {
+    const opt = document.createElement("option");
+    opt.value = t.id;
+    opt.textContent = t.title;
+    sel.appendChild(opt);
+  });
+
+  sel.addEventListener("change", (e) => {
+    const id = e.target.value;
+    if (id) openTrial(id);
+  });
+
+  return true;
+}
+
 function renderTrialList() {
-  const list = $("trialsList");
+  const list = $("trialsList"); // αν υπάρχει list UI
+  if (!list) return false;
+
   list.innerHTML = "";
 
-  // ομαδοποίηση ανά category
   const groups = TRIALS.reduce((acc, t) => {
     acc[t.category] = acc[t.category] || [];
     acc[t.category].push(t);
@@ -60,193 +96,123 @@ function renderTrialList() {
       const btn = document.createElement("button");
       btn.className = "btn-secondary";
       btn.style.marginTop = "8px";
-      btn.textContent = `${t.title}`;
+      btn.textContent = t.title;
       btn.addEventListener("click", () => openTrial(t.id));
       list.appendChild(btn);
     });
   });
+
+  return true;
 }
+
 function openTrial(trialId) {
   activeTrial = TRIALS.find(t => t.id === trialId);
   if (!activeTrial) return;
 
-  $("trialTitle").textContent = activeTrial.title;
-  $("trialIntro").textContent = activeTrial.intro;
-  $("trialInstructions").textContent = activeTrial.instructions;
-  $("trialMeta").textContent = `Φιλόσοφος: ${activeTrial.philosopher} • Χρόνος: ${formatTime(activeTrial.timeSec)}`;
+  if ($("trialTitle")) $("trialTitle").textContent = activeTrial.title || "—";
+  if ($("trialIntro")) $("trialIntro").textContent = activeTrial.intro || "—";
+  if ($("trialInstructions")) $("trialInstructions").textContent = activeTrial.instructions || "—";
+
+  if ($("trialMeta")) {
+    $("trialMeta").textContent =
+      `Φιλόσοφος: ${activeTrial.philosopher || "—"} • Χρόνος: ${formatTime(activeTrial.timeSec || 0)}`;
+  }
 
   // options
   const optBox = $("trialOptions");
-  optBox.innerHTML = "";
-  if (activeTrial.options && activeTrial.options.length) {
-    const p = document.createElement("div");
-    p.style.marginTop = "10px";
-    p.style.fontWeight = "700";
-    p.textContent = "Επιλογές:";
-    optBox.appendChild(p);
+  if (optBox) {
+    optBox.innerHTML = "";
+    if (Array.isArray(activeTrial.options) && activeTrial.options.length) {
+      const p = document.createElement("div");
+      p.style.marginTop = "10px";
+      p.style.fontWeight = "700";
+      p.textContent = "Επιλογές:";
+      optBox.appendChild(p);
 
-    activeTrial.options.forEach(o => {
-      const chip = document.createElement("div");
-      chip.style.display = "inline-block";
-      chip.style.padding = "6px 10px";
-      chip.style.margin = "6px 6px 0 0";
-      chip.style.borderRadius = "999px";
-      chip.style.background = "rgba(255,255,255,0.12)";
-      chip.textContent = o;
-      optBox.appendChild(chip);
-    });
+      activeTrial.options.forEach(o => {
+        const chip = document.createElement("div");
+        chip.style.display = "inline-block";
+        chip.style.padding = "6px 10px";
+        chip.style.margin = "6px 6px 0 0";
+        chip.style.borderRadius = "999px";
+        chip.style.background = "rgba(255,255,255,0.12)";
+        chip.textContent = o;
+        optBox.appendChild(chip);
+      });
+    }
   }
 
   // rules
   const rulesBox = $("trialRules");
-  rulesBox.innerHTML = "";
-  if (activeTrial.rules && activeTrial.rules.length) {
-    const p = document.createElement("div");
-    p.style.marginTop = "10px";
-    p.style.fontWeight = "700";
-    p.textContent = "Κανόνες:";
-    rulesBox.appendChild(p);
+  if (rulesBox) {
+    rulesBox.innerHTML = "";
+    if (Array.isArray(activeTrial.rules) && activeTrial.rules.length) {
+      const p = document.createElement("div");
+      p.style.marginTop = "10px";
+      p.style.fontWeight = "700";
+      p.textContent = "Κανόνες:";
+      rulesBox.appendChild(p);
 
-    const ul = document.createElement("ul");
-    ul.style.textAlign = "left";
-    ul.style.margin = "6px 0 0 18px";
-    activeTrial.rules.forEach(r => {
-      const li = document.createElement("li");
-      li.textContent = r;
-      ul.appendChild(li);
-    });
-    rulesBox.appendChild(ul);
+      const ul = document.createElement("ul");
+      ul.style.textAlign = "left";
+      ul.style.margin = "6px 0 0 18px";
+      activeTrial.rules.forEach(r => {
+        const li = document.createElement("li");
+        li.textContent = r;
+        ul.appendChild(li);
+      });
+      rulesBox.appendChild(ul);
+    }
   }
 
-  $("trialSuccess").textContent = activeTrial.success || "—";
-  $("trialTimer").textContent = formatTime(activeTrial.timeSec);
+  if ($("trialSuccess")) $("trialSuccess").textContent = activeTrial.success || "—";
+  if ($("trialTimer")) $("trialTimer").textContent = formatTime(activeTrial.timeSec || 0);
 
-  // show details panel
-  $("trialDetails").style.display = "block";
+  const details = $("trialDetails");
+  if (details) details.style.display = "block";
+
   stopTimer();
 }
 
-function showScreen(screenId) {
-  // κρύβουμε/δείχνουμε μόνο τα trials/welcome για τώρα
-  // (δεν πειράζουμε το setup/app — τα έχεις ήδη)
-  const welcome = $("welcomeScreen");
-  const trials = $("trialsScreen");
-
-  if (welcome) welcome.style.display = (screenId === "welcome") ? "flex" : "none";
- if (trials) {
-  trials.style.display = (screenId === "trials") ? "flex" : "none";
-
-  // ✅ μόλις ανοίξει η Α’ Φάση, φόρτωσε τις δοκιμασίες
-  if (screenId === "trials" && !TRIALS.length) {
-    loadTrials()
-      .then(() => {
-        renderTrialList();
-        if (TRIALS[0]) openTrial(TRIALS[0].id);
-      })
-      .catch(console.error);
-  }
-}
-
-async function loadTrials() {
-  const res = await fetch("/data/trials.json", { cache: "no-store" });
-  if (!res.ok) throw new Error("Δεν φορτώθηκε το trials.json");
-  const data = await res.json();
-
-  TRIALS = data.trials || [];
-  console.log("✅ trials.json loaded:", TRIALS.length, "trials", data);
-
-  // ✅ Αν υπάρχει UI για trials στη σελίδα, γέμισε τη λίστα άμεσα
-  const listEl = document.getElementById("trialsList");
-  if (listEl) {
-    renderTrialList();
-    if (TRIALS[0]) openTrial(TRIALS[0].id);
-  }
-}
-
-// ✅ Αν υπάρχει UI στη σελίδα, γέμισέ το αμέσως
-const listEl = document.getElementById("trialsList");
-if (listEl) {
-  renderTrialList();
-  if (TRIALS[0]) openTrial(TRIALS[0].id);
-}
-
-function bindUI() {
-  // κουμπί από welcome → trials
-  const startTrialsBtn = $("startTrialsBtn");
-  if (startTrialsBtn && !startTrialsBtn.dataset.bound) {
-    startTrialsBtn.addEventListener("click", async () => {
-      showScreen("trials");
-      // lazy-load
-      if (!TRIALS.length) {
-        try {
-          await loadTrials();
-          renderTrialList();
-          // ανοίγουμε την πρώτη δοκιμασία για ευκολία
-          if (TRIALS[0]) openTrial(TRIALS[0].id);
-        } catch (e) {
-          alert("⚠️ Δεν μπόρεσα να φορτώσω τις Δοκιμασίες.");
-          console.error(e);
-        }
-      }
-    });
-    startTrialsBtn.dataset.bound = "true";
-  }
-
-  // πίσω
-  const backBtn = $("trialsBackBtn");
-  if (backBtn && !backBtn.dataset.bound) {
-    backBtn.addEventListener("click", () => {
-      stopTimer();
-      showScreen("welcome");
-    });
-    backBtn.dataset.bound = "true";
-  }
-
-  // start timer
+function bindTrialsButtons() {
   const goBtn = $("trialStartBtn");
   if (goBtn && !goBtn.dataset.bound) {
     goBtn.addEventListener("click", () => {
       if (!activeTrial) return;
-      startTimer(activeTrial.timeSec);
+      startTimer(activeTrial.timeSec || 0);
     });
     goBtn.dataset.bound = "true";
   }
 
-  // stop timer
   const stopBtn = $("trialStopBtn");
   if (stopBtn && !stopBtn.dataset.bound) {
     stopBtn.addEventListener("click", () => {
       stopTimer();
-      if (activeTrial) $("trialTimer").textContent = formatTime(activeTrial.timeSec);
+      if (activeTrial && $("trialTimer")) $("trialTimer").textContent = formatTime(activeTrial.timeSec || 0);
     });
     stopBtn.dataset.bound = "true";
   }
+}
 
-  // success/fail (προς το παρόν απλά feedback)
-  const okBtn = $("trialSuccessBtn");
-  const noBtn = $("trialFailBtn");
+async function initTrialsUI() {
+  // αν δεν υπάρχει κανένα trials στοιχείο στη σελίδα, μην κάνεις τίποτα
+  const hasAny =
+    $("trialsList") || $("trialSelect") || $("trialTitle") || $("trialTimer") || $("trialStartBtn");
+  if (!hasAny) return;
 
-  if (okBtn && !okBtn.dataset.bound) {
-    okBtn.addEventListener("click", () => alert("✅ Καταγράφηκε: Επιτυχία (προσωρινά)."));
-    okBtn.dataset.bound = "true";
-  }
-  if (noBtn && !noBtn.dataset.bound) {
-    noBtn.addEventListener("click", () => alert("❌ Καταγράφηκε: Αποτυχία (προσωρινά)."));
-    noBtn.dataset.bound = "true";
+  await loadTrials();
+
+  const rendered = renderTrialsSelect() || renderTrialList();
+  bindTrialsButtons();
+
+  // άνοιξε την πρώτη δοκιμασία για να μη φαίνεται "άδειο"
+  if (rendered && TRIALS[0]) {
+    openTrial(TRIALS[0].id);
+    const sel = $("trialSelect");
+    if (sel) sel.value = TRIALS[0].id;
   }
 }
 
-window.addEventListener("DOMContentLoaded", async () => {
-  bindUI();
-
-  try {
-    const listEl = document.getElementById("trialsList");
-    if (listEl) {
-      await loadTrials();
-      renderTrialList();
-      if (TRIALS[0]) openTrial(TRIALS[0].id);
-    }
-  } catch (e) {
-    console.error(e);
-  }
+window.addEventListener("DOMContentLoaded", () => {
+  initTrialsUI().catch(err => console.error("⚠️ Trials init error:", err));
 });
