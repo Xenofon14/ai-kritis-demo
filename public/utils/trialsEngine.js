@@ -7,6 +7,10 @@ let activeTrial = null;
 let timerInterval = null;
 let remaining = 0;
 
+// 🔔 Global chime (preloaded)
+const CHIME = new Audio("/sounds/philosophical_chime.mp3");
+CHIME.preload = "auto";
+
 function $(id) { return document.getElementById(id); }
 
 function formatTime(sec) {
@@ -19,6 +23,45 @@ function stopTimer() {
   if (timerInterval) clearInterval(timerInterval);
   timerInterval = null;
 }
+
+// ✅ unlock με user gesture (στο κλικ)
+function unlockChimeOnce() {
+  if (CHIME.dataset.unlocked === "true") return;
+
+  const oldVol = CHIME.volume;
+  CHIME.volume = 0;
+
+  const p = CHIME.play();
+  if (p && typeof p.then === "function") {
+    p.then(() => {
+      CHIME.pause();
+      CHIME.currentTime = 0;
+      CHIME.volume = oldVol;
+      CHIME.dataset.unlocked = "true";
+      console.log("🔓 Chime unlocked");
+    }).catch((err) => {
+      CHIME.volume = oldVol;
+      console.warn("🔇 Unlock failed:", err);
+    });
+  } else {
+    // fallback (σπάνιο)
+    CHIME.volume = oldVol;
+    CHIME.dataset.unlocked = "true";
+  }
+}
+
+function playChime() {
+  try {
+    CHIME.currentTime = 0;
+    const p = CHIME.play();
+    if (p && typeof p.catch === "function") {
+      p.catch((err) => console.warn("🔇 Chime play blocked/failed:", err));
+    }
+  } catch (err) {
+    console.warn("🔇 Chime play threw:", err);
+  }
+}
+
 
 function startTimer(seconds) {
   stopTimer();
