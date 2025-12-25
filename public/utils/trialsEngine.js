@@ -62,7 +62,6 @@ function playChime() {
   }
 }
 
-
 function startTimer(seconds) {
   stopTimer();
   remaining = Number(seconds || 0);
@@ -71,21 +70,14 @@ function startTimer(seconds) {
 
   timerInterval = setInterval(() => {
     remaining -= 1;
+
     if (el) el.textContent = formatTime(Math.max(0, remaining));
 
-if (remaining <= 0) {
-  console.log("🔔 TIMER END reached, remaining:", remaining);
-  stopTimer();
-  if (el) el.textContent = "⏰ Τέλος!";
-  console.log("🔔 About to play chime...");
-}
-    
-  // 🔔 Ήχος λήξης
-  const chime = new Audio("/sounds/philosophical_chime.mp3"); // ✅ με αρχικό /
-  chime.currentTime = 0;
-  chime.play().catch((err) => console.warn("🔇 Chime play blocked/failed:", err));
-}
- 
+    if (remaining <= 0) {
+      stopTimer();
+      if (el) el.textContent = "⏰ Τέλος!";
+      playChime(); // 🔔 παίζει ο ήχος λήξης ΜΙΑ φορά
+    }
   }, 1000);
 }
 
