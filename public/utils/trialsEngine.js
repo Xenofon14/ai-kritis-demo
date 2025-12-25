@@ -65,6 +65,7 @@ function playChime() {
 function startTimer(seconds) {
   stopTimer();
   remaining = Number(seconds || 0);
+
   const el = $("trialTimer");
   if (el) el.textContent = formatTime(remaining);
 
@@ -76,7 +77,7 @@ function startTimer(seconds) {
     if (remaining <= 0) {
       stopTimer();
       if (el) el.textContent = "⏰ Τέλος!";
-      playChime(); // 🔔 παίζει ο ήχος λήξης ΜΙΑ φορά
+      playChime(); // 🔔 ΜΙΑ φορά στο τέλος
     }
   }, 1000);
 }
@@ -222,9 +223,9 @@ function bindTrialsButtons() {
 
   const startBtn = $("trialStartBtn");
   if (startBtn && !startBtn.dataset.bound) {
-  startBtn.addEventListener("click", () => {
+ startBtn.addEventListener("click", () => {
   if (!activeTrial) return;
-  unlockChimeOnce(); // 🔓 ξεκλειδώνει ήχο με user gesture
+  unlockChimeOnce();            // 🔓 ξεκλείδωμα autoplay
   startTimer(activeTrial.timeSec || 0);
 });
 
