@@ -35,8 +35,9 @@ function startTimer(seconds) {
   if (el) el.textContent = "⏰ Τέλος!";
 
   // 🔔 Ήχος λήξης
-  const chime = new Audio("sounds/philosophical_chime.mp3");
-  chime.play();
+  const chime = new Audio("/sounds/philosophical_chime.mp3"); // ✅ με αρχικό /
+  chime.currentTime = 0;
+  chime.play().catch((err) => console.warn("🔇 Chime play blocked/failed:", err));
 }
  
   }, 1000);
