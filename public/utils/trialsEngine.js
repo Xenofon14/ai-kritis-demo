@@ -30,10 +30,15 @@ function startTimer(seconds) {
     remaining -= 1;
     if (el) el.textContent = formatTime(Math.max(0, remaining));
 
-    if (remaining <= 0) {
-      stopTimer();
-      if (el) el.textContent = "⏰ Τέλος!";
-    }
+   if (remaining <= 0) {
+  stopTimer();
+  if (el) el.textContent = "⏰ Τέλος!";
+
+  // 🔔 Ήχος λήξης
+  const chime = new Audio("sounds/philosophical_chime.mp3");
+  chime.play();
+}
+ 
   }, 1000);
 }
 
