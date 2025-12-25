@@ -175,22 +175,36 @@ function openTrial(trialId) {
 }
 
 function bindTrialsButtons() {
-  const goBtn = $("trialStartBtn");
-  if (goBtn && !goBtn.dataset.bound) {
-    goBtn.addEventListener("click", () => {
+
+  const startBtn = $("trialStartBtn");
+  if (startBtn && !startBtn.dataset.bound) {
+    startBtn.addEventListener("click", () => {
       if (!activeTrial) return;
       startTimer(activeTrial.timeSec || 0);
     });
-    goBtn.dataset.bound = "true";
+    startBtn.dataset.bound = "true";
   }
 
-  const stopBtn = $("trialStopBtn");
-  if (stopBtn && !stopBtn.dataset.bound) {
-    stopBtn.addEventListener("click", () => {
+  const successBtn = $("trialSuccessBtn");
+  if (successBtn && !successBtn.dataset.bound) {
+    successBtn.addEventListener("click", () => {
       stopTimer();
-      if (activeTrial && $("trialTimer")) $("trialTimer").textContent = formatTime(activeTrial.timeSec || 0);
+      alert("✅ Επιτυχία!");
+      const details = $("trialDetails");
+      if (details) details.style.display = "none";
     });
-    stopBtn.dataset.bound = "true";
+    successBtn.dataset.bound = "true";
+  }
+
+  const failBtn = $("trialFailBtn");
+  if (failBtn && !failBtn.dataset.bound) {
+    failBtn.addEventListener("click", () => {
+      stopTimer();
+      alert("❌ Αποτυχία!");
+      const details = $("trialDetails");
+      if (details) details.style.display = "none";
+    });
+    failBtn.dataset.bound = "true";
   }
 }
 
