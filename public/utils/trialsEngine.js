@@ -222,10 +222,12 @@ function bindTrialsButtons() {
 
   const startBtn = $("trialStartBtn");
   if (startBtn && !startBtn.dataset.bound) {
-    startBtn.addEventListener("click", () => {
-      if (!activeTrial) return;
-      startTimer(activeTrial.timeSec || 0);
-    });
+  startBtn.addEventListener("click", () => {
+  if (!activeTrial) return;
+  unlockChimeOnce(); // 🔓 ξεκλειδώνει ήχο με user gesture
+  startTimer(activeTrial.timeSec || 0);
+});
+
     startBtn.dataset.bound = "true";
   }
 
