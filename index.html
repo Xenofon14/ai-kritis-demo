@@ -1593,7 +1593,7 @@ const memory = playerPositions[activePlayer] || {};
 // ✅ Δημιουργία δυναμικού prompt βάσει rubricWeights.json
 const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
 const rubricText = active.map(c =>
-  `- ${c.key} (max ${c.max}${c.bonus ? " +1 μπόνους" : ""})`
+  `- ${c.key} (μέγιστο ${c.max})`
 ).join("\n");
 
 const prompt = `
