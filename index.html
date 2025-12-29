@@ -1775,20 +1775,7 @@ async function getManualScore() {
         total += val;
       });
 
-      // Bonus για Εικόνα/Μεταφορά (αν υπάρχει checkbox και είναι τσεκαρισμένο)
-      let bonus = 0;
-      if (hasImageMeta) {
-        const bonusEl = document.getElementById("bonus_image_meta");
-        if (bonusEl && bonusEl.checked) {
-          bonus = 1; // μόνο +1
-          scores["Μπόνους Εικόνας/Μεταφοράς"] = 1;
-        } else {
-          scores["Μπόνους Εικόνας/Μεταφοράς"] = 0;
-        }
-      }
-
-      total += bonus;
-
+      
       modal.style.display = "none";
       resolve({
         criteria: scores,          // π.χ. { Θέση: 3, Επιχειρηματολογία: 5, ... }
