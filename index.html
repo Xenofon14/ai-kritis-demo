@@ -1225,7 +1225,7 @@ function showResultsSummary() {
     const arr = game.scores[p.name] || [];
     const validNumbers = arr.filter(n => typeof n === "number" && !isNaN(n));
 
-    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}/8`);
+    const roundScores = validNumbers.map((n, i) => `Γύρος ${i + 1}: ${n}`);
     const sum = validNumbers.reduce((a, b) => a + b, 0);
 
     totalScores[p.name] = sum;
