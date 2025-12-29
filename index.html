@@ -1757,10 +1757,8 @@ async function getManualScore() {
   const modal = document.getElementById("manualModal");
   modal.style.display = "flex";
 
-  // 4) Υπολογισμός out_of (περιλαμβάνει +1 στο μέγιστο όταν υπάρχει διαθέσιμο bonus)
-  const baseMax = active.reduce((s, c) => s + c.max, 0);
-  const hasImageMeta = active.some(c => c.key === "Εικόνα / Μεταφορά" && c.bonus);
-  const outOf = baseMax + (hasImageMeta ? 1 : 0);
+ // 4) Υπολογισμός out_of (ΧΩΡΙΣ bonus)
+const outOf = active.reduce((s, c) => s + c.max, 0);
 
   // 5) Υποβολή / Ακύρωση
   return new Promise(resolve => {
@@ -1940,7 +1938,7 @@ document.getElementById("totalScore").textContent = `${total}/${out_of}`;
     if (!game.completedRounds[currentPlayer]) game.completedRounds[currentPlayer] = [];
     game.completedRounds[currentPlayer].push(game.currentRound);
 
-   console.log(`✅ Βαθμολογία ${currentPlayer}: ${totalNum}/8`);
+   console.log(`✅ Βαθμολογία ${currentPlayer}: ${totalNum}/${out_of}`);
 
   } catch (err) {
     console.error("❌ Σφάλμα στη βαθμολόγηση:", err);
