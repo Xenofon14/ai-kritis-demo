@@ -109,10 +109,9 @@ export default async function handler(req, res) {
     );
 
     // Δημιουργία περιγραφικού κειμένου rubric για το prompt
-    const rubricText = activeCriteria.map(c => {
-      const bonusText = c.bonus ? " (+1 μπόνους)" : "";
-      return `- ${c.key}: 0–${c.max}${bonusText}`;
-    }).join("\n");
+   const rubricText = activeCriteria
+  .map(c => `- ${c.key}: 0–${c.max}`)
+  .join("\n");
 
     // --- Prompt προς το μοντέλο ---
     const completion = await client.responses.create({
