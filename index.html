@@ -912,18 +912,6 @@ function getActiveManualCriteria(gameMode, currentRound) {
   });
 }
 
-
-function getActiveManualCriteria(gameMode, currentRound) {
-  const isFirstRound = currentRound === 1;
-  const isSimple = (gameMode || "simple") === "simple";
-  return MANUAL_RUBRIC.criteria.filter(c => {
-    const roundOK = isFirstRound ? c.rounds.first : c.rounds.later;
-    const modeOK  = isSimple ? c.simple : c.advanced;
-    return roundOK && modeOK;
-  });
-}
-  
-
 /* ---------- Game state ---------- */
 const game = {
   players: [
