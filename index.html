@@ -1754,20 +1754,7 @@ async function getManualScore() {
     row.appendChild(label);
     container.appendChild(row);
 
-    // Αν είναι Εικόνα/Μεταφορά και έχει bonus, βάζουμε checkbox για +1
-    if (c.key === "Εικόνα / Μεταφορά" && c.bonus) {
-      const b = document.createElement("div");
-      b.style.fontSize = "13px";
-      b.style.opacity = "0.9";
-      b.style.marginLeft = "6px";
-      b.innerHTML = `
-        <label style="display:inline-flex; align-items:center; gap:6px; margin-top:4px;">
-          <input type="checkbox" id="bonus_image_meta" />
-          +${c.bonus} μπόνους (χρησιμοποιήθηκαν <b>και</b> Εικόνα <u>και</u> Μεταφορά)
-        </label>`;
-      container.appendChild(b);
-    }
-  });
+   });
 
   // 3) Εμφάνιση modal
   const modal = document.getElementById("manualModal");
