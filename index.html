@@ -1929,6 +1929,9 @@ document.getElementById("totalScore").textContent = `${total}/${out_of}`;
     // 💾 Αποθήκευση αποτελεσμάτων
     if (!game.scores[currentPlayer]) game.scores[currentPlayer] = [];
     game.scores[currentPlayer][game.currentRound - 1] = totalNum;
+    if (!game.outOfs) game.outOfs = {};
+    if (!game.outOfs[currentPlayer]) game.outOfs[currentPlayer] = [];
+    game.outOfs[currentPlayer][game.currentRound - 1] = out_of;
     if (!game.criteriaDetails) game.criteriaDetails = {};
     if (!game.criteriaDetails[currentPlayer]) game.criteriaDetails[currentPlayer] = {};
     game.criteriaDetails[currentPlayer][game.currentRound] = scores.criteria || {};
