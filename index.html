@@ -1630,15 +1630,21 @@ ${transcript}
 const response = await fetch("/api/score", {
   method: "POST",
   headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({
-    prompt,                // ✅ τώρα στέλνουμε το δυναμικό prompt
+   body: JSON.stringify({
+    prompt,                // (θα το καθαρίσουμε μετά — προς το παρόν άστο)
     transcript,
     mission,
-    philosopher: memory.philosopher || null,
-    initial_thesis: memory.thesis || null,
+
+    // ✅ ΝΕΟ: όπως το περιμένει το /api/score
+    philosopherContext: {
+      philosopher: memory.philosopher || null,
+      position: memory.thesis || null
+    },
+
     round: game.currentRound,
     mode: game.mode || "simple"
   })
+
 });
 
 // Από εδώ και κάτω, ξεκινά η συνέχεια του κώδικα:
