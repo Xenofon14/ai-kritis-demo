@@ -1923,8 +1923,7 @@ if (scores.out_of && !isNaN(scores.out_of)) {
   // Αν δεν υπάρχει, υπολόγισε από το rubric
   const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
   const baseMax = active.reduce((s, c) => s + c.max, 0);
-  const hasImageMeta = active.some(c => c.key === "Εικόνα / Μεταφορά" && c.bonus);
-  out_of = baseMax + (hasImageMeta ? 1 : 0);
+ out_of = baseMax;
 }
 
 document.getElementById("totalScore").textContent = `${total}/${out_of}`;
