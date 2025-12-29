@@ -199,11 +199,8 @@ for (const key of Object.keys(C)) {
     // --- Υπολογισμός συνολικής βαθμολογίας ---
     let total = Object.values(C).reduce((a, b) => a + b, 0);
 
-    // --- Υπολογισμός "out_of" από το ενεργό rubric ---
-    const maxSum = activeCriteria.reduce((sum, c) => sum + (c.max || 0), 0);
-    const hasBonus = activeCriteria.some(c => c.bonus);
-    const outOf = maxSum + (hasBonus ? 1 : 0);
-
+   // --- Υπολογισμός "out_of" από το ενεργό rubric ---
+const outOf = activeCriteria.reduce((sum, c) => sum + (c.max || 0), 0);
     if (total > outOf) total = outOf;
 
    // ✅ Επιστρέφουμε μόνο τα ενεργά κριτήρια (τα υπόλοιπα κρύβονται εντελώς)
