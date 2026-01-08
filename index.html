@@ -1590,7 +1590,6 @@ async function getAIScore(transcript, mission) {
 const activePlayer = game.players[game.activeIndex].name;
 const memory = playerPositions[activePlayer] || {};
 
-
 // 🚀 Κλήση API /api/score
 const response = await fetch("/api/score", {
   method: "POST",
@@ -1605,10 +1604,15 @@ const response = await fetch("/api/score", {
       position: memory.thesis || null
     },
 
-    round: game.currentRound,
-    mode: game.mode || "simple"
-  })
+  round: game.currentRound,
+mode: game.mode || "simple",
 
+// 🧠 Μνήμη συζήτησης για να μη διπλομετράει Εικόνα/Μεταφορά μεταξύ γύρων
+debateState: {
+  imageScored: !!(playerPositions?.[activePlayer]?.imageScored),
+  metaphorScored: !!(playerPositions?.[activePlayer]?.metaphorScored)
+}
+  })
 });
 
 // Από εδώ και κάτω, ξεκινά η συνέχεια του κώδικα:
