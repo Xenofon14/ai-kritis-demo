@@ -521,17 +521,11 @@ button.recording {
       Ποιος κρίνει;
     </label>
 
-    <select id="judgeMode" style="
-      width:100%;
-      padding:8px;
-      border-radius:10px;
-      font-size:16px;
-    ">
-      <option value="ai" selected>🤖 Τεχνητή Νοημοσύνη</option>
-      <option value="offline">💻 Αυτόματος Rubric</option>
-      <option value="manual">👤 Ανθρώπινος Κριτής</option>
-    </select>
-  </div>
+   <select id="judgeMode" style="width:100%; padding:8px; border-radius:10px; font-size:16px;">
+  <option value="ai" selected>🤖 Τεχνητή Νοημοσύνη</option>
+  <option value="offline">💻 Αυτόματος Rubric</option>
+  <option value="manual">👤 Ανθρώπινος Κριτής</option>
+</select>
 
   <!-- 🎯 Επιλογή Αποστολής (μόνο πριν την έναρξη) -->
   <div id="missionSetupContainer" style="
@@ -555,9 +549,7 @@ button.recording {
       Η αποστολή κλειδώνει μόλις ξεκινήσει το παιχνίδι.
     </div>
   </div>
-
 </div>
-
 
   <!-- ✅ Νέο ενημερωτικό μήνυμα με ομαλή εμφάνιση -->
 <p id="aiNotice" style="
@@ -570,7 +562,8 @@ button.recording {
 ">
   💡 Ο Σωκράτης λειτουργεί με Τεχνητή Νοημοσύνη. Απαιτεί σύνδεση στο διαδίκτυο.
 </p>
-</div>
+</div> <!-- κλείνει judgeModeContainer -->
+</div> <!-- κλείνει useAICheckboxContainer -->
   
   <button id="startGameBtn" style="
     margin-top:30px;
