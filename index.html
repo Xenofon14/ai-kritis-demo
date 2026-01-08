@@ -1699,8 +1699,12 @@ async function getManualScore() {
   header.style.opacity = "0.9";
   container.appendChild(header);
 
-  // Προσθήκη πεδίων ανά κριτήριο
-  active.forEach(c => {
+ // Προσθήκη πεδίων ανά κριτήριο (χωρίς διπλότυπα)
+  const seen = new Set();
+ activeUnique.forEach(c => {
+    if (seen.has(c.key)) return;
+    seen.add(c.key);
+
     const row = document.createElement("div");
     row.style.margin = "6px 0";
 
@@ -1713,7 +1717,7 @@ async function getManualScore() {
     span.textContent = `${c.key}:`;
 
     const input = document.createElement("input");
-    input.id = `crit_${c.key}`;
+    input.id = `crit_${String(c.key).replace(/\s+/g, "_")}`;
     input.type = "number";
     input.min = 0;
     input.max = c.max;
@@ -1744,7 +1748,7 @@ async function getManualScore() {
   modal.style.display = "flex";
 
  // 4) Υπολογισμός out_of (ΧΩΡΙΣ bonus)
-const outOf = active.reduce((s, c) => s + c.max, 0);
+const outOf = activeUnique.reduce((s, c) => s + c.max, 0);
 
   // 5) Υποβολή / Ακύρωση
   return new Promise(resolve => {
@@ -1753,17 +1757,17 @@ const outOf = active.reduce((s, c) => s + c.max, 0);
       let total = 0;
 
       // Τιμές ανά κριτήριο
-      active.forEach(c => {
-        const val = parseInt(document.getElementById(`crit_${c.key}`).value) || 0;
-        scores[c.key] = val;
-        total += val;
-      });
-
+    activeUnique.forEach(c => {
+  const keyId = `crit_${String(c.key).replace(/\s+/g, "_")}`;
+  const val = parseInt(document.getElementById(keyId)?.value, 10) || 0;
+  scores[c.key] = val;
+  total += val;
+});
       
       modal.style.display = "none";
       resolve({
         criteria: scores,          // π.χ. { Θέση: 3, Επιχειρηματολογία: 5, ... }
-        criteriaMax: Object.fromEntries(active.map(c => [c.key, c.max])), // π.χ. { Θέση: 4, ... }
+       criteriaMax: Object.fromEntries(activeUnique.map(c => [c.key, c.max])), // π.χ. { Θέση: 4, ... }
         total,
         out_of: outOf,
         feedback: "📋 Οι βαθμοί καταχωρήθηκαν από τον Κριτή."
@@ -1905,6 +1909,7 @@ if (scores.out_of && !isNaN(scores.out_of)) {
 } else {
   // Αν δεν υπάρχει, υπολόγισε από το rubric
   const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
   const baseMax = active.reduce((s, c) => s + c.max, 0);
  out_of = baseMax;
 }
