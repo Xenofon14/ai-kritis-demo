@@ -905,10 +905,21 @@ async function loadRubric() {
 function getActiveManualCriteria(gameMode, currentRound) {
   const isFirstRound = currentRound === 1;
   const isSimple = (gameMode || "simple") === "simple";
+
+  // 🧠 Μνήμη παίκτη: για να μην ξαναβαθμολογηθεί Εικόνα/Μεταφορά σε επόμενους γύρους
+  const activePlayer = game.players[game.activeIndex].name;
+  const memory = playerPositions[activePlayer] || {};
+
   return MANUAL_RUBRIC.criteria.filter(c => {
     const roundOK = isFirstRound ? c.rounds.first : c.rounds.later;
     const modeOK  = isSimple ? c.simple : c.advanced;
-    return roundOK && modeOK;
+    if (!(roundOK && modeOK)) return false;
+
+    // ❌ Μην ξαναεμφανίζεις κριτήρια που έχουν ήδη βαθμολογηθεί για τον παίκτη
+    if (c.key === "Εικόνα" && memory.imageScored) return false;
+    if (c.key === "Μεταφορά" && memory.metaphorScored) return false;
+
+    return true;
   });
 }
 
