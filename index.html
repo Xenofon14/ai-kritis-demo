@@ -1693,7 +1693,8 @@ async function getOfflineScore(transcript, mission) {
   /* ---------- Manual Rubric (Αξιολόγηση από άνθρωπο) ---------- */
 async function getManualScore() {
   // 1) Προσδιορισμός ενεργών κριτηρίων με βάση Γύρο & Έκδοση
-  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+ const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
 
   // 2) Φτιάχνουμε δυναμικά τα inputs
   const container = document.getElementById("manualInputs");
@@ -1920,8 +1921,8 @@ if (scores.out_of && !isNaN(scores.out_of)) {
 } else {
   // Αν δεν υπάρχει, υπολόγισε από το rubric
   const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
-const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
-  const baseMax = active.reduce((s, c) => s + c.max, 0);
+  const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
+  const baseMax = activeUnique.reduce((s, c) => s + c.max, 0);
  out_of = baseMax;
 }
 
