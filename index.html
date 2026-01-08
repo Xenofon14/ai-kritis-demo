@@ -1694,7 +1694,6 @@ async function getOfflineScore(transcript, mission) {
 async function getManualScore() {
   // 1) Προσδιορισμός ενεργών κριτηρίων με βάση Γύρο & Έκδοση
  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
-const active = Array.from(new Map(active.map(c => [c.key, c])).values());
 
   // 2) Φτιάχνουμε δυναμικά τα inputs
   const container = document.getElementById("manualInputs");
