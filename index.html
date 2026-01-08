@@ -1728,13 +1728,32 @@ const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
     const span = document.createElement("span");
     span.textContent = `${c.key}:`;
 
-    const input = document.createElement("input");
-    input.id = `crit_${String(c.key).replace(/\s+/g, "_")}`;
-    input.type = "number";
-    input.min = 0;
-    input.max = c.max;
-    input.step = 1;
-    input.value = 0;
+   const input = document.createElement("input");
+input.id = `crit_${String(c.key).replace(/\s+/g, "_")}`;
+input.type = "number";
+input.min = 0;
+input.max = c.max;
+input.step = 1;
+input.value = 0;
+
+// 🧠 Αν έχει ήδη βαθμολογηθεί σε προηγούμενο γύρο → disabled + ένδειξη
+const activePlayer = game.players[game.activeIndex].name;
+const memory = playerPositions[activePlayer] || {};
+
+let disabledReason = null;
+if (c.key === "Εικόνα" && memory.imageScored) {
+  disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
+}
+if (c.key === "Μεταφορά" && memory.metaphorScored) {
+  disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
+}
+
+if (disabledReason) {
+  input.disabled = true;
+  input.value = 0;
+  input.style.opacity = "0.6";
+}
+
     input.style.width = "60px";
     input.style.textAlign = "center";
 
@@ -1748,6 +1767,16 @@ const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
 
     label.appendChild(span);
     label.appendChild(input);
+
+   if (disabledReason) {
+  const note = document.createElement("span");
+  note.textContent = `(${disabledReason})`;
+  note.style.fontSize = "0.8em";
+  note.style.opacity = "0.8";
+  note.style.marginLeft = "6px";
+  label.appendChild(note);
+}
+
     label.insertAdjacentHTML("beforeend", ` /${c.max}`);
 
     row.appendChild(label);
