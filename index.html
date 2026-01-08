@@ -1563,17 +1563,7 @@ async function getScore(transcript, mission) {
     return await getManualScore();
   }
 
-  // 1️⃣ Τοπικός Κριτής (Offline)
-  if (judgeMode === 1) {
-    console.log("💻 Επιλέχθηκε Τοπικός Κριτής (Offline Mode)");
-    return await getOfflineScore(transcript, mission);
-  }
-
-  // 2️⃣ Ανθρώπινος Κριτής (Manual)
-  if (judgeMode === 2) {
-    console.log("🧑‍⚖️ Επιλέχθηκε Ανθρώπινος Κριτής (Manual Mode)");
-    return await getManualScore();
-  }
+ 
 
   // Αν δεν υπάρχει έγκυρος τρόπος
   console.warn("⚠️ Άγνωστος τρόπος Κριτή – επιστρέφεται προεπιλογή");
