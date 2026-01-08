@@ -1897,11 +1897,13 @@ if (scores.out_of && !isNaN(scores.out_of)) {
   // Αν υπάρχει out_of από τη βαθμολόγηση, χρησιμοποίησέ το
   out_of = Number(scores.out_of);
 } else {
-  // Αν δεν υπάρχει, υπολόγισε από το rubric
-  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
-  const active = Array.from(new Map(active.map(c => [c.key, c])).values());
-  const baseMax = active.reduce((s, c) => s + c.max, 0);
- out_of = baseMax;
+
+// Αν δεν υπάρχει, υπολόγισε από το rubric
+let active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
+active = Array.from(new Map(active.map(c => [c.key, c])).values());
+
+const baseMax = active.reduce((s, c) => s + c.max, 0);
+out_of = baseMax;
 }
 
 document.getElementById("totalScore").textContent = `${total}/${out_of}`;
