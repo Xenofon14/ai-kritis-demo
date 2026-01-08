@@ -1694,7 +1694,7 @@ async function getOfflineScore(transcript, mission) {
 async function getManualScore() {
   // 1) Προσδιορισμός ενεργών κριτηρίων με βάση Γύρο & Έκδοση
  const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
-const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
+const active = Array.from(new Map(active.map(c => [c.key, c])).values());
 
   // 2) Φτιάχνουμε δυναμικά τα inputs
   const container = document.getElementById("manualInputs");
@@ -1711,136 +1711,73 @@ const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
   header.style.opacity = "0.9";
   container.appendChild(header);
 
- // Προσθήκη πεδίων ανά κριτήριο (χωρίς διπλότυπα)
-  const seen = new Set();
- activeUnique.forEach(c => {
-    if (seen.has(c.key)) return;
-    seen.add(c.key);
+ // Προσθήκη πεδίων ανά κριτήριο
+active.forEach(c => {
 
-    const row = document.createElement("div");
-    row.style.margin = "6px 0";
+  const row = document.createElement("div");
+  row.style.margin = "6px 0";
 
-    const label = document.createElement("label");
-    label.style.display = "inline-flex";
-    label.style.alignItems = "center";
-    label.style.gap = "6px";
+  const label = document.createElement("label");
+  label.style.display = "inline-flex";
+  label.style.alignItems = "center";
+  label.style.gap = "6px";
 
-    const span = document.createElement("span");
-    span.textContent = `${c.key}:`;
+  const span = document.createElement("span");
+  span.textContent = `${c.key}:`;
 
-   const input = document.createElement("input");
-input.id = `crit_${String(c.key).replace(/\s+/g, "_")}`;
-input.type = "number";
-input.min = 0;
-input.max = c.max;
-input.step = 1;
-input.value = 0;
-
-// 🧠 Αν έχει ήδη βαθμολογηθεί σε προηγούμενο γύρο → disabled + ένδειξη
-const activePlayer = game.players[game.activeIndex].name;
-const memory = playerPositions[activePlayer] || {};
-
-let disabledReason = null;
-if (c.key === "Εικόνα" && memory.imageScored) {
-  disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
-}
-if (c.key === "Μεταφορά" && memory.metaphorScored) {
-  disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
-}
-
-if (disabledReason) {
-  input.disabled = true;
+  const input = document.createElement("input");
+  input.id = `crit_${String(c.key).replace(/\s+/g, "_")}`;
+  input.type = "number";
+  input.min = 0;
+  input.max = c.max;
+  input.step = 1;
   input.value = 0;
-  input.style.opacity = "0.6";
-}
 
-    input.style.width = "60px";
-    input.style.textAlign = "center";
+  // 🧠 Μνήμη παίκτη (Εικόνα / Μεταφορά)
+  const activePlayer = game.players[game.activeIndex].name;
+  const memory = playerPositions[activePlayer] || {};
 
-    input.addEventListener("input", () => {
-      if (input.value === "") return;
-      let val = parseInt(input.value);
-      if (isNaN(val) || val < 0) val = 0;
-      if (val > c.max) val = c.max;
-      input.value = val;
-    });
+  let disabledReason = null;
+  if (c.key === "Εικόνα" && memory.imageScored) {
+    disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
+  }
+  if (c.key === "Μεταφορά" && memory.metaphorScored) {
+    disabledReason = "Έχει ήδη αξιοποιηθεί σε προηγούμενο γύρο";
+  }
 
-    label.appendChild(span);
-    label.appendChild(input);
+  if (disabledReason) {
+    input.disabled = true;
+    input.value = 0;
+    input.style.opacity = "0.6";
+  }
 
-   if (disabledReason) {
-  const note = document.createElement("span");
-  note.textContent = `(${disabledReason})`;
-  note.style.fontSize = "0.8em";
-  note.style.opacity = "0.8";
-  note.style.marginLeft = "6px";
-  label.appendChild(note);
-}
+  input.style.width = "60px";
+  input.style.textAlign = "center";
 
-    label.insertAdjacentHTML("beforeend", ` /${c.max}`);
-
-    row.appendChild(label);
-    container.appendChild(row);
-
-   });
-
-  // 3) Εμφάνιση modal
-  const modal = document.getElementById("manualModal");
-  modal.style.display = "flex";
-
- // 4) Υπολογισμός out_of (ΧΩΡΙΣ bonus)
-const outOf = activeUnique.reduce((s, c) => s + c.max, 0);
-
-  // 5) Υποβολή / Ακύρωση
-  return new Promise(resolve => {
-    document.getElementById("manualSubmit").onclick = () => {
-      const scores = {};
-      let total = 0;
-
-      // Τιμές ανά κριτήριο
-    activeUnique.forEach(c => {
-  const keyId = `crit_${String(c.key).replace(/\s+/g, "_")}`;
-  const keyId = `crit_${String(c.key).replace(/\s+/g, "_")}`;
-  const val = parseInt(document.getElementById(keyId)?.value, 10) || 0;
-  scores[c.key] = val;
-  total += val;
-});
-
-      // 🧠 Ενημέρωση μνήμης ώστε να μην ξαναβαθμολογηθεί Εικόνα / Μεταφορά σε επόμενο γύρο
-const activePlayer = game.players[game.activeIndex].name;
-playerPositions[activePlayer] = playerPositions[activePlayer] || {};
-
-if ((scores["Εικόνα"] || 0) > 0) {
-  playerPositions[activePlayer].imageScored = true;
-}
-
-if ((scores["Μεταφορά"] || 0) > 0) {
-  playerPositions[activePlayer].metaphorScored = true;
-}
-      
-      modal.style.display = "none";
-      resolve({
-        criteria: scores,          // π.χ. { Θέση: 3, Επιχειρηματολογία: 5, ... }
-       criteriaMax: Object.fromEntries(activeUnique.map(c => [c.key, c.max])), // π.χ. { Θέση: 4, ... }
-        total,
-        out_of: outOf,
-        feedback: "📋 Οι βαθμοί καταχωρήθηκαν από τον Κριτή."
-      });
-    };
-
-    document.getElementById("manualCancel").onclick = () => {
-      modal.style.display = "none";
-      resolve({
-        criteria: {},
-        criteriaMax: {},
-        total: 0,
-        out_of: outOf,
-        feedback: "⏸️ Η αξιολόγηση ακυρώθηκε."
-      });
-    };
+  input.addEventListener("input", () => {
+    if (input.value === "") return;
+    let val = parseInt(input.value, 10);
+    if (isNaN(val) || val < 0) val = 0;
+    if (val > c.max) val = c.max;
+    input.value = val;
   });
-}
 
+  label.appendChild(span);
+  label.appendChild(input);
+  label.insertAdjacentHTML("beforeend", ` /${c.max}`);
+
+  if (disabledReason) {
+    const note = document.createElement("span");
+    note.textContent = `(${disabledReason})`;
+    note.style.fontSize = "0.8em";
+    note.style.opacity = "0.8";
+    note.style.marginLeft = "6px";
+    label.appendChild(note);
+  }
+
+  row.appendChild(label);
+  container.appendChild(row);
+});
 
 /* ---------- Score button ---------- */
 document.getElementById("scoreBtn").addEventListener("click", async ()=> {
@@ -1963,8 +1900,8 @@ if (scores.out_of && !isNaN(scores.out_of)) {
 } else {
   // Αν δεν υπάρχει, υπολόγισε από το rubric
   const active = getActiveManualCriteria(game.mode || "simple", game.currentRound);
-  const activeUnique = Array.from(new Map(active.map(c => [c.key, c])).values());
-  const baseMax = activeUnique.reduce((s, c) => s + c.max, 0);
+  const active = Array.from(new Map(active.map(c => [c.key, c])).values());
+  const baseMax = active.reduce((s, c) => s + c.max, 0);
  out_of = baseMax;
 }
 
