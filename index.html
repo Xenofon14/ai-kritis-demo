@@ -991,7 +991,6 @@ function updateJudgeModeIndicator(mode) {
   console.log(`⚙️ Ενημερώθηκε λειτουργία κριτή σε: ${mode}`);
 }
 
-  
 function loadMissions(){
   const sel = document.getElementById("missionSelect");
   sel.innerHTML = "";
@@ -1003,6 +1002,10 @@ function loadMissions(){
   });
   renderMission(missions[0].id);
 }
+  
+// 🔒 Κλείδωμα επιλογής Αποστολής αφού ξεκινήσει το παιχνίδι
+const sel = document.getElementById("missionSelect");
+if (sel) sel.disabled = true;
 
   /* ---------- Φόρτωση Ρήσεων Φιλοσόφων από εξωτερικό αρχείο ---------- */
 async function loadPhilosopherPositions(missionId) {
