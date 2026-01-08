@@ -916,8 +916,8 @@ function getActiveManualCriteria(gameMode, currentRound) {
     if (!(roundOK && modeOK)) return false;
 
     // ❌ Μην ξαναεμφανίζεις κριτήρια που έχουν ήδη βαθμολογηθεί για τον παίκτη
-    if (c.key === "Εικόνα" && memory.imageScored) return false;
-    if (c.key === "Μεταφορά" && memory.metaphorScored) return false;
+    // ✅ Δεν τα αφαιρούμε από τη λίστα.
+// Θα εμφανιστούν, αλλά θα γίνουν disabled μέσα στο getManualScore().
 
     return true;
   });
@@ -1799,6 +1799,7 @@ const outOf = activeUnique.reduce((s, c) => s + c.max, 0);
 
       // Τιμές ανά κριτήριο
     activeUnique.forEach(c => {
+  const keyId = `crit_${String(c.key).replace(/\s+/g, "_")}`;
   const keyId = `crit_${String(c.key).replace(/\s+/g, "_")}`;
   const val = parseInt(document.getElementById(keyId)?.value, 10) || 0;
   scores[c.key] = val;
