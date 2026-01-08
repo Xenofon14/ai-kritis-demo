@@ -1064,8 +1064,8 @@ window.addEventListener("load", async () => {
 });
   
 function renderMission(id){
- const m = missions.find(x=>x.id===id);
- const missionNum = String(parseInt(String(m.id || "").match(/\d+/)?.[0] || "0", 10));
+const m = missions.find(x=>x.id===id);
+const missionNum = parseInt(String(m.id || "").match(/\d+/)?.[0] || "0", 10) || "";
 document.getElementById("missionTitle").textContent = `Αποστολή ${missionNum}: ${m.title}`;
 document.getElementById("missionQuestion").textContent = `${m.question}`;
   // 📖 Φόρτωση ρήσεων φιλοσόφων για τη συγκεκριμένη αποστολή
