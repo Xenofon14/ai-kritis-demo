@@ -2251,6 +2251,7 @@ if (backToWelcomeFromTrialsBtn) {
 if (startBigDiscussionBtn) {
   startBigDiscussionBtn.addEventListener("click", () => {
     document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("setupScreen").style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
   });
 }
@@ -2258,6 +2259,7 @@ if (startBigDiscussionBtn) {
 if (backToWelcomeFromModeBtn) {
   backToWelcomeFromModeBtn.addEventListener("click", () => {
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    document.getElementById("setupScreen").style.display = "none";
     document.getElementById("welcomeScreen").style.display = "flex";
   });
 }
@@ -2265,15 +2267,18 @@ if (backToWelcomeFromModeBtn) {
 // Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
 if (modeSimpleBtn) {
   modeSimpleBtn.addEventListener("click", () => {
-    if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    startGame("simple");
+    document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("simple");
+
   });
 }
 
 if (modeAdvancedBtn) {
   modeAdvancedBtn.addEventListener("click", () => {
-    if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    startGame("advanced");
+  document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("advanced");
   });
 }
 
