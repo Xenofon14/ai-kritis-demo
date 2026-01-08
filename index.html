@@ -2124,8 +2124,13 @@ async function startGame(mode) {
   // Αποθήκευση της επιλογής
   game.mode = mode;
 
+  // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
+  const missionSel = document.getElementById("missionSelect");
+  if (missionSel) missionSel.disabled = true;
+
   // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
   if (typeof loadRubric === "function") {
+
     try {
       await loadRubric();
       console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
