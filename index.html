@@ -1607,7 +1607,7 @@ const response = await fetch("/api/score", {
   round: game.currentRound,
 mode: game.mode || "simple",
 
-// 🧠 Μνήμη συζήτησης για να μη διπλομετράει Εικόνα/Μεταφορά μεταξύ γύρων
+// 🧠 Μνήμη συζήτησης για να μη διπλομετράει Εικόνα και Μεταφορά μεταξύ γύρων
 debateState: {
   imageScored: !!(playerPositions?.[activePlayer]?.imageScored),
   metaphorScored: !!(playerPositions?.[activePlayer]?.metaphorScored)
@@ -1623,6 +1623,18 @@ if (!response.ok) {
 
 const result = await response.json();
 console.log("📨 AI Response:", result);
+
+// 🧠 Ενημέρωση μνήμης συζήτησης (Εικόνα / Μεταφορά) ΜΟΝΟ αν πήραν πόντους
+playerPositions[activePlayer] = playerPositions[activePlayer] || {};
+
+if (Number(result?.criteria?.["Εικόνα"]) > 0) {
+  playerPositions[activePlayer].imageScored = true;
+}
+
+if (Number(result?.criteria?.["Μεταφορά"]) > 0) {
+  playerPositions[activePlayer].metaphorScored = true;
+}
+
 
 // ✅ Ενημέρωση του συνολικού out_of στο global αντικείμενο
 window.scores = window.scores || {};
