@@ -1104,6 +1104,9 @@ window.addEventListener("load", async () => {
     loadArgumentPatterns(),
     loadFeedbackMessages()
   ]);
+
+  // 🎯 Φόρτωση λίστας αποστολών στο setup
+  loadMissions("missionSelectSetup", false);
 });
   
 function renderMission(id){
