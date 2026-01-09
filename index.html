@@ -459,7 +459,7 @@ button.recording {
   inset:0;
   background:rgba(10,20,60,0.95);
   color:white;
-  display:none;
+  display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2220,24 +2220,17 @@ async function startGame(mode) {
 }
 
 // ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή)
-window.addEventListener("DOMContentLoaded", () => {
-
 const startTrialsBtn = document.getElementById("startTrialsBtn");
 const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 
 const trialsScreen = document.getElementById("trialsScreen");
+const modeSelectScreen = document.getElementById("modeSelectScreen");
 
-const backToWelcomeFromTrialsBtn = document.getElementById("trialsBackBtn");
+const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
 const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
 
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
 const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
-const startGameBtn = document.getElementById("startGameBtn");
-
-  if (!backToWelcomeFromTrialsBtn) {
-  console.warn("❌ Δεν βρέθηκε κουμπί BACK για Trials. Έλεγξε id: trialsBackBtn ή backToWelcomeFromTrialsBtn");
-}
-
 
 // 1) 🟡 Α’ Φάση — Δοκιμασίες
 if (startTrialsBtn) {
@@ -2257,8 +2250,8 @@ if (backToWelcomeFromTrialsBtn) {
 // 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
 if (startBigDiscussionBtn) {
   startBigDiscussionBtn.addEventListener("click", () => {
-    const welcome = document.getElementById("welcomeScreen");
-    if (welcome) welcome.style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("setupScreen").style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
   });
 }
@@ -2266,41 +2259,34 @@ if (startBigDiscussionBtn) {
 if (backToWelcomeFromModeBtn) {
   backToWelcomeFromModeBtn.addEventListener("click", () => {
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    const welcome = document.getElementById("welcomeScreen");
-    if (welcome) welcome.style.display = "flex";
+    document.getElementById("setupScreen").style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
   });
 }
 
-// Επιλογή έκδοσης → ΠΗΓΑΙΝΟΥΜΕ στο SetupScreen (ΔΕΝ ξεκινάμε ακόμα παιχνίδι)
+// Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
 if (modeSimpleBtn) {
   modeSimpleBtn.addEventListener("click", () => {
-    if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    const setup = document.getElementById("setupScreen");
-    if (setup) setup.style.display = "flex";
-    // (προαιρετικό) αποθήκευση επιλογής
-    window.selectedMode = "simple";
+    document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("simple");
+
   });
 }
 
 if (modeAdvancedBtn) {
   modeAdvancedBtn.addEventListener("click", () => {
-    if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    const setup = document.getElementById("setupScreen");
-    if (setup) setup.style.display = "flex";
-    // (προαιρετικό) αποθήκευση επιλογής
-    window.selectedMode = "advanced";
+  document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("advanced");
   });
 }
 
-if (startGameBtn) {
-  startGameBtn.addEventListener("click", () => {
-    const mode = window.selectedMode || "simple"; // default αν δεν επιλέχθηκε
-    startGame(mode);
-  });
-} else {
-  console.warn("❌ Δεν βρέθηκε startGameBtn");
-}
-  
+/* ---------- Info ---------- */
+document.getElementById("infoButton").addEventListener("click", () => {
+  alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
+});
+
 function showSocratesPauseMessage() {
   removeSocratesPauseMessage(); // αν υπάρχει ήδη
   const msg = document.createElement("div");
