@@ -2118,6 +2118,8 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
 
   // Απόκρυψη αρχικών οθονών
   document.getElementById("welcomeScreen").style.display = "none";
+document.getElementById("debateScreen").style.display = "flex";
+document.getElementById("debateScreen").scrollTop = 0;
 
   // Ρυθμίσεις παιχνιδιού
   const playerCount = parseInt(document.getElementById("playerCount").value);
