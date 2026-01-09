@@ -2293,10 +2293,7 @@ if (backToWelcomeFromModeBtn) {
 // Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
 if (modeSimpleBtn) {
   modeSimpleBtn.addEventListener("click", () => {
-    document.getElementById("setupScreen").style.display = "none";
-if (modeSelectScreen) modeSelectScreen.style.display = "none";
-startGame("simple");
-
+    startGame("simple");
   });
 }
 
