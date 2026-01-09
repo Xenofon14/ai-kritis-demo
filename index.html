@@ -2224,13 +2224,19 @@ const startTrialsBtn = document.getElementById("startTrialsBtn");
 const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 
 const trialsScreen = document.getElementById("trialsScreen");
-const modeSelectScreen = document.getElementById("modeSelectScreen");
+const backToWelcomeFromTrialsBtn =
+  document.getElementById("trialsBackBtn") || document.getElementById("backToWelcomeFromTrialsBtn");
 
 const backToWelcomeFromTrialsBtn = document.getElementById("trialsBackBtn");
 const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
 
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
 const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
+
+  if (!backToWelcomeFromTrialsBtn) {
+  console.warn("❌ Δεν βρέθηκε κουμπί BACK για Trials. Έλεγξε id: trialsBackBtn ή backToWelcomeFromTrialsBtn");
+}
+
 
 // 1) 🟡 Α’ Φάση — Δοκιμασίες
 if (startTrialsBtn) {
