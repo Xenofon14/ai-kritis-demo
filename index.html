@@ -459,7 +459,7 @@ button.recording {
   inset:0;
   background:rgba(10,20,60,0.95);
   color:white;
-  display:none;
+  display:flex;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2175,49 +2175,30 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   renderActivePlayer();
 });
 
-  // ✅ Βοηθητική: δείχνει ΜΟΝΟ μία οθόνη και κρύβει όλες τις υπόλοιπες
-function showOnly(screenId) {
-  const ids = [
-    "welcomeScreen",
-    "trialsScreen",
-    "modeSelectScreen",
-    "setupScreen",
-    "appScreen"
-  ];
-
-  ids.forEach(id => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.style.display = (id === screenId) ? "flex" : "none";
-  });
-}
-
+  
 /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
+async function startGame(mode) {
   // Αποθήκευση της επιλογής
   game.mode = mode;
-
-  // ✅ Δείχνουμε ΑΜΕΣΑ το Setup και κρύβουμε ΑΜΕΣΑ ό,τι μπορεί να το σκεπάζει
-  const ws = document.getElementById("welcomeScreen");
-  const ts = document.getElementById("trialsScreen");
-  const ms = document.getElementById("modeSelectScreen");
-  const ss = document.getElementById("setupScreen");
-  const app = document.getElementById("appScreen");
-
-  if (ws) ws.style.display = "none";
-  if (ts) ts.style.display = "none";
-  if (ms) ms.style.display = "none";
-  if (app) app.style.display = "none";
-  if (ss) ss.style.display = "flex";
-
-  // (αν χρησιμοποιείς showOnly, κράτα το αλλά ΜΕΤΑ το hide, για να μην αφήνει κάτι ανοιχτό)
-  showOnly("setupScreen");
-  const setup = document.getElementById("setupScreen");
-  if (setup) setup.style.display = "flex";
 
   // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
   const missionSel = document.getElementById("missionSelect");
   if (missionSel) missionSel.disabled = true;
 
+  // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
+  if (typeof loadRubric === "function") {
+
+    try {
+      await loadRubric();
+      console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
+    } catch (err) {
+      console.warn("⚠️ Δεν φορτώθηκε το rubric στην έναρξη:", err);
+    }
+  }
+
+  // Απόκρυψη αρχικής και εμφάνιση setup screen
+  document.getElementById("welcomeScreen").style.display = "none";
+  document.getElementById("setupScreen").style.display = "flex";
 
   // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
   const display = document.getElementById("selectedModeDisplay");
@@ -2237,87 +2218,70 @@ function showOnly(screenId) {
     console.log("%c🧮 Προετοιμάστηκε ο πρώτος παίκτης με σωστό παρονομαστή.", "color: #7af77a; font-weight: bold;");
   }
 }
-  
-window.addEventListener("DOMContentLoaded", () => {
 
-// ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή) — Event Delegation (πιάνει πάντα)
-document.addEventListener("click", (e) => {
-  const startTrialsBtn = e.target.closest("#startTrialsBtn");
-  const startBigDiscussionBtn = e.target.closest("#startBigDiscussionBtn");
-  const backToWelcomeFromTrialsBtn = e.target.closest("#backToWelcomeFromTrialsBtn");
-  const backToWelcomeFromModeBtn = e.target.closest("#backToWelcomeFromModeBtn");
-  const modeSimpleBtn = e.target.closest("#modeSimpleBtn");
-  const modeAdvancedBtn = e.target.closest("#modeAdvancedBtn");
+// ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή)
+const startTrialsBtn = document.getElementById("startTrialsBtn");
+const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 
-  const trialsScreen = document.getElementById("trialsScreen");
-  const modeSelectScreen = document.getElementById("modeSelectScreen");
+const trialsScreen = document.getElementById("trialsScreen");
+const modeSelectScreen = document.getElementById("modeSelectScreen");
 
-  // 1) 🟡 Α’ Φάση — Δοκιμασίες
-  if (startTrialsBtn) {
-    e.preventDefault();
-    const ws = document.getElementById("welcomeScreen");
-    if (ws) ws.style.display = "none";
+const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
+const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
+
+const modeSimpleBtn = document.getElementById("modeSimpleBtn");
+const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
+
+// 1) 🟡 Α’ Φάση — Δοκιμασίες
+if (startTrialsBtn) {
+  startTrialsBtn.addEventListener("click", () => {
+    document.getElementById("welcomeScreen").style.display = "none";
     if (trialsScreen) trialsScreen.style.display = "flex";
-    return;
-  }
+  });
+}
 
-  if (backToWelcomeFromTrialsBtn) {
-    e.preventDefault();
+if (backToWelcomeFromTrialsBtn) {
+  backToWelcomeFromTrialsBtn.addEventListener("click", () => {
     if (trialsScreen) trialsScreen.style.display = "none";
-    const ws = document.getElementById("welcomeScreen");
-    if (ws) ws.style.display = "flex";
-    return;
-  }
+    document.getElementById("welcomeScreen").style.display = "flex";
+  });
+}
 
-  // 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
-  if (startBigDiscussionBtn) {
-    e.preventDefault();
-    console.log("✅ click: startBigDiscussionBtn");
-
-    const ws = document.getElementById("welcomeScreen");
-    const ss = document.getElementById("setupScreen");
-
-    if (ws) ws.style.display = "none";
-    if (ss) ss.style.display = "none";
+// 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
+if (startBigDiscussionBtn) {
+  startBigDiscussionBtn.addEventListener("click", () => {
+    document.getElementById("welcomeScreen").style.display = "none";
+    document.getElementById("setupScreen").style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
-    return;
-  }
+  });
+}
 
-  if (backToWelcomeFromModeBtn) {
-    e.preventDefault();
+if (backToWelcomeFromModeBtn) {
+  backToWelcomeFromModeBtn.addEventListener("click", () => {
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    document.getElementById("setupScreen").style.display = "none";
+    document.getElementById("welcomeScreen").style.display = "flex";
+  });
+}
 
-    const ss = document.getElementById("setupScreen");
-    const ws = document.getElementById("welcomeScreen");
-    if (ss) ss.style.display = "none";
-    if (ws) ws.style.display = "flex";
-    return;
-  }
+// Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
+if (modeSimpleBtn) {
+  modeSimpleBtn.addEventListener("click", () => {
+    document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("simple");
 
-  // Επιλογή έκδοσης → startGame(mode)
-  if (modeSimpleBtn) {
-    e.preventDefault();
-    console.log("✅ click: modeSimpleBtn");
+  });
+}
 
-    const ms = document.getElementById("modeSelectScreen");
-    if (ms) ms.style.display = "none";
-    startGame("simple");
-    return;
-  }
+if (modeAdvancedBtn) {
+  modeAdvancedBtn.addEventListener("click", () => {
+  document.getElementById("setupScreen").style.display = "none";
+if (modeSelectScreen) modeSelectScreen.style.display = "none";
+startGame("advanced");
+  });
+}
 
-  if (modeAdvancedBtn) {
-    e.preventDefault();
-    console.log("✅ click: modeAdvancedBtn");
-
-    const ms = document.getElementById("modeSelectScreen");
-    if (ms) ms.style.display = "none";
-    startGame("advanced");
-    return;
-  }
-});
-
-
-  
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
   alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
@@ -2667,3 +2631,4 @@ async function getExampleFeedback(spokenText, trioWords) {
   
 </body>
 </html>
+
