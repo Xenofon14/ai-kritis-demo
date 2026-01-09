@@ -459,7 +459,7 @@ button.recording {
   inset:0;
   background:rgba(10,20,60,0.95);
   color:white;
-  display:flex;
+  display:none;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2175,11 +2175,28 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   renderActivePlayer();
 });
 
-  
+  // ✅ Βοηθητική: δείχνει ΜΟΝΟ μία οθόνη και κρύβει όλες τις υπόλοιπες
+function showOnly(screenId) {
+  const ids = [
+    "welcomeScreen",
+    "trialsScreen",
+    "modeSelectScreen",
+    "setupScreen",
+    "appScreen"
+  ];
+
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = (id === screenId) ? "flex" : "none";
+  });
+}
+
 /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
 async function startGame(mode) {
   // Αποθήκευση της επιλογής
   game.mode = mode;
+  showOnly("setupScreen");
 
   // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
   const missionSel = document.getElementById("missionSelect");
