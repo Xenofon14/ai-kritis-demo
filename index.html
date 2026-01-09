@@ -2230,6 +2230,7 @@ const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeB
 
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
 const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
+const startGameBtn = document.getElementById("startGameBtn");
 
   if (!backToWelcomeFromTrialsBtn) {
   console.warn("❌ Δεν βρέθηκε κουμπί BACK για Trials. Έλεγξε id: trialsBackBtn ή backToWelcomeFromTrialsBtn");
@@ -2254,8 +2255,8 @@ if (backToWelcomeFromTrialsBtn) {
 // 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
 if (startBigDiscussionBtn) {
   startBigDiscussionBtn.addEventListener("click", () => {
-    document.getElementById("welcomeScreen").style.display = "none";
-    document.getElementById("setupScreen").style.display = "none";
+    const welcome = document.getElementById("welcomeScreen");
+    if (welcome) welcome.style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
   });
 }
@@ -2263,29 +2264,43 @@ if (startBigDiscussionBtn) {
 if (backToWelcomeFromModeBtn) {
   backToWelcomeFromModeBtn.addEventListener("click", () => {
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    document.getElementById("setupScreen").style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
+    const welcome = document.getElementById("welcomeScreen");
+    if (welcome) welcome.style.display = "flex";
   });
 }
 
-// Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
+// Επιλογή έκδοσης → ΠΗΓΑΙΝΟΥΜΕ στο SetupScreen (ΔΕΝ ξεκινάμε ακόμα παιχνίδι)
 if (modeSimpleBtn) {
   modeSimpleBtn.addEventListener("click", () => {
-    document.getElementById("setupScreen").style.display = "none";
-if (modeSelectScreen) modeSelectScreen.style.display = "none";
-startGame("simple");
-
+    if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    const setup = document.getElementById("setupScreen");
+    if (setup) setup.style.display = "flex";
+    // (προαιρετικό) αποθήκευση επιλογής
+    window.selectedMode = "simple";
   });
 }
 
 if (modeAdvancedBtn) {
   modeAdvancedBtn.addEventListener("click", () => {
-  document.getElementById("setupScreen").style.display = "none";
-if (modeSelectScreen) modeSelectScreen.style.display = "none";
-startGame("advanced");
+    if (modeSelectScreen) modeSelectScreen.style.display = "none";
+    const setup = document.getElementById("setupScreen");
+    if (setup) setup.style.display = "flex";
+    // (προαιρετικό) αποθήκευση επιλογής
+    window.selectedMode = "advanced";
   });
 }
 
+const startGameBtn = document.getElementById("startGameBtn");
+
+if (startGameBtn) {
+  startGameBtn.addEventListener("click", () => {
+    const mode = window.selectedMode || "simple"; // default αν δεν επιλέχθηκε
+    startGame(mode);
+  });
+} else {
+  console.warn("❌ Δεν βρέθηκε startGameBtn");
+}
+  
 function showSocratesPauseMessage() {
   removeSocratesPauseMessage(); // αν υπάρχει ήδη
   const msg = document.createElement("div");
