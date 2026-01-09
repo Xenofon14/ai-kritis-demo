@@ -2240,71 +2240,84 @@ function showOnly(screenId) {
   
 window.addEventListener("DOMContentLoaded", () => {
 
-// ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή)
-window.addEventListener("DOMContentLoaded", () => {
-const startTrialsBtn = document.getElementById("startTrialsBtn");
-const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
+// ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή) — Event Delegation (πιάνει πάντα)
+document.addEventListener("click", (e) => {
+  const startTrialsBtn = e.target.closest("#startTrialsBtn");
+  const startBigDiscussionBtn = e.target.closest("#startBigDiscussionBtn");
+  const backToWelcomeFromTrialsBtn = e.target.closest("#backToWelcomeFromTrialsBtn");
+  const backToWelcomeFromModeBtn = e.target.closest("#backToWelcomeFromModeBtn");
+  const modeSimpleBtn = e.target.closest("#modeSimpleBtn");
+  const modeAdvancedBtn = e.target.closest("#modeAdvancedBtn");
 
-const trialsScreen = document.getElementById("trialsScreen");
-const modeSelectScreen = document.getElementById("modeSelectScreen");
+  const trialsScreen = document.getElementById("trialsScreen");
+  const modeSelectScreen = document.getElementById("modeSelectScreen");
 
-const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
-const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
-
-const modeSimpleBtn = document.getElementById("modeSimpleBtn");
-const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
-
-// 1) 🟡 Α’ Φάση — Δοκιμασίες
-if (startTrialsBtn) {
-  startTrialsBtn.addEventListener("click", () => {
-    document.getElementById("welcomeScreen").style.display = "none";
+  // 1) 🟡 Α’ Φάση — Δοκιμασίες
+  if (startTrialsBtn) {
+    e.preventDefault();
+    const ws = document.getElementById("welcomeScreen");
+    if (ws) ws.style.display = "none";
     if (trialsScreen) trialsScreen.style.display = "flex";
-  });
-}
+    return;
+  }
 
-if (backToWelcomeFromTrialsBtn) {
-  backToWelcomeFromTrialsBtn.addEventListener("click", () => {
+  if (backToWelcomeFromTrialsBtn) {
+    e.preventDefault();
     if (trialsScreen) trialsScreen.style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
-  });
-}
+    const ws = document.getElementById("welcomeScreen");
+    if (ws) ws.style.display = "flex";
+    return;
+  }
 
-// 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
-if (startBigDiscussionBtn) {
-  startBigDiscussionBtn.addEventListener("click", () => {
-    document.getElementById("welcomeScreen").style.display = "none";
-    document.getElementById("setupScreen").style.display = "none";
+  // 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
+  if (startBigDiscussionBtn) {
+    e.preventDefault();
+    console.log("✅ click: startBigDiscussionBtn");
+
+    const ws = document.getElementById("welcomeScreen");
+    const ss = document.getElementById("setupScreen");
+
+    if (ws) ws.style.display = "none";
+    if (ss) ss.style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
-  });
-}
+    return;
+  }
 
-if (backToWelcomeFromModeBtn) {
-  backToWelcomeFromModeBtn.addEventListener("click", () => {
+  if (backToWelcomeFromModeBtn) {
+    e.preventDefault();
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
-    document.getElementById("setupScreen").style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
-  });
-}
 
-// Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
-if (modeSimpleBtn) {
-  modeSimpleBtn.addEventListener("click", () => {
+    const ss = document.getElementById("setupScreen");
+    const ws = document.getElementById("welcomeScreen");
+    if (ss) ss.style.display = "none";
+    if (ws) ws.style.display = "flex";
+    return;
+  }
+
+  // Επιλογή έκδοσης → startGame(mode)
+  if (modeSimpleBtn) {
+    e.preventDefault();
+    console.log("✅ click: modeSimpleBtn");
+
     const ms = document.getElementById("modeSelectScreen");
     if (ms) ms.style.display = "none";
     startGame("simple");
-  });
-}
+    return;
+  }
 
+  if (modeAdvancedBtn) {
+    e.preventDefault();
+    console.log("✅ click: modeAdvancedBtn");
 
-if (modeAdvancedBtn) {
-  modeAdvancedBtn.addEventListener("click", () => {
     const ms = document.getElementById("modeSelectScreen");
     if (ms) ms.style.display = "none";
     startGame("advanced");
-  });
-}
+    return;
+  }
 });
 
+
+  
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
   alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
