@@ -2097,6 +2097,8 @@ renderActivePlayer();
 
 /* ---------- Start Game (setup → app) ---------- */
 document.getElementById("startGameBtn").addEventListener("click", () => {
+    console.log("🚀 startGameBtn click fired");
+
   // 🔹 Επιλογές κριτή και μηνύματος
   const judgeSelect = document.getElementById("judgeMode");
   const aiNotice = document.getElementById("aiNotice");
@@ -2117,9 +2119,15 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
 
 
   // Απόκρυψη αρχικών οθονών
-  document.getElementById("welcomeScreen").style.display = "none";
-document.getElementById("debateScreen").style.display = "flex";
-document.getElementById("debateScreen").scrollTop = 0;
+ document.getElementById("welcomeScreen")?.style && (document.getElementById("welcomeScreen").style.display = "none");
+
+const debateEl = document.getElementById("debateScreen");
+if (debateEl) {
+  debateEl.style.display = "flex";
+  debateEl.scrollTop = 0;
+} else {
+  console.warn("❌ Δεν βρέθηκε debateScreen στο DOM (λάθος id ή δεν υπάρχει).");
+}
 
   // Ρυθμίσεις παιχνιδιού
   const playerCount = parseInt(document.getElementById("playerCount").value);
