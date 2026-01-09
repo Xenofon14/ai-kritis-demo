@@ -585,6 +585,18 @@ button.recording {
 </div>
 
 <script>
+
+  // ✅ Safety fix: αν το κουμπί "πεταχτεί" εκτός setupScreen από mismatch σε </div>, το ξαναβάζουμε μέσα
+(() => {
+  const setup = document.getElementById("setupScreen");
+  const btn = document.getElementById("startGameBtn");
+  if (setup && btn && !setup.contains(btn)) {
+    setup.appendChild(btn);
+    console.log("🧩 startGameBtn επανατοποθετήθηκε μέσα στο setupScreen.");
+  }
+})();
+
+  
 const characters = [
   { name: "Λία", color: "#ffd166", img: "images/Lia.png" },
   { name: "Ιάσωνας", color: "#06d6a0", img: "images/Jason.png" },
