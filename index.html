@@ -335,7 +335,7 @@ button.recording {
   inset:0;
   background:linear-gradient(180deg,#102a6d,#173b88);
   color:white;
-  display:flex;
+  display:none;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2196,9 +2196,7 @@ async function startGame(mode) {
     }
   }
 
-  // Απόκρυψη αρχικής και εμφάνιση setup screen
-  document.getElementById("welcomeScreen").style.display = "none";
-  document.getElementById("setupScreen").style.display = "flex";
+showScreen("setupScreen");
 
   // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
   const display = document.getElementById("selectedModeDisplay");
@@ -2226,6 +2224,18 @@ const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 const trialsScreen = document.getElementById("trialsScreen");
 const modeSelectScreen = document.getElementById("modeSelectScreen");
 
+const SCREENS = ["welcomeScreen", "trialsScreen", "modeSelectScreen", "setupScreen", "appScreen"];
+
+function showScreen(id) {
+  SCREENS.forEach(sid => {
+    const el = document.getElementById(sid);
+    if (!el) return;
+    el.style.display = (sid === id)
+      ? (sid === "appScreen" ? "block" : "flex")
+      : "none";
+  });
+}
+
 const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
 const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
 
@@ -2235,7 +2245,7 @@ const modeAdvancedBtn = document.getElementById("modeAdvancedBtn");
 // 1) 🟡 Α’ Φάση — Δοκιμασίες
 if (startTrialsBtn) {
   startTrialsBtn.addEventListener("click", () => {
-    document.getElementById("welcomeScreen").style.display = "none";
+   showScreen("trialsScreen");
     if (trialsScreen) trialsScreen.style.display = "flex";
   });
 }
@@ -2243,14 +2253,14 @@ if (startTrialsBtn) {
 if (backToWelcomeFromTrialsBtn) {
   backToWelcomeFromTrialsBtn.addEventListener("click", () => {
     if (trialsScreen) trialsScreen.style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
+   showScreen("welcomeScreen");
   });
 }
 
 // 2) 🟢 Μεγάλη Συζήτηση → Επιλογή Έκδοσης
 if (startBigDiscussionBtn) {
   startBigDiscussionBtn.addEventListener("click", () => {
-    document.getElementById("welcomeScreen").style.display = "none";
+    dshowScreen("modeSelectScreen");
     document.getElementById("setupScreen").style.display = "none";
     if (modeSelectScreen) modeSelectScreen.style.display = "flex";
   });
@@ -2260,7 +2270,7 @@ if (backToWelcomeFromModeBtn) {
   backToWelcomeFromModeBtn.addEventListener("click", () => {
     if (modeSelectScreen) modeSelectScreen.style.display = "none";
     document.getElementById("setupScreen").style.display = "none";
-    document.getElementById("welcomeScreen").style.display = "flex";
+  showScreen("welcomeScreen");
   });
 }
 
@@ -2276,7 +2286,7 @@ startGame("simple");
 
 if (modeAdvancedBtn) {
   modeAdvancedBtn.addEventListener("click", () => {
-  document.getElementById("setupScreen").style.display = "none";
+  
 if (modeSelectScreen) modeSelectScreen.style.display = "none";
 startGame("advanced");
   });
