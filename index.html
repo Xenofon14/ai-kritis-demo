@@ -2197,6 +2197,11 @@ async function startGame(mode) {
   // Αποθήκευση της επιλογής
   game.mode = mode;
   showOnly("setupScreen");
+  game.mode = mode;
+showOnly("setupScreen");
+const setup = document.getElementById("setupScreen");
+if (setup) setup.style.display = "flex";
+
 
   // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
   const missionSel = document.getElementById("missionSelect");
