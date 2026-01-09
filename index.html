@@ -459,7 +459,7 @@ button.recording {
   inset:0;
   background:rgba(10,20,60,0.95);
   color:white;
-  display:flex;
+  display:none;
   flex-direction:column;
   align-items:center;
   justify-content:flex-start;
@@ -2226,7 +2226,7 @@ const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 const trialsScreen = document.getElementById("trialsScreen");
 const modeSelectScreen = document.getElementById("modeSelectScreen");
 
-const backToWelcomeFromTrialsBtn = document.getElementById("backToWelcomeFromTrialsBtn");
+const backToWelcomeFromTrialsBtn = document.getElementById("trialsBackBtn");
 const backToWelcomeFromModeBtn = document.getElementById("backToWelcomeFromModeBtn");
 
 const modeSimpleBtn = document.getElementById("modeSimpleBtn");
@@ -2281,11 +2281,6 @@ if (modeSelectScreen) modeSelectScreen.style.display = "none";
 startGame("advanced");
   });
 }
-
-/* ---------- Info ---------- */
-document.getElementById("infoButton").addEventListener("click", () => {
-  alert("📜 Οδηγίες Παιχνιδιού:\n\n1️⃣ Επίλεξε παίκτες και γύρους.\n2️⃣ Μίλα ή γράψε την απάντηση του παίκτη.\n3️⃣ Ο Σωκράτης θα τη βαθμολογήσει και θα σχολιάσει.\n\nΚαλή διασκέδαση!");
-});
 
 function showSocratesPauseMessage() {
   removeSocratesPauseMessage(); // αν υπάρχει ήδη
