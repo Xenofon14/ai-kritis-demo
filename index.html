@@ -2239,6 +2239,7 @@ function showOnly(screenId) {
 }
 
 // ✅ Συνδέουμε τα κουμπιά της αρχικής (ΝΕΑ ροή)
+window.addEventListener("DOMContentLoaded", () => {
 const startTrialsBtn = document.getElementById("startTrialsBtn");
 const startBigDiscussionBtn = document.getElementById("startBigDiscussionBtn");
 
@@ -2300,6 +2301,7 @@ if (modeAdvancedBtn) {
     startGame("advanced");
   });
 }
+});
 
 /* ---------- Info ---------- */
 document.getElementById("infoButton").addEventListener("click", () => {
