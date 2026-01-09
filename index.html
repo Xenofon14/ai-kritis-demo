@@ -2193,32 +2193,10 @@ function showOnly(screenId) {
 }
 
 /* ---------- Welcome → Setup (με επιλογή έκδοσης) ---------- */
-async function startGame(mode) {
   // Αποθήκευση της επιλογής
   game.mode = mode;
-  showOnly("setupScreen");
-  game.mode = mode;
-showOnly("setupScreen");
-const setup = document.getElementById("setupScreen");
-if (setup) setup.style.display = "flex";
 
-
-  // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
-  const missionSel = document.getElementById("missionSelect");
-  if (missionSel) missionSel.disabled = true;
-
-  // ✅ Φόρτωση rubricWeights.json πριν ξεκινήσει το παιχνίδι
-  if (typeof loadRubric === "function") {
-
-    try {
-      await loadRubric();
-      console.log("📘 Rubric επιβεβαιώθηκε στην έναρξη παιχνιδιού.");
-    } catch (err) {
-      console.warn("⚠️ Δεν φορτώθηκε το rubric στην έναρξη:", err);
-    }
-  }
-
-   // Απόκρυψη όλων των άλλων οθονών που μπορεί να “σκεπάζουν”
+  // ✅ Δείχνουμε ΑΜΕΣΑ το Setup και κρύβουμε ΑΜΕΣΑ ό,τι μπορεί να το σκεπάζει
   const ws = document.getElementById("welcomeScreen");
   const ts = document.getElementById("trialsScreen");
   const ms = document.getElementById("modeSelectScreen");
@@ -2230,6 +2208,16 @@ if (setup) setup.style.display = "flex";
   if (ms) ms.style.display = "none";
   if (app) app.style.display = "none";
   if (ss) ss.style.display = "flex";
+
+  // (αν χρησιμοποιείς showOnly, κράτα το αλλά ΜΕΤΑ το hide, για να μην αφήνει κάτι ανοιχτό)
+  showOnly("setupScreen");
+  const setup = document.getElementById("setupScreen");
+  if (setup) setup.style.display = "flex";
+
+  // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
+  const missionSel = document.getElementById("missionSelect");
+  if (missionSel) missionSel.disabled = true;
+
 
   // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
   const display = document.getElementById("selectedModeDisplay");
@@ -2298,15 +2286,18 @@ if (backToWelcomeFromModeBtn) {
 // Επιλογή έκδοσης → χρησιμοποιούμε το υπάρχον startGame(mode)
 if (modeSimpleBtn) {
   modeSimpleBtn.addEventListener("click", () => {
+    const ms = document.getElementById("modeSelectScreen");
+    if (ms) ms.style.display = "none";
     startGame("simple");
   });
 }
 
+
 if (modeAdvancedBtn) {
   modeAdvancedBtn.addEventListener("click", () => {
-  document.getElementById("setupScreen").style.display = "none";
-if (modeSelectScreen) modeSelectScreen.style.display = "none";
-startGame("advanced");
+    const ms = document.getElementById("modeSelectScreen");
+    if (ms) ms.style.display = "none";
+    startGame("advanced");
   });
 }
 
