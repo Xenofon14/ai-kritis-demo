@@ -2180,6 +2180,14 @@ document.getElementById("startGameBtn").addEventListener("click", () => {
   // Αποθήκευση της επιλογής
   game.mode = mode;
 
+     // ✅ Βεβαιώσου ότι το κουμπί "Έναρξη Παιχνιδιού" φαίνεται στο Setup
+  const startBtn =
+    document.getElementById("startGameBtn") ||
+    document.getElementById("startBtn");
+
+  if (startBtn) startBtn.style.display = "block";
+
+
   // ✅ Κλείδωμα επιλογής Αποστολής (μόνο στην αρχή)
   const missionSel = document.getElementById("missionSelect");
   if (missionSel) missionSel.disabled = true;
