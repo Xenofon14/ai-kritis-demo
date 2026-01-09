@@ -2213,9 +2213,18 @@ async function startGame(mode) {
     }
   }
 
-  // Απόκρυψη αρχικής και εμφάνιση setup screen
-  document.getElementById("welcomeScreen").style.display = "none";
-  document.getElementById("setupScreen").style.display = "flex";
+   // Απόκρυψη όλων των άλλων οθονών που μπορεί να “σκεπάζουν”
+  const ws = document.getElementById("welcomeScreen");
+  const ts = document.getElementById("trialsScreen");
+  const ms = document.getElementById("modeSelectScreen");
+  const ss = document.getElementById("setupScreen");
+  const app = document.getElementById("appScreen");
+
+  if (ws) ws.style.display = "none";
+  if (ts) ts.style.display = "none";
+  if (ms) ms.style.display = "none";
+  if (app) app.style.display = "none";
+  if (ss) ss.style.display = "flex";
 
   // Ενημέρωση ένδειξης στην οθόνη ρυθμίσεων
   const display = document.getElementById("selectedModeDisplay");
